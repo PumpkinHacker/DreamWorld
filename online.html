@@ -459,6 +459,16 @@ html:has(#online.screen.active),body:has(#online.screen.active),#app:has(#online
 #online.screen.active #onlineWorldArea button.online-jump:before{pointer-events:none!important}
 @media(max-width:600px){#online.screen.active #onlinePlayerMarkers .online-avatar .pet,#online.screen.active #onlinePlayerMarkers .online-avatar .pet svg{width:62px!important;height:70px!important}#online.screen.active #onlinePlayerMarkers .online-avatar .pet{flex-basis:70px!important}}
 </style>
+<style id="online-v73-ground-collision">
+#online.screen.active #onlineWorldCanvas.pawsville{background:linear-gradient(#b8edff 0%,#e2f9ff 48%,#c4f0a0 48%,#a0df76 100%)!important}
+#online.screen.active #onlineWorldCanvas.sunny-park{background:linear-gradient(#9fe5ff 0%,#dffaff 46%,#b8ed91 46%,#80d866 100%)!important}
+#online.screen.active #onlineWorldCanvas.candy-coast{background:linear-gradient(#ffd5ef 0%,#fff0f8 44%,#ffe9a3 44%,#e8bd78 100%)!important}
+#online.screen.active #onlineWorldCanvas.pawsville .desert-sun,#online.screen.active #onlineWorldCanvas.pawsville .desert-crates,#online.screen.active #onlineWorldCanvas.pawsville .desert-pyramid,#online.screen.active #onlineWorldCanvas.pawsville .desert-tree,#online.screen.active #onlineWorldCanvas.sunny-park .desert-sun,#online.screen.active #onlineWorldCanvas.sunny-park .desert-crates,#online.screen.active #onlineWorldCanvas.sunny-park .desert-pyramid{display:none!important}
+#online.screen.active #onlineWorldCanvas.pawsville .desert-platform,#online.screen.active #onlineWorldCanvas.sunny-park .desert-platform{background:linear-gradient(#a9ec78 0 12%,#61bd48 12% 19%,#9a6534 19%,#74411f 100%)!important;border-top-color:#f4ffe0!important}
+#online.screen.active #onlineWorldCanvas.sunny-park .desert-platform{background:linear-gradient(#c1f58a 0 12%,#6acb50 12% 19%,#b88445 19%,#8b552a 100%)!important}
+#online.screen.active #onlineWorldCanvas.candy-coast .desert-platform{background:linear-gradient(#fff1b8 0 14%,#ffc9e8 14% 22%,#e9b977 22%,#c98c53 100%)!important;border-top-color:#fff8d7!important}
+#online.screen.active #onlineWorldCanvas .online-ground{z-index:4!important}
+</style>
 </head>
 <body><div id="app">
 <div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div><button id="logoutBtn" type="button" onclick="logoutDreamWorld()" aria-label="Log out of Dream World">↪ Log out</button>
@@ -536,7 +546,7 @@ let onlineMapId='',onlineX=8,onlineY=77,onlineRefreshTimer=null,onlineHeartbeatT
 const ONLINE_MAPS={pawsville:{title:'🏘️ Pawsville',className:'pawsville'},'sunny-park':{title:'🌞 Sunny Park',className:'sunny-park'},'candy-coast':{title:'🍭 Candy Coast',className:'candy-coast'}};
 function openOnlineWorld(){if(!localStorage.getItem('dreamWorldSessionV1')){showAuth();$('authError').textContent='Create an account or log in to visit the Online World.';return}const tab=window.open('online.html?world=1','_blank');if(!tab)location.href='online.html?world=1'}
 function showOnlineMaps(){stopOnlineTimers(true);$('onlineWorldArea').hidden=true;$('onlineMapPicker').hidden=false;onlineMapId=''}
-async function enterOnlineMap(mapId){if(!ONLINE_MAPS[mapId])return;const token=localStorage.getItem('dreamWorldSessionV1');if(!token){showAuth();return}stopOnlineTimers(true);onlineMapId=mapId;onlineX=8;onlineY=77;onlineJumpVelocity=0;onlineGrounded=true;$('onlineMapPicker').hidden=true;$('onlineWorldArea').hidden=false;$('onlineMapTitle').textContent=ONLINE_MAPS[mapId].title;$('onlineWorldCanvas').className='online-world-canvas '+ONLINE_MAPS[mapId].className;$('onlineStatus').textContent='Connecting…';$('onlinePlayerMarkers').innerHTML='';$('onlinePlayerList').textContent='Finding players…';$('onlineWorldViewport').scrollLeft=0;await syncOnlinePresence();onlineRefreshTimer=setInterval(loadOnlinePlayers,1200);onlineHeartbeatTimer=setInterval(syncOnlinePresence,900);onlineLastSentX=-999;onlineLastSentY=-999;onlineLastMoveAt=performance.now();if(onlineMoveTimer)clearInterval(onlineMoveTimer);onlineMoveTimer=setInterval(tickOnlineMovement,30);loadOnlinePlayers()}
+async function enterOnlineMap(mapId){if(!ONLINE_MAPS[mapId])return;const token=localStorage.getItem('dreamWorldSessionV1');if(!token){showAuth();return}stopOnlineTimers(true);onlineMapId=mapId;onlineX=8;onlineY=78;onlineJumpVelocity=0;onlineGrounded=true;window.onlineVelocityX=0;$('onlineMapPicker').hidden=true;$('onlineWorldArea').hidden=false;$('onlineMapTitle').textContent=ONLINE_MAPS[mapId].title;$('onlineWorldCanvas').className='online-world-canvas '+ONLINE_MAPS[mapId].className;$('onlineStatus').textContent='Connecting…';$('onlinePlayerMarkers').innerHTML='';$('onlinePlayerList').textContent='Finding players…';$('onlineWorldViewport').scrollLeft=0;await syncOnlinePresence();onlineRefreshTimer=setInterval(loadOnlinePlayers,1200);onlineHeartbeatTimer=setInterval(syncOnlinePresence,900);onlineLastSentX=-999;onlineLastSentY=-999;onlineLastMoveAt=performance.now();if(onlineMoveTimer)clearInterval(onlineMoveTimer);onlineMoveTimer=setInterval(tickOnlineMovement,30);loadOnlinePlayers()}
 async function syncOnlinePresence(){const token=localStorage.getItem('dreamWorldSessionV1');if(!token||!onlineMapId||onlineRequestBusy)return;onlineRequestBusy=true;onlineLastSentX=onlineX;onlineLastSentY=onlineY;try{const res=await fetch(DREAMWORLD_API+'/online/presence',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({mapId:onlineMapId,x:onlineX,y:onlineY,dog:{animal:selectedAnimal,fur:col,skin:skinName,accessory}}),cache:'no-store'});if(res.status===401){stopOnlineTimers(false);$('onlineStatus').textContent='Please log in again';return}if(!res.ok)throw Error('Presence unavailable');$('onlineStatus').textContent='🟢 Online · live updates'}catch(e){$('onlineStatus').textContent='Reconnecting…'}finally{onlineRequestBusy=false}}
 async function loadOnlinePlayers(){const token=localStorage.getItem('dreamWorldSessionV1');if(!token||!onlineMapId)return;try{const res=await fetch(DREAMWORLD_API+'/online/players?map='+encodeURIComponent(onlineMapId),{headers:{Authorization:'Bearer '+token},cache:'no-store'});const data=await res.json();if(!res.ok)throw Error(data.error||'Could not load players');renderOnlinePlayers(data.players||[])}catch(e){$('onlineStatus').textContent='Connection interrupted — retrying…'}}
 function dogSvgForData(dog){const old={selectedAnimal,col,skinName,accessory};try{const d=dog&&typeof dog==='object'?dog:{};selectedAnimal=['🐶','🐱','🐰','🦊','🐼','🐸','🦄','🐻'].includes(d.animal)?d.animal:'🐶';col=typeof d.fur==='string'&&(/^(#[0-9a-f]{3,8}|[a-z]+)$/i.test(d.fur)||['rainbow','unicorn','starlight','comet','opal','aurora'].includes(d.fur))?d.fur:'#42a5ed';skinName=typeof d.skin==='string'?d.skin.slice(0,40):'Classic Pup';accessory=typeof d.accessory==='string'?d.accessory.slice(0,8):'🎀';return puppySVG()}finally{selectedAnimal=old.selectedAnimal;col=old.col;skinName=old.skinName;accessory=old.accessory}}
@@ -547,9 +557,39 @@ function renderOnlinePlayers(players){const markers=$('onlinePlayerMarkers'),lis
 function moveOnlinePlayer(event){/* Platformer movement is handled by controls; map taps do not teleport the player. */}
 function startOnlineMove(direction,event){if(event){event.preventDefault();try{event.currentTarget.setPointerCapture(event.pointerId)}catch(e){}}onlineMoveDirection=direction;onlineLastMoveAt=performance.now()}
 function stopOnlineMove(event){if(event)event.preventDefault();onlineMoveDirection=''}
-function startOnlineJump(event){if(event){event.preventDefault();try{event.currentTarget.setPointerCapture(event.pointerId)}catch(e){}}onlineJumpHeld=true;if(onlineGrounded){onlineJumpVelocity=-210;onlineGrounded=false;playSound('jump')}}
+function startOnlineJump(event){if(event){event.preventDefault();try{event.currentTarget.setPointerCapture(event.pointerId)}catch(e){}}onlineJumpHeld=true;if(onlineGrounded){onlineJumpVelocity=-300;onlineGrounded=false;playSound('jump')}}
 function stopOnlineJump(event){if(event)event.preventDefault();onlineJumpHeld=false}
-function tickOnlineMovement(){if(!onlineMapId)return;const now=performance.now(),dt=Math.min(.06,Math.max(.001,(now-onlineLastMoveAt)/1000));onlineLastMoveAt=now;let dx=0;if(onlineMoveDirection==='left'||onlineKeys.has('ArrowLeft')||onlineKeys.has('a'))dx--;if(onlineMoveDirection==='right'||onlineKeys.has('ArrowRight')||onlineKeys.has('d'))dx++;onlineX=Math.max(2,Math.min(98,onlineX+dx*1.6*dt));if(!onlineGrounded){onlineJumpVelocity+=1250*dt;onlineY+=onlineJumpVelocity*dt/4.4;if(onlineY>=77){onlineY=77;onlineJumpVelocity=0;onlineGrounded=true}}const marker=[...$('onlinePlayerMarkers').children].find(el=>el.classList.contains('is-me'));if(marker){marker.style.left=onlineX+'%';marker.style.top=onlineY+'%'}const viewport=$('onlineWorldViewport'),canvas=$('onlineWorldCanvas');const playerPixel=canvas.clientWidth*onlineX/100;viewport.scrollLeft=Math.max(0,Math.min(canvas.clientWidth-viewport.clientWidth,playerPixel-viewport.clientWidth*.38));/* Presence is sent on the heartbeat, not every animation tick. */}
+function tickOnlineMovement(){
+ if(!onlineMapId)return;
+ const now=performance.now(),dt=Math.min(.04,Math.max(.001,(now-onlineLastMoveAt)/1000));onlineLastMoveAt=now;
+ const canvas=$('onlineWorldCanvas'),viewport=$('onlineWorldViewport'),markers=$('onlinePlayerMarkers');if(!canvas||!viewport||!markers)return;
+ let dx=0;if(onlineMoveDirection==='left'||onlineKeys.has('ArrowLeft')||onlineKeys.has('a'))dx--;if(onlineMoveDirection==='right'||onlineKeys.has('ArrowRight')||onlineKeys.has('d'))dx++;
+ if(typeof window.onlineVelocityX!=='number')window.onlineVelocityX=0;
+ const targetV=dx*2.5;window.onlineVelocityX+=(targetV-window.onlineVelocityX)*Math.min(1,dt*(dx?8:10));
+ onlineX=Math.max(1.8,Math.min(98.2,onlineX+window.onlineVelocityX*dt));
+ const cw=canvas.clientWidth,ch=canvas.clientHeight,px=cw*onlineX/100,cr=canvas.getBoundingClientRect();
+ const ground=canvas.querySelector('.online-ground'),groundTop=ground?ground.getBoundingClientRect().top-cr.top:ch*.78;
+ const prevY=ch*onlineY/100;
+ if(!onlineGrounded){
+  onlineJumpVelocity+=1150*dt;let nextY=prevY+onlineJumpVelocity*dt,land=groundTop;
+  if(onlineJumpVelocity>=0)for(const el of canvas.querySelectorAll('.desert-platform')){
+   const r=el.getBoundingClientRect(),left=r.left-cr.left,right=r.right-cr.left,top=r.top-cr.top;
+   if(r.width>2&&r.height>2&&px+17>left&&px-17<right&&prevY<=top+5&&nextY>=top&&top<land)land=top;
+  }
+  if(nextY>=land&&onlineJumpVelocity>=0){nextY=land;onlineJumpVelocity=0;onlineGrounded=true}
+  onlineY=Math.max(3,Math.min(98,nextY/ch*100));
+ }else{
+  let support=groundTop;
+  for(const el of canvas.querySelectorAll('.desert-platform')){
+   const r=el.getBoundingClientRect(),left=r.left-cr.left,right=r.right-cr.left,top=r.top-cr.top;
+   if(r.width>2&&r.height>2&&px+17>left&&px-17<right&&Math.abs(prevY-top)<Math.max(12,ch*.025)&&top<support)support=top;
+  }
+  onlineY=support/ch*100;
+ }
+ const marker=[...markers.children].find(el=>el.classList.contains('is-me'));
+ if(marker){marker.style.left=onlineX+'%';marker.style.top=onlineY+'%'}
+ const playerPixel=cw*onlineX/100;viewport.scrollLeft=Math.max(0,Math.min(cw-viewport.clientWidth,playerPixel-viewport.clientWidth*.38));
+}
 document.addEventListener('keydown',function(e){if(!onlineMapId||!['ArrowLeft','ArrowRight','ArrowUp',' ','w','a','d','W','A','D'].includes(e.key))return;if(e.target&&['INPUT','TEXTAREA'].includes(e.target.tagName))return;e.preventDefault();const key=e.key.length===1?e.key.toLowerCase():e.key;onlineKeys.add(key);if(['ArrowUp',' ','w'].includes(key)&&onlineGrounded){onlineJumpVelocity=-210;onlineGrounded=false;playSound('jump')}});document.addEventListener('keyup',function(e){onlineKeys.delete(e.key.length===1?e.key.toLowerCase():e.key)});window.addEventListener('blur',function(){onlineKeys.clear();onlineMoveDirection='';onlineJumpHeld=false});
 function stopOnlineTimers(removePresence){onlineKeys.clear();onlineMoveDirection='';onlineJumpHeld=false;if(onlineMoveTimer)clearInterval(onlineMoveTimer);onlineMoveTimer=null;if(onlineRefreshTimer)clearInterval(onlineRefreshTimer);if(onlineHeartbeatTimer)clearInterval(onlineHeartbeatTimer);onlineRefreshTimer=onlineHeartbeatTimer=null;if(removePresence&&onlineMapId){const token=localStorage.getItem('dreamWorldSessionV1');if(token)fetch(DREAMWORLD_API+'/online/leave',{method:'POST',headers:{Authorization:'Bearer '+token}}).catch(()=>{})}}
 function leaveOnlineWorld(){stopOnlineTimers(true);onlineMapId='';showScreen('home')}
