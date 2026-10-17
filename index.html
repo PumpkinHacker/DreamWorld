@@ -939,6 +939,37 @@ syncCoins=function(){_syncCoins();saveProgress();scheduleServerTokenSync()};
  syncHomeHud();
 })();
 
+// Version 47 hotfix: hard-remove legacy admin shop entries and refresh the verified admin wardrobe.
+(function(){
+ const adminSymbols=new Set(adminExclusiveItems||[]);
+ const oldRenderShop=renderShop;
+ renderShop=function(){
+   if(typeof shopCategory!=='undefined'&&shopCategory==='admin')shopCategory='all';
+   const tabs=document.getElementById('shopTabs');
+   if(tabs)for(const b of [...tabs.querySelectorAll('button')])if(/admin|exclusive|🔐/i.test(b.textContent))b.remove();
+   oldRenderShop();
+   const grid=document.getElementById('shopGrid');
+   if(grid)for(const el of [...grid.querySelectorAll('.item')]){
+     const label=(el.textContent||'').toLowerCase();
+     const symbol=(el.querySelector('.emoji')?.textContent||'').trim();
+     if(/admin|exclusive|dna crown|crystal halo|guardian emblem|star trail|disco orb|lightning aura|golden token|royal medal|potion flask|ufo buddy/.test(label)||adminSymbols.has(symbol))el.remove();
+   }
+   if(grid&&!grid.querySelector('.item'))grid.innerHTML='<p>No treasures in this section yet.</p>';
+ };
+ const oldShowScreen=showScreen;
+ showScreen=function(id){
+   oldShowScreen(id);
+   if(id==='custom'){
+     refreshAdminAccess().then(()=>{
+       if(isDreamWorldAdmin){
+         for(const e of adminExclusiveItems)if(!itemsOwned.includes(e))itemsOwned.push(e);
+         saveProgress();
+       }
+       renderCustom();
+     }).catch(()=>renderCustom());
+   }
+ };
+})();
 loadProgress();
 // Start the loading progress and initialize the game screens.
 boot();
