@@ -462,17 +462,28 @@ function displayServerAnnouncement(message){
 }
 function closeServerAnnouncement(){$('announcementPopup')?.classList.remove('show')}
 $('announcementPopupClose')?.addEventListener('click',closeServerAnnouncement);
+let serverStateRequest=null,lastServerCoins=null,lastServerAnnouncement=null;
 async function loadServerTokenBalance(){
   const token=localStorage.getItem('dreamWorldSessionV1');
-  if(!token||!playerId)return;
-  try{
-    const res=await fetch(DREAMWORLD_API+'/player/state',{headers:{Authorization:'Bearer '+token}});
+  if(!token||!playerId||serverStateRequest)return;
+  serverStateRequest=(async()=>{
+   try{
+    const res=await fetch(DREAMWORLD_API+'/player/state',{headers:{Authorization:'Bearer '+token},cache:'no-store'});
     const data=await res.json();
     if(!res.ok||!data.player)return;
     const balance=Number(data.player.coins);
-    if(Number.isSafeInteger(balance)&&balance>=0){coins=Math.min(999999999,balance);saveProgress();syncCoins();}
-    if(data.announcement&&typeof data.announcement.message==='string')displayServerAnnouncement(data.announcement.message);
-  }catch(err){console.warn('Could not load saved Tokens or announcement from account server.')}
+    if(Number.isSafeInteger(balance)&&balance>=0){
+      const serverCoins=Math.min(999999999,balance);
+      if(serverCoins!==lastServerCoins){lastServerCoins=serverCoins;coins=serverCoins;saveProgress();syncCoins();}
+    }
+    if(data.announcement&&typeof data.announcement.message==='string'){
+      const message=data.announcement.message.trim();
+      if(message!==lastServerAnnouncement){lastServerAnnouncement=message;if(message)displayServerAnnouncement(message);}
+    }
+   }catch(err){console.warn('Could not refresh live Tokens or announcement.')}
+   finally{serverStateRequest=null}
+  })();
+  await serverStateRequest;
 }
 function scheduleServerTokenSync(){
   if(!playerId)return;
@@ -1006,7 +1017,7 @@ syncCoins=function(){_syncCoins();saveProgress();scheduleServerTokenSync()};
    }
  };
 })();
-setInterval(()=>{if(playerId&&localStorage.getItem('dreamWorldSessionV1'))loadServerTokenBalance()},15000);
+setInterval(()=>{if(playerId&&localStorage.getItem('dreamWorldSessionV1'))loadServerTokenBalance()},2000);
 loadProgress();
 // Start the loading progress and initialize the game screens.
 boot();
