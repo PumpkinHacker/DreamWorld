@@ -85,6 +85,18 @@ button:active{transform:translateY(3px) scale(.98);box-shadow:0 2px 0 #153f7440}
 @media(max-width:620px){.modal{padding:18px}.background-grid{grid-template-columns:1fr 1fr}.background-card{min-height:100px;padding:9px}.background-card b{font-size:.92rem}}
 
 .space-quest-list{margin:12px auto 0;max-width:520px;padding:12px;border:1px solid #cbbaff;border-radius:16px;background:#201c56;color:#fff;text-align:left;line-height:1.5}.space-quest-list p{margin:5px 0;color:#e0d9ff}.space-menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:16px 0}.space-menu-level{border:2px solid #b5a5ff;border-radius:18px;padding:14px 8px;background:#f8f6ff;color:#3d3477;font-weight:900;min-height:90px}.space-menu-level:disabled{opacity:.5;filter:grayscale(.5)}.space-shop-panel{background:linear-gradient(160deg,#171944,#30246a 48%,#442d78);color:#fff}.space-shop-panel .topbar h2,.space-shop-panel h3{color:#fff}.space-shop-panel .tagline,.space-shop-panel .footer-note{color:#e3dcff}.space-shop-panel .item{background:#f8f6ff;border-color:#b5a5ff;color:#3d3477}.space-shop-panel .shop-preview{background:linear-gradient(110deg,#d8d2ff,#c5eeff)}.space-shop-panel .shop-tabs button{background:#eeeaff;color:#463a85}.space-shop-panel .shop-tabs button.active{background:#8a73ff;color:#fff}.space-shop-panel .space-badge{display:inline-block;border-radius:9px;background:#e6e0ff;color:#44347d;padding:3px 6px;font-size:.7rem;font-weight:900}@media(max-width:620px){.space-shop-panel .shopgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.space-menu-grid{grid-template-columns:1fr 1fr}}
+
+.auth-screen .auth-card{max-width:520px;text-align:center;padding:clamp(18px,4vw,32px)}
+.auth-screen h1{font-size:clamp(1.8rem,5vw,2.8rem);margin:8px 0;color:#1974d2}
+.auth-screen .auth-tabs{display:flex;gap:8px;margin:18px 0}
+.auth-screen .auth-tabs button{flex:1;background:#dcefff;color:#23629a;text-shadow:none;padding:12px;border-radius:14px}
+.auth-screen .auth-tabs button.active{background:#2189e8;color:#fff}
+.auth-screen label{display:block;text-align:left;font-weight:900;margin:12px 0 5px}
+.auth-screen input{width:100%;padding:14px;border:3px solid #b8dfff;border-radius:14px;font:inherit;font-size:1rem;color:#173b73;background:#fff;user-select:text}
+.auth-screen .auth-note{font-size:.88rem;line-height:1.45;color:#42658a;margin:12px 0}
+.auth-screen .auth-error{min-height:1.4em;color:#b42354;font-weight:900}
+#playerHud{position:fixed;z-index:50;top:max(8px,env(safe-area-inset-top));left:max(8px,env(safe-area-inset-left));display:none;gap:7px;align-items:center;flex-wrap:wrap;max-width:calc(100% - 16px);pointer-events:none}
+#playerHud span{border:2px solid #fff;background:#173b73eF;color:#fff;border-radius:12px;padding:6px 9px;font-size:.78rem;font-weight:900;box-shadow:0 3px 8px #173b7333}
 </style>
 <style id="esther-deluxe-design">
 :root{--navy:#14396f;--blue:#177be0;--pink:#f34f9e;--purple:#7951dc;--gold:#ffb929;--green:#27c86b}
@@ -168,8 +180,10 @@ button:disabled{cursor:not-allowed}
 
 </head>
 <body><div id="app">
+<div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div>
 <div id="scenery"><div class="cloud" style="top:10%;left:10%"></div><div class="cloud" style="top:24%;left:60%;animation-delay:-14s;transform:scale(.7)"></div><div class="hill"></div><div class="hill h2"></div><div class="flowerfield"></div></div>
 <section id="loading" class="screen active"><div class="panel loading-card"><div class="loading-title">Esther's <span style="color:#ff72b5">Kindergarten</span><br>Adventure! ✨</div><div class="hero" id="loadHero"></div><div class="tagline">A little learning, a lot of magic!</div><div class="progress"><span id="progress"></span></div><div class="loading-heart">♥ Love you Esther! ♥</div><div class="footer-note">Getting your adventure ready…</div></div></section>
+<section id="authScreen" class="screen auth-screen"><div class="panel auth-card"><div style="font-size:3rem">🐾✨</div><h1>Welcome to Dream World!</h1><div class="tagline">Create an account or log in to start your adventure.</div><div class="auth-tabs"><button id="signupTab" class="active" onclick="setAuthMode('signup')">Create Account</button><button id="loginTab" onclick="setAuthMode('login')">Log In</button></div><form id="authForm" onsubmit="submitAuth(event)" autocomplete="on"><label for="authUsername">Username</label><input id="authUsername" name="username" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+" autocomplete="username" required placeholder="3–20 letters, numbers, or _"><label for="authPassword">Password</label><input id="authPassword" name="password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required placeholder="At least 8 characters"><p class="auth-note">No email needed. Keep your password private and ask a trusted adult for help if you need it. Your Player ID is assigned automatically.</p><div id="authError" class="auth-error" role="status" aria-live="polite"></div><button class="bigbtn blue" id="authSubmit" type="submit">Create Account &amp; Play 🐶</button></form></div></section>
 <section id="home" class="screen"><div class="panel"><div class="logo" id="dreamLogo" onclick="tapDreamLogo()">Esther's <span>Kindergarten Adventure!</span></div><div class="tagline">🌈 Play • Learn • Grow • Shine 🌈</div><button class="bigbtn blue" style="max-width:230px;margin:0 auto 12px" onclick="toggleMusic()" id="musicBtn">🎵 Music: On</button><div class="tagline" style="margin:0 auto 14px;max-width:330px">🎶 A different surprise soundtrack plays automatically in every adventure!</div><div class="menu-grid"><div class="hero" id="homeHero"></div><div class="btn-stack"><button class="bigbtn green" onclick="showScreen('levels')">▶️ Play Adventure</button><button class="bigbtn pink" onclick="showScreen('custom')">🎨 Customize Puppy</button><button class="bigbtn gold" onclick="showScreen('shop')">🛍️ Star Shop</button><button class="bigbtn purple" onclick="openSpaceDimension()">🚀 Space Dimension</button><button class="bigbtn orange" onclick="showScreen('backgrounds')">🌄 Pick a Background</button><button class="bigbtn purple" onclick="showScreen('word')">🔤 Word Drop</button><button class="bigbtn blue" onclick="openAchievementsMenu()">🏆 My Achievements</button><button class="bigbtn purple" style="border:3px solid #ffd166;box-shadow:0 0 0 3px rgba(255,209,102,.22)" onclick="requestModMenu()">🛠️ Admin Panel</button><button class="bigbtn blue" onclick="requestParentMenu()">👨‍👩‍👧 Parent Menu</button><button class="bigbtn orange" onclick="openParent()">🎁 Parent Bonus</button></div></div><div class="footer-note">✨ Little steps, big dreams! ✨ <span id="coinHome"></span></div></div></section>
 <section id="levels" class="screen"><div class="panel"><div class="topbar"><button class="closebtn" onclick="showScreen('home')">‹</button><h2>⭐ Choose Your Adventure</h2><div class="coinpill" id="coinLevel">✨ 0 TOKENS</div></div><div class="levelgrid" id="levelGrid"></div><div class="space-dimension"><div class="space-stars" aria-hidden="true">✦ · ⋆ · ✧ · ✦</div><div class="space-title">🚀 Space Dimension</div><div class="space-subtitle">Explore planets, meet the Space Cat, and find cosmic treasures!</div><button class="bigbtn purple" onclick="openSpaceDimension()">🌀 Enter Space Dimension</button><div class="space-quest-list"><b>🧭 Space missions & secrets</b><p id="spaceQuestSummary">Complete space levels to earn explorer achievements.</p><div>🌙 Moon Scout — complete Moon Base</div><div>💎 Crystal Finder — collect treasures in space</div><div>🛸 Secret signal — explore Alien Arcade</div></div></div><div class="footer-note">Every level has a question at the start AND the finish! 💡</div></div></section>
 <section id="custom" class="screen"><div class="panel"><div class="topbar"><button class="closebtn" onclick="showScreen('home')">‹</button><h2>🎨 Puppy Dress-Up</h2><button class="closebtn" onclick="showScreen('home')">×</button></div><div class="shop-tabs wardrobe-tabs" id="wardrobeTabs"><button class="active" onclick="setWardrobeCategory('all',this)">🌟 All</button><button onclick="setWardrobeCategory('animals',this)">🐾 Animals</button><button onclick="setWardrobeCategory('shoes',this)">👟 Shoes</button><button onclick="setWardrobeCategory('items',this)">🎒 Items</button><button onclick="setWardrobeCategory('skins',this)">🎨 Skins</button></div><div class="custom-layout"><div><div class="previewbox" id="customPreview"></div><div class="character-card" id="characterCard"><div><strong>✨ My Dreamworld Pup</strong><small id="characterDetails">Classic Pup · Bow</small></div><span style="font-size:1.6rem">💖</span></div></div><div><p style="font-weight:1000">Pick a puppy color!</p><div class="options" id="colors"></div><p style="font-weight:1000">Choose an accessory</p><div class="options" id="accessories"></div><p class="autosave-note">✨ Your puppy look saves automatically on this device!</p></div></div></div></section>
@@ -370,14 +384,7 @@ function boot(){
     if(finished)return;
     finished=true;
     clearInterval(timer);
-    try{showScreen('home');}
-    catch(err){console.error('Dream World home transition issue:',err);}
-    // Last-resort screen switch if another UI function interrupts the normal transition.
-    if(!$('home')?.classList.contains('active')){
-      document.querySelectorAll('.screen').forEach(screen=>screen.classList.remove('active'));
-      const home=$('home');
-      if(home)home.classList.add('active');
-    }
+    resumeAuthSession();
   };
   const timer=setInterval(()=>{
     p=Math.min(100,p+8);
@@ -397,6 +404,59 @@ function boot(){
   safeInit('word game',newWord);
   safeInit('tokens',syncCoins);
 }
+
+const DREAMWORLD_API='https://esther-world-api.daviolvcass.workers.dev';
+let authMode='signup',authSession=null,playerId=null;
+function setAuthMode(mode){
+  authMode=mode==='login'?'login':'signup';
+  $('signupTab').classList.toggle('active',authMode==='signup');
+  $('loginTab').classList.toggle('active',authMode==='login');
+  $('authSubmit').textContent=authMode==='signup'?'Create Account & Play 🐶':'Log In & Play 🐶';
+  $('authPassword').autocomplete=authMode==='signup'?'new-password':'current-password';
+}
+function showAuth(){
+  authSession=null;playerId=null;$('playerHud').style.display='none';
+  setAuthMode('signup');$('authError').textContent='';showScreen('authScreen');
+}
+function setPlayerHud(id){
+  playerId=String(id);$('playerIdLabel').textContent='Player ID: '+playerId;$('playerHud').style.display='flex';
+}
+async function apiAuth(path,body){
+  const res=await fetch(DREAMWORLD_API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  let data={};try{data=await res.json()}catch(e){}
+  if(!res.ok)throw new Error(data.error||'Could not connect. Please try again.');
+  return data;
+}
+async function resumeAuthSession(){
+  const token=localStorage.getItem('dreamWorldSessionV1');
+  if(!token){showAuth();return}
+  try{
+    const res=await fetch(DREAMWORLD_API+'/auth/me',{headers:{Authorization:'Bearer '+token}});
+    const data=await res.json();
+    if(!res.ok||!data.player){localStorage.removeItem('dreamWorldSessionV1');showAuth();return}
+    authSession=token;setPlayerHud(data.player.playerId);showScreen('home');
+  }catch(e){showAuth();$('authError').textContent='Can’t reach the account server. Check your connection and try again.'}
+}
+async function submitAuth(event){
+  event.preventDefault();
+  const username=$('authUsername').value.trim(),password=$('authPassword').value;
+  $('authError').textContent='';$('authSubmit').disabled=true;$('authSubmit').textContent='One moment…';
+  try{
+    const data=await apiAuth(authMode==='signup'?'/auth/register':'/auth/login',{username,password});
+    if(!data.token||!data.player||!data.player.playerId)throw new Error('The server response was incomplete. Please try again.');
+    authSession=data.token;localStorage.setItem('dreamWorldSessionV1',data.token);setPlayerHud(data.player.playerId);
+    $('authPassword').value='';showScreen('home');
+  }catch(err){$('authError').textContent=err.message||'Something went wrong. Please try again.'}
+  finally{$('authSubmit').disabled=false;$('authSubmit').textContent=authMode==='signup'?'Create Account & Play 🐶':'Log In & Play 🐶'}
+}
+let fpsFrames=0,fpsLast=performance.now();
+function updateFPSCounter(now){
+  fpsFrames++;
+  if(now-fpsLast>=1000){$('fpsLabel').textContent='FPS: '+Math.round(fpsFrames*1000/(now-fpsLast));fpsFrames=0;fpsLast=now}
+  requestAnimationFrame(updateFPSCounter);
+}
+requestAnimationFrame(updateFPSCounter);
+
 function highestUnlockedLevel(){let n=1;while(n<8&&levelDone[n])n++;return n}
 function renderLevels(){$('levelGrid').innerHTML=levels.map((l,i)=>{const n=i+1,unlocked=n<=9?(n===9||n<=highestUnlockedLevel()):(n===10||!!levelDone[n-1]),done=!!levelDone[n];return `<button class="levelcard ${unlocked?'unlocked':'locked'}" style="background:linear-gradient(145deg,${l[2]},${l[3]});" ${unlocked?`onclick="startLevel(${n})"`:'disabled aria-disabled="true"'}><strong>${n===9?'🎃 HALLOWEEN':n>=10?'🚀 SPACE '+(n-9):unlocked?'LEVEL':'🔒 LEVEL'} ${n>=10?n-9:n===9?'':n}</strong><span class="levelart">${unlocked?l[1]:'🔒'}</span><b>${l[0]}</b><br><small>${done?'⭐ Complete':unlocked?(n===9?'🎃 Jump on pumpkins & ghosts':n>=10?'🚀 Explore this space level':'▶ Start adventure'):'🔒 Complete the previous level'}</small></button>`}).join('');const q=$('spaceQuestSummary');if(q){const done=[10,11,12,13,14].filter(n=>levelDone[n]).length;q.textContent=done+'/5 space levels complete. Hidden signal: finish Alien Arcade (Level 13) to discover the secret signal!'} }
 function renderCustom(){ $('customPreview').innerHTML=puppySVG();renderPuppy('homeHero');if($('characterDetails'))$('characterDetails').textContent=selectedAnimal+' '+skinName+' · '+({'🎀':'Bow','⭐':'Star','🧢':'Cool cap','💖':'Heart','🌸':'Flower','👑':'Royal crown','🦋':'Butterfly','🌈':'Rainbow','🪽':'Angel wings','✨':'Sparkles','🕶️':'Sunnies','🍓':'Berry clip'}[accessory]||accessory); const palette=[['Ocean Pop','#42a5ed'],['Berry Fizz','#f07bb6'],['Mint Dream','#56c9a1'],['Sunbeam','#f4bd49'],['Galaxy Grape','#8057df'],['Cotton Candy','#ffb7e3'],['Dragonfire','#ff654f'],['Lime Sprite','#a6e843'],['Moon Silver','#c7d4ef'],['Midnight','#26335e'],['Rainbow Magic','rainbow'],['Unicorn Aura','unicorn'],['Starlight','starlight'],['Crystal Ice','#a6f4ff'],['Peach Puff','#ffb58e'],['Mystic Lavender','#c7a2ff'],['Comet Tail','comet'],['Magic Opal','opal'],['Bubblegum','#ff79d1'],['Arctic Aurora','aurora']]; $('colors').innerHTML=palette.map(([n,c])=>{let v=c==='rainbow'?'linear-gradient(90deg,red,orange,yellow,lime,cyan,blue,violet)':c==='comet'?'linear-gradient(135deg,#ff7a59,#ffd166,#7ee8fa,#b388ff)':c==='opal'?'linear-gradient(135deg,#f7b8ff,#9ef6ff,#fff3a6,#b9a7ff)':c==='aurora'?'linear-gradient(135deg,#75fff0,#7aa8ff,#d69cff)':c==='unicorn'?'linear-gradient(135deg,#ffb5e8,#bca8ff,#a7f3ff)':c==='starlight'?'linear-gradient(135deg,#17244f,#9c8aff,#fff4a6)':c;return `<button class="choice ${col===c?'selected':''}" onclick="col='${c}';skinName='Custom: ${n}';playSound('tap');renderCustom();renderShop();saveProgress()"><span class="swatch" style="background:${v}"></span>${n}</button>`}).join(''); $('accessories').innerHTML=['🎀','⭐','🧢','🌸','👑','🦋','🎧','👟','🪽','🧣','🎃','🦇','🧙','👻'].map(a=>`<button class="choice ${accessory===a?'selected':''}" onclick="accessory='${a}';playSound('tap');renderCustom();saveProgress()">${a} ${({'🎀':'Bow','⭐':'Star','🧢':'Cool cap','💖':'Heart','🌸':'Flower','👑':'Royal crown','🦋':'Butterfly','🌈':'Rainbow','🪽':'Angel wings','✨':'Sparkles','🕶️':'Sunnies','🍓':'Berry clip','🫧':'Bubble wand','💎':'Shiny gem','🐉':'Tiny dragon','🪄':'Wish wand','🍭':'Candy trail','🪐':'Planet pet','💫':'Comet shoes','🧸':'Teddy pack','🎒':'Adventure pack','🪁':'Kite buddy','🍄':'Mushroom hat','🐝':'Bee buddy','🦕':'Dino pal','🧚':'Fairy dust','🧿':'Lucky charm','🎧':'Headphones','🛼':'Roller paws','🧣':'Cozy scarf','🪺':'Nest hat','🦜':'Parrot pal','🎃':'Pumpkin hat','🦇':'Bat wings','🧙':'Witch hat','👻':'Ghost backpack'})[a]}</button>`).join('')}
