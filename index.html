@@ -319,7 +319,24 @@ function puppySVG(){
   ${extra}
   </svg>`;
 }
-function renderPuppy(id){const el=$(id);if(el){el.innerHTML=puppySVG();if(id==='homeHero'){el.style.cursor='pointer';el.setAttribute('role','button');el.setAttribute('aria-label','Tap the puppy to hear a happy bark');el.onclick=barkPuppy;}}}
+function renderPuppy(id){
+  const el=$(id);
+  if(!el)return;
+  try{
+    const art=puppySVG();
+    el.innerHTML=art;
+    if(!el.querySelector('svg'))throw new Error('Puppy SVG did not render');
+  }catch(err){
+    console.error('Dream World puppy display fallback:',err);
+    el.innerHTML='<div aria-label="Puppy" style="font-size:clamp(100px,22vw,180px);line-height:1;filter:drop-shadow(0 8px 4px #3454a633)">🐶</div>';
+  }
+  if(id==='homeHero'){
+    el.style.cursor='pointer';
+    el.setAttribute('role','button');
+    el.setAttribute('aria-label','Tap the puppy to hear a happy bark');
+    el.onclick=barkPuppy;
+  }
+}
 function barkPuppy(){
   if(!soundOn)return;
   const audio=$('dogBarkAudio');
