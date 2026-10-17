@@ -95,8 +95,10 @@ button:active{transform:translateY(3px) scale(.98);box-shadow:0 2px 0 #153f7440}
 .auth-screen input{width:100%;padding:14px;border:3px solid #b8dfff;border-radius:14px;font:inherit;font-size:1rem;color:#173b73;background:#fff;user-select:text}
 .auth-screen .auth-note{font-size:.88rem;line-height:1.45;color:#42658a;margin:12px 0}
 .auth-screen .auth-error{min-height:1.4em;color:#b42354;font-weight:900}
-#playerHud{position:fixed;z-index:50;top:max(8px,env(safe-area-inset-top));left:max(8px,env(safe-area-inset-left));display:none;gap:7px;align-items:center;flex-wrap:wrap;max-width:calc(100% - 16px);pointer-events:none}
-#playerHud span{border:2px solid #fff;background:#173b73eF;color:#fff;border-radius:12px;padding:6px 9px;font-size:.78rem;font-weight:900;box-shadow:0 3px 8px #173b7333}\n#logoutBtn{display:none;position:fixed;z-index:51;top:max(8px,env(safe-area-inset-top));right:max(8px,env(safe-area-inset-right));border:2px solid #fff;border-radius:14px;padding:9px 13px;background:linear-gradient(#ff9aca,#f04f6a);color:#fff;font-size:.84rem;font-weight:1000;box-shadow:0 4px 0 #9d315544;pointer-events:auto}\n#logoutBtn:focus-visible{outline:3px solid #173b73;outline-offset:2px}
+#playerHud{position:fixed;z-index:50;top:max(8px,env(safe-area-inset-top));right:max(8px,env(safe-area-inset-right));display:none;gap:7px;align-items:center;flex-wrap:wrap;max-width:calc(100% - 16px);pointer-events:none}
+#playerHud span{border:2px solid #fff;background:#173b73eF;color:#fff;border-radius:12px;padding:6px 9px;font-size:.78rem;font-weight:900;box-shadow:0 3px 8px #173b7333}
+#logoutBtn{display:none;position:fixed;z-index:1000;top:max(8px,env(safe-area-inset-top));left:max(8px,env(safe-area-inset-left));border:2px solid #fff;border-radius:14px;padding:9px 13px;background:linear-gradient(#ff9aca,#f04f6a);color:#fff;font-size:.84rem;font-weight:1000;box-shadow:0 4px 0 #9d315544;pointer-events:auto}\n#logoutBtn:focus-visible{outline:3px solid #173b73;outline-offset:2px}
+#logoutBtn:disabled{opacity:.8;cursor:wait}
 </style>
 <style id="esther-deluxe-design">
 :root{--navy:#14396f;--blue:#177be0;--pink:#f34f9e;--purple:#7951dc;--gold:#ffb929;--green:#27c86b}
