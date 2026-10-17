@@ -361,6 +361,32 @@ button:disabled{cursor:not-allowed}
  #online.screen.active .online-player-list{grid-template-columns:1fr!important}
 }
 </style>
+<style id="online-gameplay-only-fix">
+/* Once a map is selected, show only the level and controls. */
+#onlineMapPicker[hidden],#onlineWorldArea[hidden]{display:none!important}
+#online.screen.active{position:fixed!important;inset:0!important;z-index:100!important;width:100vw!important;height:100dvh!important;min-height:100dvh!important;padding:0!important;margin:0!important;overflow:hidden!important;background:#ffe27b!important}
+#online.screen.active .online-panel{position:absolute!important;inset:0!important;width:100%!important;max-width:none!important;height:100%!important;min-height:100%!important;max-height:100%!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;background:#ffe27b!important}
+#online.screen.active .topbar,#online.screen.active>.online-panel>.tagline{display:none!important}
+#online.screen.active #onlineMapPicker:not([hidden]){display:flex!important;position:absolute!important;inset:0!important;align-content:center!important;align-items:center!important;justify-content:center!important;flex-wrap:wrap!important;padding:24px!important;background:linear-gradient(#ffe8a0,#f5ce55)!important}
+#online.screen.active #onlineWorldArea:not([hidden]){display:block!important;position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;overflow:hidden!important}
+#online.screen.active #onlineWorldArea .online-world-heading,
+#online.screen.active #onlineWorldArea .online-hint,
+#online.screen.active #onlineWorldArea .online-player-heading,
+#online.screen.active #onlineWorldArea .online-player-list,
+#online.screen.active #onlineWorldArea>button.bigbtn{display:none!important}
+#online.screen.active #onlineWorldArea .online-world-viewport{position:absolute!important;inset:0!important;width:100vw!important;height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;background:#ffe27b!important}
+#online.screen.active #onlineWorldCanvas{position:absolute!important;left:0!important;top:0!important;height:100dvh!important;min-height:100dvh!important;width:2800px!important;max-width:none!important}
+#online.screen.active #onlineWorldArea .online-controls{position:absolute!important;left:0!important;right:0!important;bottom:0!important;z-index:30!important;display:flex!important;justify-content:center!important;align-items:center!important;gap:14px!important;margin:0!important;padding:10px 12px calc(12px + env(safe-area-inset-bottom))!important;border:0!important;border-radius:20px 20px 0 0!important;background:linear-gradient(180deg,#ffffff00,#ffffffdf 30%)!important;box-shadow:none!important;backdrop-filter:none!important}
+#online.screen.active #onlineWorldArea .online-controls>span{display:none!important}
+#online.screen.active #onlineWorldArea .online-dpad button,#online.screen.active #onlineWorldArea .online-jump{touch-action:none!important}
+#online.screen.active #onlinePlayerMarkers .online-avatar,
+#online.screen.active #onlinePlayerMarkers button.online-avatar{appearance:none!important;-webkit-appearance:none!important;display:flex!important;position:absolute!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important;min-width:0!important;width:auto!important;height:auto!important;padding:0!important;margin:0!important;background:transparent!important;background-color:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;outline:0!important;overflow:visible!important;color:inherit!important}
+#online.screen.active #onlinePlayerMarkers .online-avatar .pet{display:flex!important;align-items:center!important;justify-content:center!important;width:76px!important;height:76px!important;padding:0!important;margin:0!important;background:transparent!important;background-color:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important}
+#online.screen.active #onlinePlayerMarkers .online-avatar .pet svg{width:76px!important;height:76px!important;max-width:none!important;background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible!important}
+#online.screen.active #onlinePlayerMarkers .online-avatar .username{white-space:nowrap!important;max-width:180px!important;background:#fff0a8!important;border:2px solid #f3b62c!important;border-radius:14px!important;padding:4px 8px!important;color:#27335b!important;font-size:12px!important;box-shadow:0 2px 0 #345a7b2a!important}
+#online.screen.active #onlineWorldCanvas .online-ground{height:20%!important}
+@media(max-width:600px){#online.screen.active #onlineWorldArea .online-controls{gap:10px!important}#online.screen.active #onlinePlayerMarkers .online-avatar .pet,#online.screen.active #onlinePlayerMarkers .online-avatar .pet svg{width:68px!important;height:68px!important}}
+</style>
 </head>
 <body><div id="app">
 <div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div><button id="logoutBtn" type="button" onclick="logoutDreamWorld()" aria-label="Log out of Dream World">↪ Log out</button>
