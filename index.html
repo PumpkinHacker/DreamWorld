@@ -276,6 +276,16 @@ function puppySVG(){
     ? `<path d="M130 72 L119 25 L141 62Z" fill="#ffe58a" stroke="#b986d9" stroke-width="4" stroke-linejoin="round"/>`
     : `<path d="M83 87 C57 52 32 58 35 91 C37 117 54 136 79 137 L99 112Z" fill="${fur}" stroke="#423553" stroke-width="5" stroke-linejoin="round"/><path d="M48 82 C54 82 66 100 77 120 Q58 115 49 96Z" fill="#f4a6b6"/><path d="M177 86 C200 51 228 54 228 84 C229 111 210 133 184 137 L164 110Z" fill="${fur}" stroke="#423553" stroke-width="5" stroke-linejoin="round"/><path d="M215 79 Q203 104 188 120 Q211 112 218 92Z" fill="#f4a6b6"/>`;
   const accessoryArt={
+    '🧬':'<text x="130" y="55" text-anchor="middle" font-size="39" paint-order="stroke" stroke="#fff" stroke-width="2">🧬</text>',
+    '💠':'<ellipse cx="130" cy="53" rx="49" ry="10" fill="none" stroke="#6deaff" stroke-width="7"/><text x="130" y="51" text-anchor="middle" font-size="31">💠</text>',
+    '🔰':'<text x="130" y="117" text-anchor="middle" font-size="43" paint-order="stroke" stroke="#fff" stroke-width="2">🔰</text>',
+    '🌠':'<text x="130" y="64" text-anchor="middle" font-size="42" paint-order="stroke" stroke="#fff" stroke-width="2">🌠</text>',
+    '🪩':'<text x="130" y="183" text-anchor="middle" font-size="43" paint-order="stroke" stroke="#fff" stroke-width="2">🪩</text>',
+    '⚡':'<text x="130" y="57" text-anchor="middle" font-size="43" paint-order="stroke" stroke="#fff" stroke-width="2">⚡</text>',
+    '🪙':'<text x="130" y="187" text-anchor="middle" font-size="42" paint-order="stroke" stroke="#fff" stroke-width="2">🪙</text>',
+    '🏵️':'<text x="130" y="188" text-anchor="middle" font-size="42" paint-order="stroke" stroke="#fff" stroke-width="2">🏵️</text>',
+    '🧫':'<text x="130" y="188" text-anchor="middle" font-size="42" paint-order="stroke" stroke="#fff" stroke-width="2">🧫</text>',
+    '🛸':'<text x="130" y="58" text-anchor="middle" font-size="45" paint-order="stroke" stroke="#fff" stroke-width="2">🛸</text>',
     '🎀':'<path d="M128 52 C111 34 97 40 101 54 C104 63 116 63 128 59 C139 66 153 64 157 53 C161 39 145 35 128 52Z" fill="#ff5ca8" stroke="#fff" stroke-width="4"/><circle cx="129" cy="57" r="6" fill="#ffd8ed" stroke="#fff" stroke-width="2"/>',
     '⭐':'<path d="M130 32 L138 48 L156 50 L143 62 L146 79 L130 70 L114 79 L117 62 L104 50 L122 48Z" fill="#ffd84d" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>',
     '👑':'<path d="M104 61 L99 36 L117 49 L130 27 L143 49 L161 36 L156 62Z" fill="#ffd34e" stroke="#a86b22" stroke-width="3" stroke-linejoin="round"/><rect x="104" y="58" width="52" height="9" rx="4" fill="#ff8dba" stroke="#fff" stroke-width="2"/>',
@@ -425,7 +435,10 @@ function setAuthMode(mode){
   $('authPassword').autocomplete=authMode==='signup'?'new-password':'current-password';
 }
 function showAuth(){
-  authSession=null;playerId=null;$('playerHud').style.display='none';$('logoutBtn').style.display='none';
+  authSession=null;playerId=null;isDreamWorldAdmin=false;
+  const kept=(itemsOwned||[]).filter(e=>!adminExclusiveItems.includes(e));
+  if(kept.length!==(itemsOwned||[]).length){itemsOwned=kept;if(adminExclusiveItems.includes(accessory))accessory='🎀';saveProgress()}
+  $('playerHud').style.display='none';$('logoutBtn').style.display='none';
   setAuthMode('signup');$('authError').textContent='';showScreen('authScreen');
 }
 function setPlayerHud(id){
@@ -506,6 +519,7 @@ let shopCategory='all';
 let shopPreviewItemName='Your puppy’s look';
 let isDreamWorldAdmin=false;
 const adminExclusiveItems=['🧬','💠','🔰','🌠','🪩','⚡','🪙','🏵️','🧫','🛸'];
+const adminExclusiveNames={'🧬':'DNA Crown','💠':'Crystal Halo','🔰':'Guardian Emblem','🌠':'Star Trail','🪩':'Disco Orb','⚡':'Lightning Aura','🪙':'Golden Token','🏵️':'Royal Medal','🧫':'Potion Flask','🛸':'UFO Buddy'};
 async function refreshAdminAccess(){const token=localStorage.getItem('dreamWorldSessionV1');let verified=false;if(token){try{const r=await fetch(DREAMWORLD_API+'/admin/me',{headers:{Authorization:'Bearer '+token}});const d=await r.json();verified=!!(r.ok&&d.isAdmin===true&&String(d.accountId)==='3')}catch(e){verified=false}}const changed=isDreamWorldAdmin!==verified;isDreamWorldAdmin=verified;let changedItems=false;if(isDreamWorldAdmin){for(const e of adminExclusiveItems){if(!itemsOwned.includes(e)){itemsOwned.push(e);changedItems=true}}}else{const next=(itemsOwned||[]).filter(e=>!adminExclusiveItems.includes(e));if(next.length!==itemsOwned.length){itemsOwned=next;changedItems=true}if(adminExclusiveItems.includes(accessory)){accessory='🎀';changedItems=true}}if(changedItems)saveProgress();if(changed||changedItems){renderCustom();renderShop()}}
 function setShopCategory(category,btn){shopCategory=category;document.querySelectorAll('#shopTabs button').forEach(b=>b.classList.toggle('active',b===btn));renderShop()}
 function renderShop(){
@@ -897,7 +911,7 @@ renderCustom=function(){
   }else if(wardrobeCategory==='items'||wardrobeCategory==='all'){
     const basics=['🎀','⭐','🧢','🌸','👑','🦋','🎧','🪽','🧣','🎃','🦇','🧙','👻','🎒','🧸','🕶️','💎','🪄'];
     const owned=(itemsOwned||[]).filter(e=>typeof e==='string'&&e.length>0&&!e.startsWith('animal:')&&(isDreamWorldAdmin||!adminExclusiveItems.includes(e)));
-    opts=[...new Set([...basics,...owned])].map(e=>'<button class="choice '+(accessory===e?'selected':'')+'" onclick="accessory=\''+e+'\';playSound(\'tap\');renderCustom();renderShop();saveProgress()">'+e+' '+(accessory===e?'✓ Selected':'Item')+'</button>');
+    opts=[...new Set([...basics,...owned])].map(e=>'<button class="choice '+(accessory===e?'selected':'')+'" onclick="accessory=\''+e+'\';playSound(\'tap\');renderCustom();renderShop();saveProgress()">'+e+' '+(adminExclusiveItems.includes(e)?(adminExclusiveNames[e]||'Admin Item'):(accessory===e?'✓ Selected':'Item'))+'</button>');
   }else return;
   list.innerHTML=opts.join('');
 };
