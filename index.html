@@ -898,7 +898,7 @@ renderCustom=function(){
   const colorTitle=$('colors')?.previousElementSibling;
   const accessoryTitle=$('accessories')?.previousElementSibling;
   const showSkins=wardrobeCategory==='all'||wardrobeCategory==='skins';
-  const showItems=wardrobeCategory==='all'||wardrobeCategory==='items'||wardrobeCategory==='shoes'||wardrobeCategory==='animals';
+  const showItems=wardrobeCategory==='all'||wardrobeCategory==='items'||wardrobeCategory==='shoes'||wardrobeCategory==='animals'||wardrobeCategory==='accessories'||wardrobeCategory==='halloween';
   if($('colors'))$('colors').parentElement.style.display=showSkins?'block':'none';
   if(colorTitle)colorTitle.style.display=showSkins?'block':'none';
   if(accessoryTitle)accessoryTitle.style.display=showItems?'block':'none';
@@ -916,9 +916,9 @@ renderCustom=function(){
     const halloweenOnly=new Set(['🎃','🦇','🧙','👻','🕸️','🧛','🧟','🍬','🕯️','🦉','🪦','🧪','🦴','🕷️','🧹','🩸','🧠','🍭']);
     const accessoryOnly=new Set(['🎀','⭐','🧢','🌸','👑','🦋','🪽','🧣','🎧','🧸','🕶️','🍓','🫧','💎','🐉','🪄','🪐','🎒','🪁','🍄','🐝','🦕','🧚','🧿','🪺','🦜','🪶','🧥','🧤','🧺','🛟','🪖','🌈','✨','🎈','🪆','📚','🪻','🍀','🫎','🛡️','🎇','🧬','💠','🔰','🌠','🪩','⚡','🪙','🏵️','🧫','🛸']);
     let categoryItems=owned;
-    if(wardrobeCategory==='accessories')categoryItems=owned.filter(e=>accessoryOnly.has(e)&&!shoesOnly.has(e)&&!halloweenOnly.has(e));
-    else if(wardrobeCategory==='halloween')categoryItems=owned.filter(e=>halloweenOnly.has(e)&&!shoesOnly.has(e));
-    else if(wardrobeCategory==='items')categoryItems=owned.filter(e=>!shoesOnly.has(e)&&!halloweenOnly.has(e));
+    if(wardrobeCategory==='accessories')categoryItems=[...new Set([...basics.filter(e=>accessoryOnly.has(e)&&!shoesOnly.has(e)&&!halloweenOnly.has(e)),...owned.filter(e=>accessoryOnly.has(e)&&!shoesOnly.has(e)&&!halloweenOnly.has(e))])];
+    else if(wardrobeCategory==='halloween')categoryItems=[...new Set([...halloweenOnly,...owned.filter(e=>halloweenOnly.has(e)&&!shoesOnly.has(e))])];
+    else if(wardrobeCategory==='items')categoryItems=[...new Set([...basics.filter(e=>!shoesOnly.has(e)&&!halloweenOnly.has(e)),...owned.filter(e=>!shoesOnly.has(e)&&!halloweenOnly.has(e))])];
 
     opts=[...new Set(wardrobeCategory==='all'?[...basics,...owned]:categoryItems)].map(e=>'<button class="choice '+(accessory===e?'selected':'')+'" onclick="accessory=\''+e+'\';playSound(\'tap\');renderCustom();renderShop();saveProgress()">'+e+' '+(adminExclusiveItems.includes(e)?(adminExclusiveNames[e]||'Admin Item'):(accessory===e?'✓ Selected':'Item'))+'</button>');
   }else return;
