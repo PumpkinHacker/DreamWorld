@@ -319,6 +319,48 @@ button:disabled{cursor:not-allowed}
 .online-avatar .pet{filter:drop-shadow(0 3px 0 #6b461b55)}
 @media(max-width:600px){.desert-platform{height:76px}.platform-center{height:82px}.platform-high{height:58px}.desert-pyramid{border-left-width:64px;border-right-width:64px;border-bottom-width:110px}.desert-sun{left:36%;width:260px;height:260px}.desert-crates{font-size:32px}.desert-tree{font-size:34px}}
 </style>
+<style id="online-immersive-game-fix">
+/* Immersive mobile gameplay: the actual level fills the screen, not a small framed box. */
+#online.screen.active{padding:0!important;align-items:stretch!important;justify-content:flex-start!important;background:#f9d76b!important;overflow:hidden!important}
+#online.screen.active .online-panel{width:100%!important;max-width:none!important;min-height:100dvh!important;height:100dvh!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:linear-gradient(#ffe8a0,#f6d05a)!important;overflow-x:hidden!important;overflow-y:auto!important}
+#online.screen.active .topbar{padding:calc(env(safe-area-inset-top) + 8px) 14px 8px!important;margin:0!important;background:#ffe8a0}
+#online.screen.active .online-panel>p.tagline{margin:0!important;padding:6px 14px 10px!important;background:#ffe8a0}
+#online.screen.active #onlineMapPicker{padding:8px 12px 18px!important}
+#online.screen.active #onlineWorldArea:not([hidden]){display:flex!important;flex-direction:column!important;gap:0!important}
+#online.screen.active .online-world-heading{margin:0!important;padding:9px 14px!important;background:#ffe8a0;font-size:1rem!important}
+#online.screen.active .online-hint{margin:0!important;padding:6px 14px 10px!important;background:#ffe8a0;font-size:.82rem!important}
+#online.screen.active .online-world-viewport{
+ width:100vw!important;max-width:none!important;
+ height:clamp(390px,calc(100dvh - 255px),720px)!important;
+ min-height:390px!important;flex:1 0 auto!important;
+ margin:0!important;border:0!important;border-radius:0!important;
+ box-shadow:none!important;overflow-x:auto!important;overflow-y:hidden!important;
+ background:#ffe27b!important;scrollbar-width:none!important;
+}
+#online.screen.active .online-world-viewport::-webkit-scrollbar{display:none}
+#online.screen.active .online-world-canvas{height:100%!important;min-height:390px!important;width:2800px!important}
+#online.screen.active .online-world-canvas .online-ground{height:20%!important}
+#online.screen.active .online-player-heading{margin:0!important;padding:8px 14px!important;background:#fff8e3}
+#online.screen.active .online-player-list{padding:6px 12px 10px!important;background:#fff8e3}
+#online.screen.active .online-controls{position:sticky!important;bottom:0!important;z-index:20!important;margin:0!important;padding:10px 12px calc(10px + env(safe-area-inset-bottom))!important;border:0!important;border-radius:0!important;background:#fff9e9ee!important;backdrop-filter:blur(10px)}
+#online.screen.active .online-controls>span{display:none!important}
+#online.screen.active .online-safety-note{margin:0!important;border-radius:0!important;padding:7px 12px!important;background:#fff8e3}
+#online.screen.active #onlineWorldArea:not([hidden])~.online-safety-note{display:none!important}
+#online.screen.active #onlineWorldArea:not([hidden]) .online-world-viewport .online-building,
+#online.screen.active #onlineWorldArea:not([hidden]) .online-world-viewport .online-platform-deco{display:none!important}
+#online.screen.active .desert-platform{height:clamp(70px,13vh,115px)!important}
+#online.screen.active .platform-center{height:clamp(82px,15vh,135px)!important}
+#online.screen.active .platform-high{height:clamp(55px,9vh,82px)!important}
+#online.screen.active .desert-pyramid{bottom:20%!important}
+#online.screen.active .online-avatar .pet{background:transparent!important;box-shadow:none!important;border:0!important}
+#online.screen.active .online-avatar .pet svg{background:transparent!important;display:block!important}
+#online.screen.active .online-avatar{background:transparent!important;border:0!important;box-shadow:none!important}
+@media(max-width:600px){
+ #online.screen.active .online-world-viewport{height:clamp(390px,calc(100dvh - 250px),650px)!important;min-height:390px!important}
+ #online.screen.active .online-world-canvas{height:100%!important}
+ #online.screen.active .online-player-list{grid-template-columns:1fr!important}
+}
+</style>
 </head>
 <body><div id="app">
 <div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div><button id="logoutBtn" type="button" onclick="logoutDreamWorld()" aria-label="Log out of Dream World">↪ Log out</button>
