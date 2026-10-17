@@ -180,6 +180,12 @@ button:disabled{cursor:not-allowed}
 
 </style>
 
+
+<style id="home-only-account-hud">
+/* Keep account controls exclusively on the signed-in home screen. */
+#app:not(.home-hud-visible) #playerHud,
+#app:not(.home-hud-visible) #logoutBtn{display:none!important}
+</style>
 </head>
 <body><div id="app">
 <div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div><button id="logoutBtn" type="button" onclick="logoutDreamWorld()" aria-label="Log out of Dream World">↪ Log out</button>
@@ -895,6 +901,21 @@ syncCoins=function(){_syncCoins();saveProgress();scheduleServerTokenSync()};
 // Version 31 polish: distinct animal silhouettes, synthesized animal voices, and a true Space hub.
 ;
 
+
+// Show Player ID, FPS, and Logout only while the home screen is active.
+(function(){
+ const app=document.getElementById('app');
+ if(!app)return;
+ const syncHomeHud=()=>{
+   const home=document.getElementById('home');
+   const gameScreen=document.getElementById('gameScreen');
+   const onHome=!!home&&home.classList.contains('active')&&(!gameScreen||getComputedStyle(gameScreen).display==='none');
+   app.classList.toggle('home-hud-visible',onHome);
+ };
+ const observer=new MutationObserver(syncHomeHud);
+ observer.observe(app,{subtree:true,attributes:true,attributeFilter:['class','style']});
+ syncHomeHud();
+})();
 
 loadProgress();
 // Start the loading progress and initialize the game screens.
