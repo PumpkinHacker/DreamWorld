@@ -346,25 +346,29 @@ function setBackground(id){if(!backgroundOptions.some(b=>b.id===id))return;activ
 function loadBackground(){try{const v=localStorage.getItem('estherDreamworldBackground');if(backgroundOptions.some(b=>b.id===v))activeBackground=v}catch(e){}applyBackground();renderBackgrounds()}
 
 function boot(){
-  // Start the loading indicator first, so a separate setup error cannot strand the player here.
-  let p=0;
+  // Keep the progress animation independent from game setup, and never leave the player stranded here.
+  let p=0,finished=false;
   const progress=$('progress');
+  const openHome=()=>{
+    if(finished)return;
+    finished=true;
+    clearInterval(timer);
+    try{showScreen('home');}
+    catch(err){console.error('Dream World home transition issue:',err);}
+    // Last-resort screen switch if another UI function interrupts the normal transition.
+    if(!$('home')?.classList.contains('active')){
+      document.querySelectorAll('.screen').forEach(screen=>screen.classList.remove('active'));
+      const home=$('home');
+      if(home)home.classList.add('active');
+    }
+  };
   const timer=setInterval(()=>{
     p=Math.min(100,p+8);
     if(progress)progress.style.width=p+'%';
-    if(p>=100){
-      clearInterval(timer);
-      setTimeout(()=>{
-        try{showScreen('home');}
-        catch(err){
-          console.error('Dream World could not open the home menu:',err);
-          document.querySelectorAll('.screen').forEach(screen=>screen.classList.remove('active'));
-          const home=$('home');
-          if(home)home.classList.add('active');
-        }
-      },250);
-    }
+    if(p>=100)setTimeout(openHome,250);
   },100);
+  // Watchdog: the home menu still opens even if a progress callback fails.
+  setTimeout(openHome,3000);
   const safeInit=(label,fn)=>{try{fn();}catch(err){console.error('Dream World setup issue ('+label+'):',err);}};
   safeInit('background',loadBackground);
   safeInit('music',startMusic);
