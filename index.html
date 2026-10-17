@@ -423,6 +423,29 @@ function showAuth(){
 function setPlayerHud(id){
   playerId=String(id);$('playerIdLabel').textContent='Player ID: '+playerId;$('playerHud').style.display='flex';$('logoutBtn').style.display='block';
 }
+let serverTokenSyncTimer=null;
+async function loadServerTokenBalance(){
+  const token=localStorage.getItem('dreamWorldSessionV1');
+  if(!token||!playerId)return;
+  try{
+    const res=await fetch(DREAMWORLD_API+'/player/state',{headers:{Authorization:'Bearer '+token}});
+    const data=await res.json();
+    if(!res.ok||!data.player)return;
+    const balance=Number(data.player.coins);
+    if(Number.isSafeInteger(balance)&&balance>=0){coins=Math.min(999999999,balance);saveProgress();syncCoins();}
+  }catch(err){console.warn('Could not load saved Tokens from account server.')}
+}
+function scheduleServerTokenSync(){
+  if(!playerId)return;
+  const token=localStorage.getItem('dreamWorldSessionV1');
+  if(!token)return;
+  if(serverTokenSyncTimer)clearTimeout(serverTokenSyncTimer);
+  serverTokenSyncTimer=setTimeout(async()=>{
+    try{await fetch(DREAMWORLD_API+'/player/tokens',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({coins:Math.max(0,Math.min(999999999,Math.floor(Number(coins)||0)))})});}
+    catch(err){console.warn('Could not sync Tokens to account server.')}
+  },500);
+}
+
 async function logoutDreamWorld(){
   const token=localStorage.getItem('dreamWorldSessionV1');
   const button=$('logoutBtn');if(button){button.disabled=true;button.textContent='Logging out…'}
@@ -444,7 +467,7 @@ async function resumeAuthSession(){
     const res=await fetch(DREAMWORLD_API+'/auth/me',{headers:{Authorization:'Bearer '+token}});
     const data=await res.json();
     if(!res.ok||!data.player){localStorage.removeItem('dreamWorldSessionV1');showAuth();return}
-    authSession=token;setPlayerHud(data.player.playerId);showScreen('home');
+    authSession=token;setPlayerHud(data.player.playerId);await loadServerTokenBalance();showScreen('home');
   }catch(e){showAuth();$('authError').textContent='Can’t reach the account server. Check your connection and try again.'}
 }
 async function submitAuth(event){
@@ -455,7 +478,7 @@ async function submitAuth(event){
     const data=await apiAuth(authMode==='signup'?'/auth/register':'/auth/login',{username,password});
     if(!data.token||!data.player||!data.player.playerId)throw new Error('The server response was incomplete. Please try again.');
     authSession=data.token;localStorage.setItem('dreamWorldSessionV1',data.token);setPlayerHud(data.player.playerId);
-    $('authPassword').value='';showScreen('home');
+    await loadServerTokenBalance();$('authPassword').value='';showScreen('home');
   }catch(err){$('authError').textContent=err.message||'Something went wrong. Please try again.'}
   finally{$('authSubmit').disabled=false;$('authSubmit').textContent=authMode==='signup'?'Create Account & Play 🐶':'Log In & Play 🐶'}
 }
@@ -867,7 +890,7 @@ renderCustom=function(){
 };
 
 const _syncCoins=syncCoins;
-syncCoins=function(){_syncCoins();saveProgress()};
+syncCoins=function(){_syncCoins();saveProgress();scheduleServerTokenSync()};
 
 // Version 31 polish: distinct animal silhouettes, synthesized animal voices, and a true Space hub.
 ;
