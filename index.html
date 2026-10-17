@@ -891,6 +891,7 @@ const _equipSkinV30=equipSkin;
 equipSkin=function(n){_equipSkinV30(n);if($('spaceShop')?.classList.contains('active'))renderSpaceShop()};
 const _chooseSpaceAnimalV30=chooseSpaceAnimal;
 chooseSpaceAnimal=function(e,n,price){_chooseSpaceAnimalV30(e,n,price);$('spacePreviewPup').innerHTML=paintShopPreview({animal:e});$('spacePreviewName').textContent=n+' selected'};
+function chooseWardrobeAccessory(e){accessory=e;playSound('tap');renderCustom();renderShop();saveProgress()}
 function setWardrobeCategory(category,btn){wardrobeCategory=category;document.querySelectorAll('#wardrobeTabs button').forEach(b=>b.classList.toggle('active',b===btn));if(isDreamWorldAdmin){for(const e of adminExclusiveItems)if(!itemsOwned.includes(e))itemsOwned.push(e);saveProgress()}renderCustom();refreshAdminAccess().then(()=>renderCustom()).catch(()=>renderCustom())}
 const _renderCustomV30=renderCustom;
 renderCustom=function(){
@@ -903,12 +904,17 @@ renderCustom=function(){
   if(colorTitle)colorTitle.style.display=showSkins?'block':'none';
   if(accessoryTitle)accessoryTitle.style.display=showItems?'block':'none';
   const list=$('accessories');if(!list)return;
+  // Force the wardrobe choices and their heading visible; older layout rules could leave this panel hidden.
+  if(list.parentElement)list.parentElement.style.display=showItems?'block':'none';
+  list.style.display=showItems?'grid':'none';
+  list.style.visibility='visible';
+  list.style.opacity='1';
   let opts=[];
   if(wardrobeCategory==='animals'){
     opts=[['🐶','Dream Pup',0],['🐱','Garden Kitty',0],['🐰','Meadow Bunny',45],['🦊','Little Fox',55]].map(([e,n,cost])=>'<button class="choice '+(selectedAnimal===e?'selected':'')+'" onclick="chooseShopAnimal(\''+e+'\',\''+n+'\','+cost+')">'+e+' '+n+'</button>');
   }else if(wardrobeCategory==='shoes'){
-    const shoes=['👟','🥾','🛼','💫','🩰','👢','🥿','👞'];
-    opts=[...new Set([...shoes,...(itemsOwned||[]).filter(e=>['👟','🥾','🛼','💫','🩰','👢','🥿','👞'].includes(e))])].map(e=>'<button class="choice '+(accessory===e?'selected':'')+'" onclick="accessory=\''+e+'\';playSound(\'tap\');renderCustom();renderShop();saveProgress()">'+e+' Shoes</button>');
+    const shoes=[['👟','Sneakers'],['🥾','Trail Boots'],['🛼','Roller Skates'],['💫','Comet Shoes'],['🩰','Ballet Shoes'],['👢','Rain Boots'],['🥿','Comfy Flats'],['👞','Classic Shoes']];
+    opts=shoes.map(([e,n])=>'<button class="choice '+(accessory===e?'selected':'')+'" data-item="'+e+'" onclick="chooseWardrobeAccessory(this.dataset.item)">'+e+' '+n+'</button>');
   }else if(wardrobeCategory==='items'||wardrobeCategory==='all'||wardrobeCategory==='accessories'||wardrobeCategory==='halloween'){
     const basics=['🎀','⭐','🧢','🌸','👑','🦋','🎧','🪽','🧣','🎃','🦇','🧙','👻','🎒','🧸','🕶️','💎','🪄'];
     const owned=[...new Set([...(itemsOwned||[]).filter(e=>typeof e==='string'&&e.length>0&&!e.startsWith('animal:')&&(isDreamWorldAdmin||!adminExclusiveItems.includes(e))),...(isDreamWorldAdmin?adminExclusiveItems:[])])];
