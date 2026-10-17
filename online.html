@@ -443,22 +443,32 @@ function setBackground(id){if(!backgroundOptions.some(b=>b.id===id))return;activ
 function loadBackground(){try{const v=localStorage.getItem('estherDreamworldBackground');if(backgroundOptions.some(b=>b.id===v))activeBackground=v}catch(e){}applyBackground();renderBackgrounds()}
 
 function boot(){
-  // Keep the progress animation independent from game setup, and never leave the player stranded here.
+  // Keep loading independent from setup; restore the session before choosing the first screen.
   let p=0,finished=false;
   const progress=$('progress');
-  const openHome=()=>{
+  const openHome=async()=>{
     if(finished)return;
     finished=true;
     clearInterval(timer);
-    resumeAuthSession();
-    if(new URLSearchParams(location.search).has('world')){if(localStorage.getItem('dreamWorldSessionV1')){showScreen('online');showOnlineMaps()}else{showAuth();$('authError').textContent='Log in from Dream World to enter the Online World.'}}
+    try{await resumeAuthSession()}catch(err){console.error('Session restore issue:',err)}
+    if(new URLSearchParams(location.search).has('world')){
+      if(localStorage.getItem('dreamWorldSessionV1')){
+        showScreen('online');
+        showOnlineMaps();
+      }else{
+        showAuth();
+        $('authError').textContent='Log in from Dream World to enter the Online World.';
+      }
+    }else if(!localStorage.getItem('dreamWorldSessionV1')){
+      showScreen('home');
+    }
   };
   const timer=setInterval(()=>{
     p=Math.min(100,p+8);
     if(progress)progress.style.width=p+'%';
     if(p>=100)setTimeout(openHome,250);
   },100);
-  // Watchdog: the home menu still opens even if a progress callback fails.
+  // Watchdog guarantees a destination even if the loading animation stalls.
   setTimeout(openHome,3000);
   const safeInit=(label,fn)=>{try{fn();}catch(err){console.error('Dream World setup issue ('+label+'):',err);}};
   safeInit('background',loadBackground);
