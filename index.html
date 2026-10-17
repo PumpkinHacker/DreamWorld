@@ -621,7 +621,7 @@ function drawPuppy(x,y,tilt=0,squash=0){
     img.onerror=()=>{puppyCanvasImage=null;puppyCanvasFailed=true;if($('gameScreen').style.display==='block')drawScene()};
     img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(puppySVG());
   }
-  if(puppyCanvasImage){
+  if(puppyCanvasImage && puppyCanvasImage.complete && puppyCanvasImage.naturalWidth>0){
     // Keep the full portrait aspect ratio; no squashing or stretching.
     const w=86,h=92;
     ctx.drawImage(puppyCanvasImage,x-29,y-88,w,h);
