@@ -96,7 +96,7 @@ button:active{transform:translateY(3px) scale(.98);box-shadow:0 2px 0 #153f7440}
 .auth-screen .auth-note{font-size:.88rem;line-height:1.45;color:#42658a;margin:12px 0}
 .auth-screen .auth-error{min-height:1.4em;color:#b42354;font-weight:900}
 #playerHud{position:fixed;z-index:50;top:max(8px,env(safe-area-inset-top));left:max(8px,env(safe-area-inset-left));display:none;gap:7px;align-items:center;flex-wrap:wrap;max-width:calc(100% - 16px);pointer-events:none}
-#playerHud span{border:2px solid #fff;background:#173b73eF;color:#fff;border-radius:12px;padding:6px 9px;font-size:.78rem;font-weight:900;box-shadow:0 3px 8px #173b7333}
+#playerHud span{border:2px solid #fff;background:#173b73eF;color:#fff;border-radius:12px;padding:6px 9px;font-size:.78rem;font-weight:900;box-shadow:0 3px 8px #173b7333}\n#logoutBtn{display:none;position:fixed;z-index:51;top:max(8px,env(safe-area-inset-top));right:max(8px,env(safe-area-inset-right));border:2px solid #fff;border-radius:14px;padding:9px 13px;background:linear-gradient(#ff9aca,#f04f6a);color:#fff;font-size:.84rem;font-weight:1000;box-shadow:0 4px 0 #9d315544;pointer-events:auto}\n#logoutBtn:focus-visible{outline:3px solid #173b73;outline-offset:2px}
 </style>
 <style id="esther-deluxe-design">
 :root{--navy:#14396f;--blue:#177be0;--pink:#f34f9e;--purple:#7951dc;--gold:#ffb929;--green:#27c86b}
@@ -180,7 +180,7 @@ button:disabled{cursor:not-allowed}
 
 </head>
 <body><div id="app">
-<div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div>
+<div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div><button id="logoutBtn" type="button" onclick="logoutDreamWorld()" aria-label="Log out of Dream World">↪ Log out</button>
 <div id="scenery"><div class="cloud" style="top:10%;left:10%"></div><div class="cloud" style="top:24%;left:60%;animation-delay:-14s;transform:scale(.7)"></div><div class="hill"></div><div class="hill h2"></div><div class="flowerfield"></div></div>
 <section id="loading" class="screen active"><div class="panel loading-card"><div class="loading-title">Esther's <span style="color:#ff72b5">Kindergarten</span><br>Adventure! ✨</div><div class="hero" id="loadHero"></div><div class="tagline">A little learning, a lot of magic!</div><div class="progress"><span id="progress"></span></div><div class="loading-heart">♥ Love you Esther! ♥</div><div class="footer-note">Getting your adventure ready…</div></div></section>
 <section id="authScreen" class="screen auth-screen"><div class="panel auth-card"><div style="font-size:3rem">🐾✨</div><h1>Welcome to Dream World!</h1><div class="tagline">Create an account or log in to start your adventure.</div><div class="auth-tabs"><button id="signupTab" class="active" onclick="setAuthMode('signup')">Create Account</button><button id="loginTab" onclick="setAuthMode('login')">Log In</button></div><form id="authForm" onsubmit="submitAuth(event)" autocomplete="on"><label for="authUsername">Username</label><input id="authUsername" name="username" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+" autocomplete="username" required placeholder="3–20 letters, numbers, or _"><label for="authPassword">Password</label><input id="authPassword" name="password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required placeholder="At least 8 characters"><p class="auth-note">No email needed. Keep your password private and ask a trusted adult for help if you need it. Your Player ID is assigned automatically.</p><div id="authError" class="auth-error" role="status" aria-live="polite"></div><button class="bigbtn blue" id="authSubmit" type="submit">Create Account &amp; Play 🐶</button></form></div></section>
@@ -415,11 +415,19 @@ function setAuthMode(mode){
   $('authPassword').autocomplete=authMode==='signup'?'new-password':'current-password';
 }
 function showAuth(){
-  authSession=null;playerId=null;$('playerHud').style.display='none';
+  authSession=null;playerId=null;$('playerHud').style.display='none';$('logoutBtn').style.display='none';
   setAuthMode('signup');$('authError').textContent='';showScreen('authScreen');
 }
 function setPlayerHud(id){
-  playerId=String(id);$('playerIdLabel').textContent='Player ID: '+playerId;$('playerHud').style.display='flex';
+  playerId=String(id);$('playerIdLabel').textContent='Player ID: '+playerId;$('playerHud').style.display='flex';$('logoutBtn').style.display='block';
+}
+async function logoutDreamWorld(){
+  const token=localStorage.getItem('dreamWorldSessionV1');
+  const button=$('logoutBtn');if(button){button.disabled=true;button.textContent='Logging out…'}
+  try{if(token)await fetch(DREAMWORLD_API+'/auth/logout',{method:'POST',headers:{Authorization:'Bearer '+token}})}catch(e){}
+  localStorage.removeItem('dreamWorldSessionV1');authSession=null;playerId=null;
+  if(button){button.disabled=false;button.textContent='↪ Log out'}
+  showAuth();
 }
 async function apiAuth(path,body){
   const res=await fetch(DREAMWORLD_API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
