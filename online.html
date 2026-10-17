@@ -489,6 +489,31 @@ html:has(#online.screen.active),body:has(#online.screen.active),#app:has(#online
 #online.screen.active #onlineWorldArea .online-controls button:active{transform:translateY(2px) scale(.97)!important}
 @media(prefers-reduced-motion:reduce){#online.screen.active *{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
+<style id="online-v75-parent-screen-lock">
+#parentScreenLock{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at 20% 10%,#fff9 0 3%,transparent 35%),linear-gradient(145deg,#9fe7ff,#c8d9ff 48%,#ffd8ef);font-family:inherit}
+#parentScreenLock.visible{display:flex}
+#parentScreenLock .lock-card{width:min(100%,380px);padding:28px 22px;border:4px solid white;border-radius:30px;background:#ffffffed;text-align:center;box-shadow:0 10px 0 #777acb55,0 22px 55px #283c6433}
+#parentScreenLock .lock-icon{font-size:56px;line-height:1.2}
+#parentScreenLock h2{color:#28365f;margin:12px 0 6px}
+#parentScreenLock p{color:#53618a;line-height:1.45}
+#parentScreenLock input{width:100%;box-sizing:border-box;border:3px solid #c9d6ff;border-radius:15px;padding:14px;font:700 18px inherit;text-align:center;margin:10px 0}
+#parentScreenLock button{border:0;border-radius:16px;padding:13px 18px;font:900 16px inherit;cursor:pointer;box-shadow:0 4px 0 #a8b0e8}
+#parentScreenLock .unlock{background:linear-gradient(#b7f39c,#67cf70);color:#214d34;width:100%}
+#parentScreenLock .lock-error{min-height:20px;color:#c43b55;font-weight:800}
+#online.screen.active #onlineWorldViewport{border-radius:22px!important;border:4px solid #fff!important;box-shadow:0 8px 0 #677dcc44,0 18px 35px #233b5720!important}
+#online.screen.active #onlineWorldCanvas{isolation:isolate!important;overflow:hidden!important;background-size:100% 100%!important}
+#online.screen.active #onlineWorldCanvas:before{z-index:0!important;opacity:.7!important;background:radial-gradient(ellipse at 18% 14%,#ffffffa8 0 4%,transparent 20%),radial-gradient(ellipse at 77% 19%,#ffffff88 0 5%,transparent 22%),linear-gradient(180deg,#b3eaff 0%,#e5faff 58%,transparent 58%)!important}
+#online.screen.active #onlineWorldCanvas .online-sky-label{z-index:2!important;color:#31527d!important;text-shadow:0 2px 0 #fff9!important}
+#online.screen.active #onlineWorldCanvas .online-cloud{filter:drop-shadow(0 5px 3px #567b8c18)!important;opacity:.86!important}
+#online.screen.active #onlineWorldCanvas .online-hill{filter:drop-shadow(0 7px 0 #4d9e5b15)!important}
+#online.screen.active #onlineWorldCanvas .online-building{filter:drop-shadow(0 8px 5px #3a536022)!important}
+#online.screen.active #onlineWorldCanvas .desert-platform{border-radius:14px 14px 4px 4px!important;box-shadow:0 7px 0 #53381d22,0 12px 22px #3d4c3514!important}
+#online.screen.active #onlineWorldCanvas.pawsville .desert-sun,#online.screen.active #onlineWorldCanvas.pawsville .desert-crates,#online.screen.active #onlineWorldCanvas.pawsville .desert-pyramid,#online.screen.active #onlineWorldCanvas.pawsville .desert-tree,#online.screen.active #onlineWorldCanvas.sunny-park .desert-sun,#online.screen.active #onlineWorldCanvas.sunny-park .desert-crates,#online.screen.active #onlineWorldCanvas.sunny-park .desert-pyramid,#online.screen.active #onlineWorldCanvas.sunny-park .desert-tree,#online.screen.active #onlineWorldCanvas.candy-coast .desert-sun,#online.screen.active #onlineWorldCanvas.candy-coast .desert-crates,#online.screen.active #onlineWorldCanvas.candy-coast .desert-pyramid,#online.screen.active #onlineWorldCanvas.candy-coast .desert-tree{display:none!important}
+#online.screen.active #onlineWorldCanvas.pawsville .online-platform-deco{filter:drop-shadow(0 5px 3px #315a2b25)!important}
+#online.screen.active #onlineWorldCanvas.candy-coast .online-platform-deco{filter:drop-shadow(0 5px 3px #7d426b22)!important}
+#online.screen.active #onlinePlayerMarkers .online-avatar .pet svg{shape-rendering:geometricPrecision!important}
+#online.screen.active #onlineWorldArea .online-controls{backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important;background:linear-gradient(180deg,#fff9,#e7f5ffed)!important;border-top:1px solid #ffffff!important;box-shadow:0 -10px 30px #3b65941a!important}
+</style>
 </head>
 <body><div id="app">
 <div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div><button id="logoutBtn" type="button" onclick="logoutDreamWorld()" aria-label="Log out of Dream World">↪ Log out</button>
@@ -976,6 +1001,19 @@ function unlockParentMenu(){
   if($('parentMenuCode')?.value!=='5030'){playSound('wrong');toast('That code does not match. Nothing was changed.');return;}
   playSound('success');renderParentDashboard();
 }
+
+function activateParentScreenLock(){
+ const overlay=$('parentScreenLock');if(!overlay)return;
+ closeModal();gameActive=false;paused=true;onlineMoveDirection=null;onlineKeys?.clear?.();
+ overlay.classList.add('visible');$('parentScreenUnlockCode')?.focus();
+}
+function unlockScreenLock(event){
+ if(event)event.preventDefault();
+ const code=$('parentScreenUnlockCode')?.value||'';
+ if(code!=='5030'){$('parentScreenLockError').textContent='That code is not correct. Ask your grown-up to try again.';playSound('wrong');return false;}
+ $('parentScreenLockError').textContent='';$('parentScreenUnlockCode').value='';$('parentScreenLock').classList.remove('visible');
+ paused=false;playSound('success');return false;
+}
 function formatPlayTime(seconds){seconds=Math.max(0,Math.floor(Number(seconds)||0));const h=Math.floor(seconds/3600),m=Math.floor((seconds%3600)/60);if(h)return h+' hr '+m+' min';return m+' min';}
 function getUsageData(){try{return JSON.parse(localStorage.getItem('estherParentUsageV1')||'{"totalSeconds":0,"days":{}}')}catch(e){return {totalSeconds:0,days:{}}}}
 function renderParentDashboard(){
@@ -984,7 +1022,7 @@ function renderParentDashboard(){
   const completed=Object.keys(levelDone||{}).filter(k=>levelDone[k]).length;
   const achCount=Object.values(achievements||{}).filter(Boolean).length+Object.values(achievementFlags||{}).filter(Boolean).length;
   const currentActivity=gameActive?'Playing a level':document.querySelector('.screen.active')?.id==='home'?'Home menu open':'Using the game menu';
-  $('modalContent').innerHTML=`<div style="font-size:2.5rem">📊🌈</div><h2>Parent Dashboard</h2><p>Play-time and progress summary for this browser and device. <b>Scroll down</b> to see all reports and recommendations.</p><div class="options" style="margin:12px 0"><div class="item"><div class="emoji">⏱️</div><b>Total time</b><br><small>${formatPlayTime(u.totalSeconds)}</small></div><div class="item"><div class="emoji">📅</div><b>Today</b><br><small>${formatPlayTime((u.days||{})[localDateKey(now)]||0)}</small></div><div class="item"><div class="emoji">🗓️</div><b>Last 7 days</b><br><small>${formatPlayTime(week)}</small></div><div class="item"><div class="emoji">🎮</div><b>Current activity</b><br><small>${currentActivity}</small></div><div class="item"><div class="emoji">⭐</div><b>Levels completed</b><br><small>${completed} of ${levels.length}</small></div><div class="item"><div class="emoji">🏆</div><b>Achievement flags</b><br><small>${achCount} earned</small></div><div class="item"><div class="emoji">✨</div><b>TOKENS</b><br><small>${Math.max(0,Number(coins)||0)}</small></div><div class="item"><div class="emoji">🎒</div><b>Shop items</b><br><small>${(itemsOwned||[]).length} owned · ${(ownedSkins||[]).length} skins</small></div></div><h3>💡 Grown-up check-in ideas</h3><ul style="text-align:left;line-height:1.6"><li>Try a short play session with a stretch or water break every 20–30 minutes.</li><li>Ask Esther which level or learning question she enjoyed most.</li><li>Play together sometimes and praise effort, not just completion.</li><li>These are local estimates; clearing browser data can erase the report.</li></ul><button class="bigbtn blue" onclick="recordUsageTick();renderParentDashboard()">🔄 Refresh Report</button><button class="bigbtn pink" style="margin-top:8px" onclick="closeModal()">Close Parent Menu</button><div class="footer-note">This static website does not send reports to anyone. Time counts only while this page is visible and open.</div>`;
+  $('modalContent').innerHTML=`<div style="font-size:2.5rem">📊🌈</div><h2>Parent Dashboard</h2><p>Play-time and progress summary for this browser and device. <b>Scroll down</b> to see all reports and recommendations.</p><div class="options" style="margin:12px 0"><div class="item"><div class="emoji">⏱️</div><b>Total time</b><br><small>${formatPlayTime(u.totalSeconds)}</small></div><div class="item"><div class="emoji">📅</div><b>Today</b><br><small>${formatPlayTime((u.days||{})[localDateKey(now)]||0)}</small></div><div class="item"><div class="emoji">🗓️</div><b>Last 7 days</b><br><small>${formatPlayTime(week)}</small></div><div class="item"><div class="emoji">🎮</div><b>Current activity</b><br><small>${currentActivity}</small></div><div class="item"><div class="emoji">⭐</div><b>Levels completed</b><br><small>${completed} of ${levels.length}</small></div><div class="item"><div class="emoji">🏆</div><b>Achievement flags</b><br><small>${achCount} earned</small></div><div class="item"><div class="emoji">✨</div><b>TOKENS</b><br><small>${Math.max(0,Number(coins)||0)}</small></div><div class="item"><div class="emoji">🎒</div><b>Shop items</b><br><small>${(itemsOwned||[]).length} owned · ${(ownedSkins||[]).length} skins</small></div></div><h3>💡 Grown-up check-in ideas</h3><ul style="text-align:left;line-height:1.6"><li>Try a short play session with a stretch or water break every 20–30 minutes.</li><li>Ask Esther which level or learning question she enjoyed most.</li><li>Play together sometimes and praise effort, not just completion.</li><li>These are local estimates; clearing browser data can erase the report.</li></ul><button class="bigbtn blue" onclick="recordUsageTick();renderParentDashboard()">🔄 Refresh Report</button><button class="bigbtn purple" style="margin-top:8px" onclick="activateParentScreenLock()">🔒 Lock Screen Now</button><button class="bigbtn pink" style="margin-top:8px" onclick="closeModal()">Close Parent Menu</button><div class="footer-note">This static website does not send reports to anyone. Time counts only while this page is visible and open.</div>`;
 }
 function localDateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function recordUsageTick(){
@@ -1401,4 +1439,5 @@ function randomizeCustomLook(){
 }
 function resetCustomLook(){col='#42a5ed';skinName='Classic Pup';accessory='🎀';selectedAnimal='🐶';playSound('tap');renderCustom();renderShop();saveProgress();toast('Back to your classic puppy look! 🐶')}
 
-</script></body></html>
+</script><div id="parentScreenLock" role="dialog" aria-modal="true" aria-labelledby="parentLockTitle"><div class="lock-card"><div class="lock-icon">🔒🌈</div><h2 id="parentLockTitle">Screen Locked</h2><p>A grown-up can unlock Dream World with the family code.</p><form onsubmit="return unlockScreenLock(event)"><input id="parentScreenUnlockCode" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="Family code" aria-label="Family code" required><button class="unlock" type="submit">🔓 Unlock Screen</button></form><div class="lock-error" id="parentScreenLockError" role="status"></div></div></div>
+</body></html>
