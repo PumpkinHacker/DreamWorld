@@ -451,14 +451,15 @@ function setPlayerHud(id){
 let serverTokenSyncTimer=null;
 function displayServerAnnouncement(message){
   const text=String(message||'').trim();
-  if(!text)return;
+  if(!text)return true;
   const seenKey='dreamWorldLastAnnouncementV1';
-  if(localStorage.getItem(seenKey)===text)return;
+  if(localStorage.getItem(seenKey)===text)return true;
   const popup=$('announcementPopup'),messageEl=$('announcementPopupMessage');
-  if(!popup||!messageEl||$('modal')?.classList.contains('show'))return;
+  if(!popup||!messageEl||$('modal')?.classList.contains('show'))return false;
   messageEl.textContent=text;
   popup.classList.add('show');
   localStorage.setItem(seenKey,text);
+  return true;
 }
 function closeServerAnnouncement(){$('announcementPopup')?.classList.remove('show')}
 $('announcementPopupClose')?.addEventListener('click',closeServerAnnouncement);
@@ -478,7 +479,10 @@ async function loadServerTokenBalance(){
     }
     if(data.announcement&&typeof data.announcement.message==='string'){
       const message=data.announcement.message.trim();
-      if(message!==lastServerAnnouncement){lastServerAnnouncement=message;if(message)displayServerAnnouncement(message);}
+      if(message!==lastServerAnnouncement){
+        if(!message)lastServerAnnouncement='';
+        else if(displayServerAnnouncement(message))lastServerAnnouncement=message;
+      }
     }
    }catch(err){console.warn('Could not refresh live Tokens or announcement.')}
    finally{serverStateRequest=null}
