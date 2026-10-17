@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#dff4ff"><title>Dream World Admin</title>
+<style>
+:root{color-scheme:light;--ink:#23466e;--blue:#2689e8;--pink:#ff83bd;--line:#cce7ff}
+*{box-sizing:border-box}body{margin:0;padding:20px;font-family:system-ui,-apple-system,sans-serif;background:linear-gradient(145deg,#dff7ff,#fff0f8);color:var(--ink)}main{max-width:850px;margin:auto}.card{background:#ffffffed;border:2px solid white;border-radius:22px;padding:20px;margin:16px 0;box-shadow:0 7px 0 #9cc9e544}h1{margin:8px 0;color:#2178c9;text-align:center}p{line-height:1.45}.muted{color:#637f9f;font-size:.92rem}.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:180px}label{display:block;font-weight:800;margin:10px 0 6px}input,textarea{font:inherit;width:100%;padding:12px;border:2px solid var(--line);border-radius:12px;background:#fbfeff;color:#183c66}textarea{min-height:90px;resize:vertical}button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:12px 16px;background:linear-gradient(#79caff,#2689e8);color:white;cursor:pointer;margin-top:10px}button.secondary{background:linear-gradient(#ffb4d6,#f46aa8)}button:disabled{opacity:.55;cursor:wait}.status{padding:11px 13px;border-radius:12px;background:#edf7ff;margin-top:12px;overflow-wrap:anywhere}.status.error{background:#fff0f0;color:#9c3030}.status.ok{background:#eaf9ee;color:#247444}.hidden{display:none}.player{padding:12px;border:1px solid var(--line);border-radius:12px;margin:8px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.player code{overflow-wrap:anywhere}.pill{background:#fff2be;border-radius:20px;padding:6px 10px;font-weight:900}.danger-note{border-left:4px solid #f1b94a;padding:10px 12px;background:#fff9e8;border-radius:8px}
+</style>
+</head>
+<body><main>
+<h1>🐾 Dream World Admin</h1>
+<p class="muted" style="text-align:center">Private management panel · connect to your existing game API</p>
+<section class="card" id="loginCard">
+<h2>Connect securely</h2>
+<p class="muted">Enter the API address and the ADMIN_TOKEN secret you set in Cloudflare. The token is kept in this tab's session only and is not saved to local storage.</p>
+<label for="apiUrl">API URL</label><input id="apiUrl" type="url" value="https://esther-world-api.daviolvcass.workers.dev" autocomplete="url">
+<label for="token">Admin token</label><input id="token" type="password" autocomplete="current-password" placeholder="Paste your ADMIN_TOKEN value">
+<button id="connectBtn">Connect to admin API</button><div id="loginStatus" class="status" role="status">Not connected yet.</div>
+</section>
+<section id="dashboard" class="hidden">
+<div class="card"><div class="row" style="align-items:center"><div><h2>Players</h2><p class="muted">The API returns up to 100 registered players.</p></div><div style="text-align:right"><button id="refreshBtn">Refresh players</button></div></div><div id="players"></div></div>
+<div class="card"><h2>Set player coins</h2><p class="muted">Enter the exact player ID and the new total coin balance.</p><label for="playerId">Player ID</label><input id="playerId" autocomplete="off" placeholder="Player ID"><label for="coins">New coin total (0–999,999,999)</label><input id="coins" type="number" min="0" max="999999999" step="1" placeholder="0"><button id="saveCoinsBtn">Save coin balance</button><div id="coinsStatus" class="status" role="status">No changes made.</div></div>
+<div class="card"><h2>Announcement</h2><p class="muted">Post a message for the game to display. Maximum 300 characters.</p><label for="announcement">Message</label><textarea id="announcement" maxlength="300" placeholder="Write an announcement for players…"></textarea><p class="muted"><span id="charCount">0</span>/300 characters</p><button id="saveAnnouncementBtn">Publish announcement</button><div id="announcementStatus" class="status" role="status">No announcement changes made.</div></div>
+<div class="card"><button id="disconnectBtn" class="secondary">Disconnect and clear token</button><p class="muted">This clears the token from this tab's session. It does not delete player data.</p></div>
+</section>
+<section class="card danger-note"><strong>Safety note:</strong> Never put your ADMIN_TOKEN into the public game HTML or share it in a screenshot. This page only sends it in the Authorization header to your API.</section>
+</main>
+<script>
+(function(){
+ const $=id=>document.getElementById(id);
+ let apiBase='',token='';
+ function status(id,msg,kind){const el=$(id);el.textContent=msg;el.className='status'+(kind?' '+kind:'')}
+ function cleanUrl(){return $('apiUrl').value.trim().replace(/\/+$/,'')}
+ async function api(path,method,body){
+  const opts={method:method||'GET',headers:{'Authorization':'Bearer '+token}};
+  if(body!==undefined){opts.headers['Content-Type']='application/json';opts.body=JSON.stringify(body)}
+  let response;
+  try{response=await fetch(apiBase+path,opts)}catch(e){throw new Error('Could not reach the API. Check the API URL and network.')}
+  let data={};try{data=await response.json()}catch(e){}
+  if(!response.ok)throw new Error(data.error||('API returned HTTP '+response.status));
+  return data;
+ }
+ async function connect(){
+  apiBase=cleanUrl();token=$('token').value;
+  if(!/^https:\/\//i.test(apiBase)){status('loginStatus','Enter a valid HTTPS API URL.','error');return}
+  if(!token){status('loginStatus','Enter your ADMIN_TOKEN value.','error');return}
+  $('connectBtn').disabled=true;status('loginStatus','Testing secure admin access…');
+  try{
+   const data=await api('/admin/players');
+   sessionStorage.setItem('dw_admin_api',apiBase);sessionStorage.setItem('dw_admin_token',token);
+   $('loginCard').classList.add('hidden');$('dashboard').classList.remove('hidden');
+   status('loginStatus','Connected.','ok');
+   if(data.announcement&&data.announcement.message)$('announcement').value=data.announcement.message;
+   $('charCount').textContent=$('announcement').value.length;
+   renderPlayers(data.players||[]);
+   status('announcementStatus','Current announcement loaded.','ok');
+  }catch(e){status('loginStatus',e.message,e.message==='Unauthorized'?'error':'error');token='';}
+  finally{$('connectBtn').disabled=false}
+ }
+ function renderPlayers(players){
+  const root=$('players');root.innerHTML='';
+  if(!players.length){root.textContent='No registered players found yet.';return}
+  players.forEach(p=>{
+   const row=document.createElement('div');row.className='player';
+   const info=document.createElement('div');const id=document.createElement('code');id.textContent=p.playerId;
+   const coins=document.createElement('div');coins.className='pill';coins.textContent=String(p.coins)+' coins';
+   const pick=document.createElement('button');pick.textContent='Select';pick.addEventListener('click',()=>{$('playerId').value=p.playerId;$('coins').value=p.coins;$('playerId').focus()});
+   info.appendChild(id);row.appendChild(info);row.appendChild(coins);row.appendChild(pick);root.appendChild(row);
+  });
+ }
+ async function refresh(){ $('refreshBtn').disabled=true;try{const d=await api('/admin/players');renderPlayers(d.players||[]);if(d.announcement&&typeof d.announcement.message==='string')$('announcement').value=d.announcement.message;$('charCount').textContent=$('announcement').value.length;status('coinsStatus','Player list refreshed.','ok')}catch(e){status('coinsStatus',e.message,'error')}finally{$('refreshBtn').disabled=false}}
+ async function saveCoins(){
+  const id=$('playerId').value.trim(),raw=$('coins').value,coins=Number(raw);
+  if(!id||raw===''||!Number.isSafeInteger(coins)||coins<0||coins>999999999){status('coinsStatus','Enter a player ID and a whole-number coin total from 0 to 999,999,999.','error');return}
+  $('saveCoinsBtn').disabled=true;
+  try{await api('/admin/coins','POST',{playerId:id,coins:coins});status('coinsStatus','Saved '+coins+' coins for player '+id+'.','ok');await refresh()}
+  catch(e){status('coinsStatus',e.message,'error')}finally{$('saveCoinsBtn').disabled=false}
+ }
+ async function saveAnnouncement(){
+  const message=$('announcement').value.trim();
+  if(!message||message.length>300){status('announcementStatus','Enter an announcement from 1 to 300 characters.','error');return}
+  $('saveAnnouncementBtn').disabled=true;
+  try{await api('/admin/announcement','POST',{message:message});status('announcementStatus','Announcement published.','ok')}
+  catch(e){status('announcementStatus',e.message,'error')}finally{$('saveAnnouncementBtn').disabled=false}
+ }
+ function disconnect(){token='';apiBase='';sessionStorage.removeItem('dw_admin_token');sessionStorage.removeItem('dw_admin_api');$('token').value='';$('dashboard').classList.add('hidden');$('loginCard').classList.remove('hidden');status('loginStatus','Disconnected. Token cleared from this tab.')}
+ $('connectBtn').addEventListener('click',connect);$('refreshBtn').addEventListener('click',refresh);$('saveCoinsBtn').addEventListener('click',saveCoins);$('saveAnnouncementBtn').addEventListener('click',saveAnnouncement);$('disconnectBtn').addEventListener('click',disconnect);
+ $('announcement').addEventListener('input',()=>$('charCount').textContent=$('announcement').value.length);
+ $('token').addEventListener('keydown',e=>{if(e.key==='Enter')connect()});
+ const rememberedApi=sessionStorage.getItem('dw_admin_api');if(rememberedApi)$('apiUrl').value=rememberedApi;
+})();
+</script></body></html>
