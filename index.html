@@ -100,6 +100,8 @@ button:active{transform:translateY(3px) scale(.98);box-shadow:0 2px 0 #153f7440}
 #logoutBtn{display:none;position:fixed;z-index:1000;top:max(8px,env(safe-area-inset-top));left:max(8px,env(safe-area-inset-left));border:2px solid #fff;border-radius:14px;padding:9px 13px;background:linear-gradient(#ff9aca,#f04f6a);color:#fff;font-size:.84rem;font-weight:1000;box-shadow:0 4px 0 #9d315544;pointer-events:auto}\n#logoutBtn:focus-visible{outline:3px solid #173b73;outline-offset:2px}
 #logoutBtn:disabled{opacity:.8;cursor:wait}
 .wardrobe-hint{margin:0 0 10px;padding:10px 12px;border-radius:14px;background:linear-gradient(110deg,#f1eaff,#e6f8ff);color:#63508c;font-weight:800;font-size:.88rem;text-align:center;border:1px solid #fff}.custom-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.custom-actions .bigbtn{font-size:.9rem;min-height:42px;margin:0;padding:8px}.wardrobe-tabs{display:flex;gap:8px;overflow-x:auto;padding:7px 3px 12px;scrollbar-width:thin}.wardrobe-tabs button{flex:0 0 auto;white-space:nowrap}.custom-layout .options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:300px;overflow:auto;padding:4px 4px 9px}.custom-layout .choice{min-height:48px;padding:8px;font-size:.9rem;overflow-wrap:anywhere}.custom-layout .choice:focus-visible,.wardrobe-tabs button:focus-visible{outline:3px solid #6d5bd0;outline-offset:2px}.skin-swatch{display:inline-block;width:20px;height:20px;border-radius:50%;vertical-align:middle;margin-right:5px;border:2px solid #fff;box-shadow:0 0 0 1px #b9b8dc}.custom-layout .previewbox{min-height:280px}.custom-layout .previewbox .puppy{filter:drop-shadow(0 9px 5px #5b5b7a26)}@media(max-width:620px){.custom-actions{grid-template-columns:1fr 1fr}.custom-layout .previewbox{min-height:205px}.custom-layout .options{grid-template-columns:repeat(2,minmax(0,1fr));max-height:240px}.custom-layout .choice{font-size:.84rem;min-height:44px}}
+
+#announcementPopup{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:18px;background:#153b67b8;backdrop-filter:blur(6px)}#announcementPopup.show{display:flex}#announcementPopup .announcement-card{width:min(500px,100%);max-height:80dvh;overflow:auto;background:linear-gradient(145deg,#fff,#f2f8ff);border:4px solid white;border-radius:26px;padding:24px;text-align:center;box-shadow:0 10px 0 #123a6a44}#announcementPopup h2{margin:4px 0 12px;color:#2074c8;font-size:clamp(1.5rem,4vw,2rem)}#announcementPopupMessage{white-space:pre-wrap;overflow-wrap:anywhere;color:#31577f;font-weight:850;user-select:text;line-height:1.5;margin:14px 0 20px}
 </style>
 <style id="esther-deluxe-design">
 :root{--navy:#14396f;--blue:#177be0;--pink:#f34f9e;--purple:#7951dc;--gold:#ffb929;--green:#27c86b}
@@ -203,6 +205,7 @@ button:disabled{cursor:not-allowed}
 <section id="word" class="screen"><div class="panel quiz"><div class="topbar"><button class="closebtn" onclick="showScreen('home')">‹</button><h2>🔤 Word Drop</h2><div class="coinpill">+5 ✨ TOKENS per word</div></div><div class="question" id="wordPrompt">Catch the letters to spell SUN!</div><div class="wordslots" id="wordSlots"></div><div class="wordboard" id="wordLetters"></div><div class="feedback" id="wordFeedback"></div><button class="bigbtn blue" onclick="newWord()">🔄 New Word</button></div></section>
 <section id="gameScreen"><canvas id="gameCanvas" class="gamecanvas"></canvas><div class="gamehud"><div class="hudgroup"><div class="coinpill" id="gameCoins">✨ 0 TOKENS</div></div><div class="hudgroup"><button class="roundbtn" onclick="toggleSound()" id="soundBtn" aria-label="Sound">🔊</button><button class="roundbtn mod" onclick="requestModMenu()" aria-label="Admin Panel">⚡</button><button class="roundbtn" onclick="pauseGame()" aria-label="Pause">Ⅱ</button><button class="roundbtn" onclick="askExit()" aria-label="Exit">×</button></div></div><div class="touchcontrols"><div class="hudgroup"><button id="leftBtn">←</button><button id="rightBtn">→</button></div><button id="jumpBtn">↑</button></div></section>
 <div class="modal-back" id="modal"><div class="modal" id="modalContent"></div></div>
+<div id="announcementPopup" role="dialog" aria-modal="true" aria-labelledby="announcementPopupTitle"><div class="announcement-card"><div style="font-size:2.8rem">📣✨</div><h2 id="announcementPopupTitle">Dream World Announcement!</h2><p id="announcementPopupMessage"></p><button class="bigbtn pink" id="announcementPopupClose" type="button">Got it! 💖</button></div></div>
 </div>
 <script>
 const $=id=>document.getElementById(id);
@@ -446,6 +449,19 @@ function setPlayerHud(id){
   playerId=String(id);try{localStorage.setItem('dreamWorldPlayerIdV1',playerId)}catch(e){}$('playerIdLabel').textContent='Player ID: '+playerId;$('playerHud').style.display='flex';$('logoutBtn').style.display='block';
 }
 let serverTokenSyncTimer=null;
+function displayServerAnnouncement(message){
+  const text=String(message||'').trim();
+  if(!text)return;
+  const seenKey='dreamWorldLastAnnouncementV1';
+  if(localStorage.getItem(seenKey)===text)return;
+  const popup=$('announcementPopup'),messageEl=$('announcementPopupMessage');
+  if(!popup||!messageEl||$('modal')?.classList.contains('show'))return;
+  messageEl.textContent=text;
+  popup.classList.add('show');
+  localStorage.setItem(seenKey,text);
+}
+function closeServerAnnouncement(){$('announcementPopup')?.classList.remove('show')}
+$('announcementPopupClose')?.addEventListener('click',closeServerAnnouncement);
 async function loadServerTokenBalance(){
   const token=localStorage.getItem('dreamWorldSessionV1');
   if(!token||!playerId)return;
@@ -455,7 +471,8 @@ async function loadServerTokenBalance(){
     if(!res.ok||!data.player)return;
     const balance=Number(data.player.coins);
     if(Number.isSafeInteger(balance)&&balance>=0){coins=Math.min(999999999,balance);saveProgress();syncCoins();}
-  }catch(err){console.warn('Could not load saved Tokens from account server.')}
+    if(data.announcement&&typeof data.announcement.message==='string')displayServerAnnouncement(data.announcement.message);
+  }catch(err){console.warn('Could not load saved Tokens or announcement from account server.')}
 }
 function scheduleServerTokenSync(){
   if(!playerId)return;
@@ -989,6 +1006,7 @@ syncCoins=function(){_syncCoins();saveProgress();scheduleServerTokenSync()};
    }
  };
 })();
+setInterval(()=>{if(playerId&&localStorage.getItem('dreamWorldSessionV1'))loadServerTokenBalance()},15000);
 loadProgress();
 // Start the loading progress and initialize the game screens.
 boot();
