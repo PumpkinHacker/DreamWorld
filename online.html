@@ -469,6 +469,26 @@ html:has(#online.screen.active),body:has(#online.screen.active),#app:has(#online
 #online.screen.active #onlineWorldCanvas.candy-coast .desert-platform{background:linear-gradient(#fff1b8 0 14%,#ffc9e8 14% 22%,#e9b977 22%,#c98c53 100%)!important;border-top-color:#fff8d7!important}
 #online.screen.active #onlineWorldCanvas .online-ground{z-index:4!important}
 </style>
+<style id="online-v74-smooth-graphics">
+/* Final unified visual layer: remove conflicting old overrides and soften edges. */
+#online.screen.active #onlineWorldViewport{overflow:hidden!important;isolation:isolate!important;contain:layout paint!important;background:#bceeff!important;scroll-behavior:auto!important}
+#online.screen.active #onlineWorldCanvas{will-change:transform!important;backface-visibility:hidden!important;-webkit-backface-visibility:hidden!important;transform:translateZ(0)!important;image-rendering:auto!important}
+#online.screen.active #onlineWorldCanvas:before{content:"";position:absolute;inset:0 0 20% 0;pointer-events:none;background:radial-gradient(ellipse at 15% 20%,#ffffff70 0 7%,transparent 23%),radial-gradient(ellipse at 76% 17%,#ffffff55 0 6%,transparent 22%),linear-gradient(180deg,#a9e5ff 0%,#dff7ff 76%,#e8fbff 100%);z-index:0}
+#online.screen.active #onlineWorldCanvas.pawsville{background:linear-gradient(180deg,#a8e5ff 0%,#e3f8ff 56%,#b9e995 56%,#8bd76b 100%)!important}
+#online.screen.active #onlineWorldCanvas.sunny-park{background:linear-gradient(180deg,#9fe1ff 0%,#e2f8ff 53%,#c3ef93 53%,#83d35e 100%)!important}
+#online.screen.active #onlineWorldCanvas.candy-coast{background:linear-gradient(180deg,#ffd8ee 0%,#fff0f8 53%,#ffe8b5 53%,#f4c68b 100%)!important}
+#online.screen.active #onlineWorldCanvas .desert-platform{border:0!important;border-radius:12px 12px 3px 3px!important;overflow:hidden!important;box-shadow:0 7px 0 #55371b20,0 12px 22px #503b1b12!important;outline:2px solid #ffffff20!important;will-change:transform!important}
+#online.screen.active #onlineWorldCanvas.pawsville .desert-platform{background:linear-gradient(180deg,#d8ffad 0 8%,#78d45c 8% 17%,#a87542 17%,#88552e 100%)!important}
+#online.screen.active #onlineWorldCanvas.sunny-park .desert-platform{background:linear-gradient(180deg,#e0ffb0 0 8%,#91df60 8% 17%,#b9854b 17%,#95602f 100%)!important}
+#online.screen.active #onlineWorldCanvas.candy-coast .desert-platform{background:linear-gradient(180deg,#fff5c9 0 8%,#ffcae6 8% 17%,#e9bd85 17%,#ce965d 100%)!important}
+#online.screen.active #onlineWorldCanvas .online-ground{border:0!important;background:linear-gradient(180deg,#a9eb78 0%,#66c94f 12%,#57bb48 18%,#49ad3d 100%)!important;box-shadow:0 -3px 0 #e5ffd0,0 -7px 0 #ffffff50!important}
+#online.screen.active #onlinePlayerMarkers .online-avatar,#online.screen.active #onlinePlayerMarkers button.online-avatar{transition:none!important;will-change:left,top!important;backface-visibility:hidden!important;-webkit-backface-visibility:hidden!important}
+#online.screen.active #onlinePlayerMarkers .online-avatar .pet{filter:drop-shadow(0 4px 2px #263b3030)!important;transform:translateZ(0)!important}
+#online.screen.active #onlinePlayerMarkers .online-avatar .username{box-shadow:0 3px 0 #d3a13d!important;border-color:#f2bd3e!important}
+#online.screen.active #onlineWorldArea .online-controls button{transition:transform .12s ease,box-shadow .12s ease!important}
+#online.screen.active #onlineWorldArea .online-controls button:active{transform:translateY(2px) scale(.97)!important}
+@media(prefers-reduced-motion:reduce){#online.screen.active *{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
 </head>
 <body><div id="app">
 <div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div><button id="logoutBtn" type="button" onclick="logoutDreamWorld()" aria-label="Log out of Dream World">↪ Log out</button>
