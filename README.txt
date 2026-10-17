@@ -1,1 +1,0 @@
-Dream World Version 41\nReplace your existing index.html with this file. This is a standalone website file; no separate worker or admin file is required. Make a backup of your current index.html before replacing it.\n
