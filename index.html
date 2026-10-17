@@ -345,7 +345,37 @@ function renderBackgrounds(){const grid=$('backgroundGrid');if(!grid)return;grid
 function setBackground(id){if(!backgroundOptions.some(b=>b.id===id))return;activeBackground=id;applyBackground();renderBackgrounds();try{localStorage.setItem('estherDreamworldBackground',id)}catch(e){}if(id==='halloween'){playSound('success');toast('Halloween Haunt selected! 🎃 Halloween music will play automatically in levels.')}else{playSound('tap');toast('Background changed to '+backgroundOptions.find(b=>b.id===id).name+'! 🌈')}saveProgress()}
 function loadBackground(){try{const v=localStorage.getItem('estherDreamworldBackground');if(backgroundOptions.some(b=>b.id===v))activeBackground=v}catch(e){}applyBackground();renderBackgrounds()}
 
-function boot(){loadBackground();startMusic();renderPuppy('loadHero');renderPuppy('homeHero');let p=0;let timer=setInterval(()=>{p+=4+Math.random()*8;$('progress').style.width=Math.min(100,p)+'%';if(p>=100){clearInterval(timer);setTimeout(()=>showScreen('home'),280)}},100);renderLevels();renderCustom();renderShop();newWord();syncCoins()}
+function boot(){
+  // Start the loading indicator first, so a separate setup error cannot strand the player here.
+  let p=0;
+  const progress=$('progress');
+  const timer=setInterval(()=>{
+    p=Math.min(100,p+8);
+    if(progress)progress.style.width=p+'%';
+    if(p>=100){
+      clearInterval(timer);
+      setTimeout(()=>{
+        try{showScreen('home');}
+        catch(err){
+          console.error('Dream World could not open the home menu:',err);
+          document.querySelectorAll('.screen').forEach(screen=>screen.classList.remove('active'));
+          const home=$('home');
+          if(home)home.classList.add('active');
+        }
+      },250);
+    }
+  },100);
+  const safeInit=(label,fn)=>{try{fn();}catch(err){console.error('Dream World setup issue ('+label+'):',err);}};
+  safeInit('background',loadBackground);
+  safeInit('music',startMusic);
+  safeInit('loading puppy',()=>renderPuppy('loadHero'));
+  safeInit('home puppy',()=>renderPuppy('homeHero'));
+  safeInit('levels',renderLevels);
+  safeInit('customization',renderCustom);
+  safeInit('shop',renderShop);
+  safeInit('word game',newWord);
+  safeInit('tokens',syncCoins);
+}
 function highestUnlockedLevel(){let n=1;while(n<8&&levelDone[n])n++;return n}
 function renderLevels(){$('levelGrid').innerHTML=levels.map((l,i)=>{const n=i+1,unlocked=n<=9?(n===9||n<=highestUnlockedLevel()):(n===10||!!levelDone[n-1]),done=!!levelDone[n];return `<button class="levelcard ${unlocked?'unlocked':'locked'}" style="background:linear-gradient(145deg,${l[2]},${l[3]});" ${unlocked?`onclick="startLevel(${n})"`:'disabled aria-disabled="true"'}><strong>${n===9?'🎃 HALLOWEEN':n>=10?'🚀 SPACE '+(n-9):unlocked?'LEVEL':'🔒 LEVEL'} ${n>=10?n-9:n===9?'':n}</strong><span class="levelart">${unlocked?l[1]:'🔒'}</span><b>${l[0]}</b><br><small>${done?'⭐ Complete':unlocked?(n===9?'🎃 Jump on pumpkins & ghosts':n>=10?'🚀 Explore this space level':'▶ Start adventure'):'🔒 Complete the previous level'}</small></button>`}).join('');const q=$('spaceQuestSummary');if(q){const done=[10,11,12,13,14].filter(n=>levelDone[n]).length;q.textContent=done+'/5 space levels complete. Hidden signal: finish Alien Arcade (Level 13) to discover the secret signal!'} }
 function renderCustom(){ $('customPreview').innerHTML=puppySVG();renderPuppy('homeHero');if($('characterDetails'))$('characterDetails').textContent=selectedAnimal+' '+skinName+' · '+({'🎀':'Bow','⭐':'Star','🧢':'Cool cap','💖':'Heart','🌸':'Flower','👑':'Royal crown','🦋':'Butterfly','🌈':'Rainbow','🪽':'Angel wings','✨':'Sparkles','🕶️':'Sunnies','🍓':'Berry clip'}[accessory]||accessory); const palette=[['Ocean Pop','#42a5ed'],['Berry Fizz','#f07bb6'],['Mint Dream','#56c9a1'],['Sunbeam','#f4bd49'],['Galaxy Grape','#8057df'],['Cotton Candy','#ffb7e3'],['Dragonfire','#ff654f'],['Lime Sprite','#a6e843'],['Moon Silver','#c7d4ef'],['Midnight','#26335e'],['Rainbow Magic','rainbow'],['Unicorn Aura','unicorn'],['Starlight','starlight'],['Crystal Ice','#a6f4ff'],['Peach Puff','#ffb58e'],['Mystic Lavender','#c7a2ff'],['Comet Tail','comet'],['Magic Opal','opal'],['Bubblegum','#ff79d1'],['Arctic Aurora','aurora']]; $('colors').innerHTML=palette.map(([n,c])=>{let v=c==='rainbow'?'linear-gradient(90deg,red,orange,yellow,lime,cyan,blue,violet)':c==='comet'?'linear-gradient(135deg,#ff7a59,#ffd166,#7ee8fa,#b388ff)':c==='opal'?'linear-gradient(135deg,#f7b8ff,#9ef6ff,#fff3a6,#b9a7ff)':c==='aurora'?'linear-gradient(135deg,#75fff0,#7aa8ff,#d69cff)':c==='unicorn'?'linear-gradient(135deg,#ffb5e8,#bca8ff,#a7f3ff)':c==='starlight'?'linear-gradient(135deg,#17244f,#9c8aff,#fff4a6)':c;return `<button class="choice ${col===c?'selected':''}" onclick="col='${c}';skinName='Custom: ${n}';playSound('tap');renderCustom();renderShop();saveProgress()"><span class="swatch" style="background:${v}"></span>${n}</button>`}).join(''); $('accessories').innerHTML=['🎀','⭐','🧢','🌸','👑','🦋','🎧','👟','🪽','🧣','🎃','🦇','🧙','👻'].map(a=>`<button class="choice ${accessory===a?'selected':''}" onclick="accessory='${a}';playSound('tap');renderCustom();saveProgress()">${a} ${({'🎀':'Bow','⭐':'Star','🧢':'Cool cap','💖':'Heart','🌸':'Flower','👑':'Royal crown','🦋':'Butterfly','🌈':'Rainbow','🪽':'Angel wings','✨':'Sparkles','🕶️':'Sunnies','🍓':'Berry clip','🫧':'Bubble wand','💎':'Shiny gem','🐉':'Tiny dragon','🪄':'Wish wand','🍭':'Candy trail','🪐':'Planet pet','💫':'Comet shoes','🧸':'Teddy pack','🎒':'Adventure pack','🪁':'Kite buddy','🍄':'Mushroom hat','🐝':'Bee buddy','🦕':'Dino pal','🧚':'Fairy dust','🧿':'Lucky charm','🎧':'Headphones','🛼':'Roller paws','🧣':'Cozy scarf','🪺':'Nest hat','🦜':'Parrot pal','🎃':'Pumpkin hat','🦇':'Bat wings','🧙':'Witch hat','👻':'Ghost backpack'})[a]}</button>`).join('')}
