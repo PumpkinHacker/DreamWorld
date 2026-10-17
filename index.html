@@ -635,7 +635,7 @@ const _saveProgressV29=saveProgress;
 saveProgress=function(){try{const old=JSON.parse(localStorage.getItem('estherDreamworldV5')||'{}');old.selectedAnimal=selectedAnimal;old.coins=coins;old.col=col;old.accessory=accessory;old.skinName=skinName;old.ownedSkins=ownedSkins;old.itemsOwned=itemsOwned;old.levelDone=levelDone;old.currentLevel=currentLevel;old.achievements=achievements;old.claimedAchievements=claimedAchievements;old.wordsSolved=wordsSolved;old.achievementFlags=achievementFlags;old.powers=powers;old.activeBackground=activeBackground;localStorage.setItem('estherDreamworldV5',JSON.stringify(old));localStorage.setItem('dreamWorldVersion','31')}catch(e){} _saveProgressV29()};
 // Replace the old one-screen shop renderer with its original unchanged implementation; space shop is separate.
 
-boot();
+// Game initialization runs at the end, after all state variables are declared.
 // Dreamworld Deluxe: keep pretend progress on this device only.
 function saveProgress(){
   try{localStorage.setItem('estherDreamworldV4',JSON.stringify({coins,col,accessory,skinName,ownedSkins,itemsOwned,levelDone,currentLevel,achievements,claimedAchievements,wordsSolved,achievementFlags,powers,activeBackground,selectedAnimal}));localStorage.setItem('estherDreamworldV5',JSON.stringify({coins,col,accessory,skinName,ownedSkins,itemsOwned,levelDone,currentLevel,achievements,claimedAchievements,wordsSolved,achievementFlags,powers,activeBackground,selectedAnimal}));}catch(e){}
