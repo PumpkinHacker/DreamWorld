@@ -952,7 +952,7 @@ previewShopSkin=function(n,c){$('shopPreviewPup').innerHTML=paintShopPreview({fu
 setSpaceCategory=function(c){spaceCategory=c;renderSpaceShop()};
 renderSpaceShop=function(){
  const coin=$('coinSpaceShop');if(coin)coin.textContent='✨ '+coins+' TOKENS';const initialPreview=$('spacePreviewPup');if(initialPreview&&!initialPreview.innerHTML)initialPreview.innerHTML=paintShopPreview();
- const animals=[['🐶','Dream Pup',0],['🐱','Space Cat',0],['🐰','Moon Bunny',80],['🦊','Star Fox',90],['🐼','Galaxy Panda',100],['🐸','Astro Frog',85],['🦄','Nebula Unicorn',130],['🐻','Orbit Bear',95]];
+ const animals=[['🐶','Dream Pup',0],['🐱','Space Cat',0],['🐰','Moon Bunny',80],['🦊','Star Fox',90],['🐼','Galaxy Panda',100],['🐸','Astro Frog',85],['🐻','Orbit Bear',95],['🦁','Sunrise Lion',110],['🐨','Cloud Koala',105],['🦌','Forest Fawn',115],['🐲','Crystal Dragon',160],['🐹','Berry Hamster',75],['🦔','Hedgehog',85]];
  $('animalGrid').style.display=(spaceCategory==='all'||spaceCategory==='animals')?'grid':'none';
  $('animalGrid').innerHTML=animals.map(([emoji,name,price])=>{const id='animal:'+emoji,owned=price===0||itemsOwned.includes(id),active=selectedAnimal===emoji;return `<div class="item" onclick="previewSpaceAnimal('${emoji}','${name}')"><div class="emoji">${emoji}</div><b>${name}</b><br><small>${active?'✨ Selected':owned?'Unlocked':price+' Tokens'}</small><button onclick="event.stopPropagation();chooseSpaceAnimal('${emoji}','${name}',${price})">${active?'✓ Selected':owned?'Choose':'Unlock · '+price}</button></div>`}).join('');
  const skins=spaceSkins.filter(x=>spaceCategory==='all'||spaceCategory==='skins');
