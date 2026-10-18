@@ -290,6 +290,25 @@ button:disabled{cursor:not-allowed}
 .mini-prompt{font-size:clamp(1.35rem,5vw,2rem);font-weight:1000;text-align:center;color:#2466a7;padding:24px 10px;min-height:110px;display:grid;place-items:center}
 .mini-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:10px 0 18px}.mini-choice{min-height:65px;border:3px solid white;border-radius:18px;background:linear-gradient(#dff4ff,#b9e2ff);box-shadow:0 4px 0 #8bbce5;color:#214e7c;font-size:1.25rem;font-weight:1000;padding:12px;cursor:pointer}.mini-choice:disabled{opacity:.8}.mini-choice.correct{background:linear-gradient(#d8ffe6,#9be9b7)}.mini-choice.wrong{background:linear-gradient(#ffe2e8,#ffb6c5)}
 @media(max-width:420px){.mini-games-grid{gap:9px}.mini-thumb{height:88px}.mini-game-card{padding:8px}.mini-game-card b{font-size:.92rem}}
+
+/* Polished mini-game cards and drawing studio */
+.mini-games-grid{gap:15px;margin:22px 0 26px}
+.mini-game-card{overflow:hidden;border:2px solid #fff;border-radius:25px;background:linear-gradient(155deg,#fff,#f0f7ff);box-shadow:0 6px 0 #b6d4ef,0 12px 24px #477ab018;transition:transform .15s}
+.mini-game-card:active{transform:translateY(3px);box-shadow:0 3px 0 #b6d4ef}
+.mini-thumb{height:116px;border:1px solid #ffffffa8;border-radius:19px;font-size:3rem;box-shadow:inset 0 -18px 30px #ffffff24}
+.mini-thumb small{padding:4px 9px;border-radius:20px;background:#ffffffb8;letter-spacing:1.6px}
+.mini-game-card b{font-size:1.04rem;color:#234e80}.mini-game-card>small{font-size:.8rem;color:#667d9c;line-height:1.35}
+.thumb-word{background:radial-gradient(circle at 20% 15%,#fff7fc,#ffacd6 60%,#f17ab7)}.thumb-math{background:radial-gradient(circle at 20% 15%,#f4fff8,#9ae8bd 60%,#51c994)}.thumb-memory{background:radial-gradient(circle at 20% 15%,#faf6ff,#c7b4ff 60%,#9782eb)}.thumb-animal{background:radial-gradient(circle at 20% 15%,#fffdf2,#ffda8a 60%,#ffb34f)}.thumb-color{background:radial-gradient(circle at 20% 15%,#fff,#a7efff 45%,#8daeff 75%,#d3a7ff)}.thumb-odd{background:radial-gradient(circle at 20% 15%,#f7f9ff,#b8caff 60%,#879ef0)}
+.drawing-studio{width:100%;max-width:740px;margin:0 auto}.drawing-tip{font-size:.92rem;font-weight:800;text-align:center;color:#6480a1;margin:0 0 12px}
+.drawing-canvas-wrap{border:4px solid white;border-radius:23px;overflow:hidden;background:#fff;box-shadow:0 5px 0 #c9dff5,0 10px 24px #42658c18}
+#colorDrawingCanvas{display:block;width:100%;height:clamp(260px,42vh,430px);touch-action:none;cursor:crosshair;background:#fff}
+.drawing-tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:9px;padding:14px 5px 5px}
+.draw-color{width:36px;height:36px;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 0 #b9cde2;cursor:pointer}.draw-color.active{outline:3px solid #457fc4;outline-offset:2px;transform:scale(1.08)}
+.draw-tool-btn{border:2px solid white;border-radius:15px;padding:10px 13px;background:linear-gradient(#eff8ff,#d8ebff);box-shadow:0 3px 0 #b6d2ee;color:#2b5d8f;font-weight:1000}
+.draw-tool-btn.primary{background:linear-gradient(#ffb9dc,#ff86c0);box-shadow:0 3px 0 #dc68a1;color:#76305a}
+.drawing-size-row{display:flex;align-items:center;justify-content:center;gap:10px;color:#5c7899;font-size:.9rem;font-weight:900;margin-top:10px}.drawing-size-row input{width:130px;accent-color:#ec76b6}
+.drawing-caption{padding:10px 12px;border-radius:15px;background:#f2f8ff;color:#6480a1;font-size:.82rem;font-weight:800;text-align:center;margin:12px 0}
+@media(max-width:420px){.mini-thumb{height:100px}.mini-game-card{padding:8px}.drawing-tools{gap:8px}.draw-tool-btn{padding:9px 10px}}
 </style></head>
 <body><div id="app">
 <div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div><button id="logoutBtn" type="button" onclick="logoutDreamWorld()" aria-label="Log out of Dream World">↪ Log out</button>
@@ -1418,6 +1437,7 @@ function startMiniGame(kind){miniKind=kind;showScreen('miniPlay');nextMiniRound(
 function miniButtonChoices(items){$('miniChoices').innerHTML=items.map((v,i)=>'<button class="mini-choice" onclick="checkMiniAnswer('+i+',this)">'+v.label+'</button>').join('')}
 function nextMiniRound(){
  miniMemoryFirst=null;miniMemoryLock=false;miniCorrect=-1;
+ if(miniKind==='color'){renderColorStudio();return;}
  const info=miniGameInfo[miniKind]||miniGameInfo.math;$('miniTitle').textContent=info.title;$('miniFeedback').textContent='Pick an answer to earn +5 tokens! ✨';
  let choices=[],prompt='';
  if(miniKind==='math'){
@@ -1446,4 +1466,25 @@ function pickMemory(i,btn){
  if(miniMemoryFirst.dataset.pair===btn.dataset.pair){miniMemoryFirst.disabled=true;btn.disabled=true;miniMemoryFirst.classList.add('correct');btn.classList.add('correct');$('miniFeedback').textContent='A match! +5 tokens! ✨';coins+=5;syncCoins();saveProgress();playSound('success');}
  else{$('miniFeedback').textContent='Not a match — tap Play Again to shuffle!';playSound('tap')}
 }
+
+let drawColor='#ff5ca8',drawSize=7,drawIsDown=false,drawLast=null,drawRewarded=false,drawHistory=[];
+function renderColorStudio(){
+ $('miniTitle').textContent='🌈 Color Pop Studio';
+ $('miniPrompt').innerHTML='<div class="drawing-studio"><div style="font-size:2.2rem;margin-bottom:6px">🎨 Make something magical!</div><div class="drawing-tip">Draw with your finger or mouse. Pick colors, doodle, and make your own masterpiece.</div></div>';
+ const palette=[['#ff5ca8','Pink'],['#ff884d','Orange'],['#ffd447','Yellow'],['#53c985','Green'],['#39bff0','Blue'],['#9271f5','Purple'],['#4b5268','Ink'],['#ffffff','Eraser']];
+ $('miniChoices').innerHTML='<div class="drawing-studio"><div class="drawing-tools" id="drawPalette">'+palette.map(([c,n])=>'<button class="draw-color '+(c===drawColor?'active':'')+'" style="background:'+c+'" aria-label="'+n+'" title="'+n+'" data-color="'+c+'"></button>').join('')+'</div><div class="drawing-canvas-wrap"><canvas id="colorDrawingCanvas" aria-label="Drawing canvas"></canvas></div><div class="drawing-size-row"><span>🖌️ Brush</span><input id="drawSizeInput" type="range" min="2" max="24" value="'+drawSize+'"><span id="drawSizeLabel">'+drawSize+' px</span></div><div class="drawing-tools"><button class="draw-tool-btn" id="drawUndo">↶ Undo</button><button class="draw-tool-btn" id="drawClear">🧽 Clear</button><button class="draw-tool-btn primary" id="drawDone">✨ Done!</button></div><div class="drawing-caption">Just for fun — keep drawing, undo a stroke, or clear the canvas to start fresh.</div></div>';
+ $('miniFeedback').textContent='Choose a color and start drawing! 🖍️';drawRewarded=false;drawHistory=[];setupDrawingCanvas();
+ document.querySelectorAll('.draw-color').forEach(b=>b.onclick=()=>{drawColor=b.dataset.color;document.querySelectorAll('.draw-color').forEach(x=>x.classList.toggle('active',x===b))});
+ $('drawSizeInput').oninput=e=>{drawSize=Number(e.target.value);$('drawSizeLabel').textContent=drawSize+' px'};
+ $('drawClear').onclick=clearDrawing;$('drawUndo').onclick=undoDrawing;$('drawDone').onclick=finishDrawing;
+}
+function setupDrawingCanvas(){
+ const c=$('colorDrawingCanvas');if(!c)return;const r=c.getBoundingClientRect(),dpr=Math.max(1,Math.min(2,window.devicePixelRatio||1));c.width=Math.round(r.width*dpr);c.height=Math.round(r.height*dpr);const x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.lineCap='round';x.lineJoin='round';x.fillStyle='#fff';x.fillRect(0,0,r.width,r.height);
+ c.onpointerdown=e=>{e.preventDefault();c.setPointerCapture(e.pointerId);drawIsDown=true;const b=c.getBoundingClientRect();drawLast={x:e.clientX-b.left,y:e.clientY-b.top};drawHistory.push(x.getImageData(0,0,c.width,c.height));if(drawHistory.length>12)drawHistory.shift();x.beginPath();x.arc(drawLast.x,drawLast.y,drawSize/2,0,Math.PI*2);x.fillStyle=drawColor;x.fill()};
+ c.onpointermove=e=>{if(!drawIsDown)return;e.preventDefault();const b=c.getBoundingClientRect(),p={x:e.clientX-b.left,y:e.clientY-b.top};x.beginPath();x.moveTo(drawLast.x,drawLast.y);x.lineTo(p.x,p.y);x.strokeStyle=drawColor;x.lineWidth=drawSize;x.stroke();drawLast=p};
+ const stop=()=>{drawIsDown=false;drawLast=null};c.onpointerup=stop;c.onpointercancel=stop;c.onlostpointercapture=stop;
+}
+function clearDrawing(){const c=$('colorDrawingCanvas');if(!c)return;const x=c.getContext('2d'),dpr=c.width/Math.max(1,c.getBoundingClientRect().width),r=c.getBoundingClientRect();x.clearRect(0,0,c.width,c.height);x.fillStyle='#fff';x.fillRect(0,0,r.width,r.height);drawHistory=[];$('miniFeedback').textContent='Fresh canvas! What will you draw? 🌈'}
+function undoDrawing(){const c=$('colorDrawingCanvas');if(!c||!drawHistory.length)return;c.getContext('2d').putImageData(drawHistory.pop(),0,0);$('miniFeedback').textContent='Last stroke undone. ✨'}
+function finishDrawing(){if(!drawRewarded){coins+=5;syncCoins();saveProgress();drawRewarded=true;playSound('success');$('miniFeedback').textContent='Masterpiece made! +5 tokens! Keep creating! 🌟'}else $('miniFeedback').textContent='Your masterpiece is ready — keep drawing or clear it for a fresh page! 🎨'}
 </script></body></html>
