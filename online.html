@@ -594,6 +594,15 @@ html,body{height:100%;overflow:hidden!important}
 #online.screen.active #onlineWorldArea:not([hidden]) .online-controls>span{display:none!important}
 #online.screen.active .online-safety-note{display:none!important}
 @media(max-height:520px){#online.screen.active #onlineWorldArea:not([hidden]) .online-dpad button{width:48px!important;height:44px!important}#online.screen.active #onlineWorldArea:not([hidden]) .online-jump{height:48px!important}}
+</style><style id="pawsville-platformer-v62">/* Pawsville v62: unmistakably a neighborhood platformer, with low continuous land. */
+#online.screen.active #onlineWorldCanvas.pawsville{background:linear-gradient(180deg,#83d9ff 0%,#d9f5ff 43%,#a9e7ff 44%,#d9f4b3 45%,#83d66d 100%)!important}
+#online.screen.active #onlineWorldCanvas.pawsville:before{content:"🏡　　 🏪　　 🏫　　 🏠　　 🏡　　 🏬　　 🏡";position:absolute;left:40px;right:0;top:29%;height:18%;font-size:clamp(42px,8vw,76px);letter-spacing:12px;white-space:nowrap;z-index:1;pointer-events:none;filter:drop-shadow(0 5px 0 #fff8)}
+#online.screen.active #onlineWorldCanvas.pawsville .online-ground{position:absolute!important;left:0!important;right:0!important;bottom:0!important;width:100%!important;height:25%!important;min-height:110px!important;background:repeating-linear-gradient(0deg,#a76b3d 0 9px,#93572f 9px 12px)!important;border-top:12px solid #62c94e!important;z-index:4!important}
+#online.screen.active #onlineWorldCanvas.pawsville .online-hill{bottom:25%!important;z-index:0!important}
+#online.screen.active #onlineWorldCanvas.pawsville .online-platform-deco{bottom:26%!important;z-index:5!important}
+#online.screen.active #onlineWorldCanvas.pawsville .desert-platform{z-index:6!important}
+#online.screen.active #onlineWorldCanvas.pawsville .online-sky-sun{left:82%!important;top:8%!important}
+#online.screen.active #onlineWorldCanvas.pawsville .online-clou d{pointer-events:none}
 </style></head>
 <body><div id="app">
 <div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div><button id="logoutBtn" type="button" onclick="logoutDreamWorld()" aria-label="Log out of Dream World">↪ Log out</button>
