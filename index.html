@@ -489,15 +489,19 @@ function boot(){
   // Watchdog: the home menu still opens even if a progress callback fails.
   setTimeout(openHome,3000);
   const safeInit=(label,fn)=>{try{fn();}catch(err){console.error('Dream World setup issue ('+label+'):',err);}};
+  // Keep startup lightweight so the loading screen cannot be held hostage by heavy shop/customization rendering.
   safeInit('background',loadBackground);
   safeInit('music',startMusic);
   safeInit('loading puppy',()=>renderPuppy('loadHero'));
-  safeInit('home puppy',()=>renderPuppy('homeHero'));
-  safeInit('levels',renderLevels);
-  safeInit('customization',renderCustom);
-  safeInit('shop',renderShop);
-  safeInit('word game',newWord);
   safeInit('tokens',syncCoins);
+  // Build secondary screens after the first frame, not during the critical loading path.
+  setTimeout(()=>{
+    safeInit('home puppy',()=>renderPuppy('homeHero'));
+    safeInit('levels',renderLevels);
+    safeInit('customization',renderCustom);
+    safeInit('shop',renderShop);
+    safeInit('word game',newWord);
+  },50);
 }
 
 const DREAMWORLD_API='https://dreamworld-account-api.daviolvcass.workers.dev';
