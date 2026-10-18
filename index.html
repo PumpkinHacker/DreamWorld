@@ -1365,4 +1365,26 @@ function resetCustomLook(){col='#42a5ed';skinName='Classic Pup';accessory='🎀'
  });
 })();
 
+
+// Version 61: expose the full animal roster directly in customization.
+(function restoreCustomizationAnimalRoster(){
+ const previousRenderCustom=renderCustom;
+ renderCustom=function(){
+  previousRenderCustom();
+  const host=document.getElementById('customPreview');
+  if(!host)return;
+  let panel=document.getElementById('customAnimalRoster');
+  if(!panel){panel=document.createElement('div');panel.id='customAnimalRoster';panel.style.cssText='margin:12px 0;padding:12px;background:#f1f4ff;border:2px solid #d9defe;border-radius:16px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;';
+   const title=document.createElement('h3');title.textContent='🐾 Choose Your Animal';title.style.cssText='grid-column:1/-1;margin:0 0 4px;color:#4c4a98';panel.appendChild(title);
+   const roster=[['🐶','Dream Pup'],['🐱','Garden Kitty'],['🐰','Meadow Bunny'],['🦊','Little Fox'],['🐼','Panda Pal'],['🐸','Puddle Frog'],['🦄','Rainbow Unicorn'],['🐻','Honey Bear'],['🦁','Sunny Lion'],['🐨','Koala Cloud'],['🦌','Woodland Fawn'],['🐲','Tiny Dragon'],['🐹','Berry Hamster'],['🦔','Little Hedgehog']];
+   roster.forEach(([emoji,name])=>{const button=document.createElement('button');button.type='button';button.textContent=emoji+'\n'+name;button.style.cssText='white-space:pre-line;min-width:0;padding:9px 3px;border:2px solid #d5daf8;border-radius:12px;background:#fff;font-weight:800;font-size:12px;';button.onclick=()=>{selectedAnimal=emoji;saveProgress();renderCustom();renderShop();toast(name+' selected! 🐾')};panel.appendChild(button)});
+   const style=document.createElement('style');style.textContent='#customAnimalRoster button:active{transform:scale(.97)}@media(max-width:420px){#customAnimalRoster{grid-template-columns:repeat(3,minmax(0,1fr))!important}}';panel.appendChild(style);
+   host.parentNode.insertBefore(panel,host.nextSibling);
+  }
+  panel.querySelectorAll('button').forEach(button=>{const emoji=button.textContent.trim().split('\n')[0];button.style.outline=emoji===selectedAnimal?'3px solid #8b79ff':'none';button.style.background=emoji===selectedAnimal?'#e6e1ff':'#fff'});
+ };
+ const animals=['🐶','🐱','🐰','🦊','🐼','🐸','🦄','🐻','🦁','🐨','🦌','🐲','🐹','🦔'];
+ const originalRandomize=randomizeCustomLook;
+ randomizeCustomLook=function(){originalRandomize();selectedAnimal=animals[Math.floor(Math.random()*animals.length)];renderCustom();renderShop();saveProgress()};
+})();
 </script></body></html>
