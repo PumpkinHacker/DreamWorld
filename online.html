@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<!-- Dream World Version 51: expanded live maps, themed landmarks, extra jump platforms, and bounce pads -->
+<!-- Dream World Version 52: platform edge-fall fix, smoother jumping, safer live refreshes, and polished map UI -->
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#c8e8ff"><title>Dream World — Online World</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23268de8'/%3E%3Ccircle cx='50' cy='62' r='21' fill='%23fff'/%3E%3Cellipse cx='27' cy='35' rx='10' ry='14' fill='%23fff'/%3E%3Cellipse cx='45' cy='24' rx='10' ry='14' fill='%23fff'/%3E%3Cellipse cx='65' cy='24' rx='10' ry='14' fill='%23fff'/%3E%3Cellipse cx='80' cy='37' rx='8' ry='12' fill='%23fff'/%3C/svg%3E">
@@ -532,7 +532,19 @@ html:has(#online.screen.active),body:has(#online.screen.active),#app:has(#online
 @media(prefers-reduced-motion:reduce){#online.screen.active #onlineWorldCanvas .live-map-prop{animation:none!important}}
 </style>
 
-</head>
+<style id="dreamworld-v52-polish">
+#online.screen .online-panel{max-width:1100px!important;background:linear-gradient(145deg,#fffffffa,#f2f8fffa)!important;border:1px solid #ffffff!important;box-shadow:0 18px 48px #294b7d22,0 4px 0 #d5e8ff!important}
+#online.screen .online-map-card{border:2px solid #fff!important;border-radius:22px!important;box-shadow:0 8px 0 #274a7820,0 14px 28px #315f8c14!important;transition:transform .18s,box-shadow .18s,filter .18s!important;overflow:hidden}
+#online.screen .online-map-card:active{transform:translateY(2px) scale(.99)!important}
+#online.screen .online-map-card b{font-size:1.05rem!important;letter-spacing:.01em}
+#online.screen .online-world-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 14px;border-radius:16px;background:linear-gradient(90deg,#e8f5ff,#fff1f8);margin-bottom:10px}
+#online.screen #onlineStatus{font-size:.82rem;font-weight:800;padding:6px 10px;border-radius:999px;background:#ffffffd9;max-width:100%}
+#online.screen .online-world-viewport{border:4px solid #fff;box-shadow:0 0 0 1px #cce3ff,0 12px 28px #315f8c1c}
+#online.screen .online-controls button{min-width:58px;min-height:54px;border-radius:17px!important;box-shadow:0 5px 0 #244a772e!important}
+#online.screen .online-player-list{gap:10px}
+#online.screen .online-avatar{border:2px solid #fff!important;box-shadow:0 5px 0 #274a7820!important}
+@media(max-width:600px){#online.screen .online-panel{padding:12px!important}#online.screen .online-map-card{min-height:145px}#online.screen .online-world-viewport{min-height:260px}}
+</style></head>
 <body><div id="app">
 <div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div><button id="logoutBtn" type="button" onclick="logoutDreamWorld()" aria-label="Log out of Dream World">↪ Log out</button>
 <div id="scenery"><div class="cloud" style="top:10%;left:10%"></div><div class="cloud" style="top:24%;left:60%;animation-delay:-14s;transform:scale(.7)"></div><div class="hill"></div><div class="hill h2"></div><div class="flowerfield"></div></div>
@@ -605,13 +617,13 @@ function toggleMusic(){musicOn=!musicOn;$('musicBtn').textContent=musicOn?'🎵 
 function toggleSound(){soundOn=!soundOn;$('soundBtn').textContent=soundOn?'🔊':'🔇';if(soundOn){playSound('tap');if(musicOn)startMusic()}else if(musicTimer){clearInterval(musicTimer);musicTimer=null}}
 
 /* Online World side-scrolling platformer presence: usernames only; no public chat. */
-let onlineMapId='',onlineX=8,onlineY=77,onlineRefreshTimer=null,onlineHeartbeatTimer=null,onlineRequestBusy=false,onlineMoveTimer=null,onlineMoveDirection='',onlineLastMoveAt=0,onlineLastSentX=-999,onlineLastSentY=-999,onlineKeys=new Set(),onlineJumpVelocity=0,onlineGrounded=true,onlineJumpHeld=false,onlineMoveFrame=0,onlineCachedCanvas=null,onlineCachedPlatforms=[],onlineCachedGroundTop=0;
+let onlineMapId='',onlineX=8,onlineY=77,onlineRefreshTimer=null,onlineHeartbeatTimer=null,onlineRequestBusy=false,onlinePlayersRequestSeq=0,onlineMoveTimer=null,onlineMoveDirection='',onlineLastMoveAt=0,onlineLastSentX=-999,onlineLastSentY=-999,onlineKeys=new Set(),onlineJumpVelocity=0,onlineGrounded=true,onlineJumpHeld=false,onlineMoveFrame=0,onlineCachedCanvas=null,onlineCachedPlatforms=[],onlineCachedGroundTop=0;
 const ONLINE_MAPS={pawsville:{title:'🏘️ Pawsville',className:'pawsville'},'sunny-park':{title:'🌞 Sunny Park',className:'sunny-park'},'candy-coast':{title:'🍭 Candy Coast',className:'candy-coast'}};
 function openOnlineWorld(){if(!localStorage.getItem('dreamWorldSessionV1')){showAuth();$('authError').textContent='Create an account or log in to visit the Online World.';return}const tab=window.open('online.html?world=1','_blank');if(!tab)location.href='online.html?world=1'}
 function showOnlineMaps(){stopOnlineTimers(true);$('onlineWorldArea').hidden=true;$('onlineMapPicker').hidden=false;onlineMapId=''}
-async function enterOnlineMap(mapId){if(!ONLINE_MAPS[mapId])return;const token=localStorage.getItem('dreamWorldSessionV1');if(!token){showAuth();return}stopOnlineTimers(true);onlineMapId=mapId;onlineX=8;onlineY=78;onlineJumpVelocity=0;onlineGrounded=true;window.onlineVelocityX=0;$('onlineMapPicker').hidden=true;$('onlineWorldArea').hidden=false;$('onlineMapTitle').textContent=ONLINE_MAPS[mapId].title;$('onlineWorldCanvas').className='online-world-canvas '+ONLINE_MAPS[mapId].className;$('onlineStatus').textContent='Connecting…';$('onlinePlayerMarkers').innerHTML='';$('onlinePlayerList').textContent='Finding players…';$('onlineWorldViewport').scrollLeft=0;await syncOnlinePresence();onlineRefreshTimer=setInterval(loadOnlinePlayers,1200);onlineHeartbeatTimer=setInterval(syncOnlinePresence,900);onlineLastSentX=-999;onlineLastSentY=-999;onlineLastMoveAt=performance.now();onlineCachedCanvas=null;if(onlineMoveTimer)clearInterval(onlineMoveTimer);if(onlineMoveFrame)cancelAnimationFrame(onlineMoveFrame);onlineMoveFrame=requestAnimationFrame(tickOnlineMovement);loadOnlinePlayers()}
-async function syncOnlinePresence(){const token=localStorage.getItem('dreamWorldSessionV1');if(!token||!onlineMapId||onlineRequestBusy)return;onlineRequestBusy=true;onlineLastSentX=onlineX;onlineLastSentY=onlineY;try{const res=await fetch(DREAMWORLD_API+'/online/presence',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({mapId:onlineMapId,x:onlineX,y:onlineY,dog:{animal:selectedAnimal,fur:col,skin:skinName,accessory}}),cache:'no-store'});if(res.status===401){stopOnlineTimers(false);$('onlineStatus').textContent='Please log in again';return}if(!res.ok)throw Error('Presence unavailable');$('onlineStatus').textContent='🟢 Online · live updates'}catch(e){$('onlineStatus').textContent='Reconnecting…'}finally{onlineRequestBusy=false}}
-async function loadOnlinePlayers(){const token=localStorage.getItem('dreamWorldSessionV1');if(!token||!onlineMapId)return;try{const res=await fetch(DREAMWORLD_API+'/online/players?map='+encodeURIComponent(onlineMapId),{headers:{Authorization:'Bearer '+token},cache:'no-store'});const data=await res.json();if(!res.ok)throw Error(data.error||'Could not load players');renderOnlinePlayers(data.players||[])}catch(e){$('onlineStatus').textContent='Connection interrupted — retrying…'}}
+async function enterOnlineMap(mapId){if(!ONLINE_MAPS[mapId])return;const token=localStorage.getItem('dreamWorldSessionV1');if(!token){showAuth();return}stopOnlineTimers(true);onlinePlayersRequestSeq++;onlineMapId=mapId;onlineX=8;onlineY=78;onlineJumpVelocity=0;onlineGrounded=true;onlineJumpHeld=false;window.onlineVelocityX=0;$('onlineMapPicker').hidden=true;$('onlineWorldArea').hidden=false;$('onlineMapTitle').textContent=ONLINE_MAPS[mapId].title;$('onlineWorldCanvas').className='online-world-canvas '+ONLINE_MAPS[mapId].className;$('onlineStatus').textContent='Connecting…';$('onlinePlayerMarkers').innerHTML='';$('onlinePlayerList').textContent='Finding players…';$('onlineWorldViewport').scrollLeft=0;await syncOnlinePresence();onlineRefreshTimer=setInterval(loadOnlinePlayers,1200);onlineHeartbeatTimer=setInterval(syncOnlinePresence,900);onlineLastSentX=-999;onlineLastSentY=-999;onlineLastMoveAt=performance.now();onlineCachedCanvas=null;if(onlineMoveTimer)clearInterval(onlineMoveTimer);if(onlineMoveFrame)cancelAnimationFrame(onlineMoveFrame);onlineMoveFrame=requestAnimationFrame(tickOnlineMovement);loadOnlinePlayers()}
+async function syncOnlinePresence(){const token=localStorage.getItem('dreamWorldSessionV1'),mapAtStart=onlineMapId;if(!token||!mapAtStart||onlineRequestBusy)return;onlineRequestBusy=true;onlineLastSentX=onlineX;onlineLastSentY=onlineY;try{const res=await fetch(DREAMWORLD_API+'/online/presence',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({mapId:mapAtStart,x:onlineX,y:onlineY,dog:{animal:selectedAnimal,fur:col,skin:skinName,accessory}}),cache:'no-store'});if(onlineMapId!==mapAtStart)return;if(res.status===401){stopOnlineTimers(false);$('onlineStatus').textContent='Please log in again';return}if(!res.ok)throw Error('Presence unavailable');$('onlineStatus').textContent='🟢 Online · live updates'}catch(e){if(onlineMapId===mapAtStart)$('onlineStatus').textContent='Connection issue — retrying shortly'}finally{onlineRequestBusy=false}}
+async function loadOnlinePlayers(){const token=localStorage.getItem('dreamWorldSessionV1'),mapAtStart=onlineMapId;if(!token||!mapAtStart)return;const requestSeq=++onlinePlayersRequestSeq;try{const res=await fetch(DREAMWORLD_API+'/online/players?map='+encodeURIComponent(mapAtStart),{headers:{Authorization:'Bearer '+token},cache:'no-store'});const data=await res.json();if(requestSeq!==onlinePlayersRequestSeq||mapAtStart!==onlineMapId)return;if(!res.ok)throw Error(data.error||'Could not load players');renderOnlinePlayers(Array.isArray(data.players)?data.players:[])}catch(e){if(requestSeq===onlinePlayersRequestSeq&&mapAtStart===onlineMapId)$('onlineStatus').textContent='Player list unavailable — retrying shortly'}}
 function dogSvgForData(dog){const old={selectedAnimal,col,skinName,accessory};try{const d=dog&&typeof dog==='object'?dog:{};selectedAnimal=['🐶','🐱','🐰','🦊','🐼','🐸','🦄','🐻'].includes(d.animal)?d.animal:'🐶';col=typeof d.fur==='string'&&(/^(#[0-9a-f]{3,8}|[a-z]+)$/i.test(d.fur)||['rainbow','unicorn','starlight','comet','opal','aurora'].includes(d.fur))?d.fur:'#42a5ed';skinName=typeof d.skin==='string'?d.skin.slice(0,40):'Classic Pup';accessory=typeof d.accessory==='string'?d.accessory.slice(0,8):'🎀';return puppySVG()}finally{selectedAnimal=old.selectedAnimal;col=old.col;skinName=old.skinName;accessory=old.accessory}}
 function openPlayerProfile(id,username,dog){const mine=String(id)===String(playerId||localStorage.getItem('dreamWorldPlayerIdV1')||'');window.onlineProfileDog=dog||null;$('profilePlayerName').textContent='🐾 '+username;$('profileDogCaption').textContent=mine?'Your custom Dream World dog ✨':username+'’s custom dog ✨';const stage=$('profileDogStage');stage.innerHTML=dogSvgForData(window.onlineProfileDog);const svg=stage.querySelector('svg');if(svg){svg.classList.add('puppy');svg.removeAttribute('width');svg.removeAttribute('height');svg.style.width='min(78%,360px)';svg.style.maxHeight='80%'}window.profileReturnScreen='online';showScreen('playerProfile')}
 function closePlayerProfile(){showScreen('online')}
@@ -640,7 +652,7 @@ function tickOnlineMovement(){
  }
  const groundTop=onlineCachedGroundTop,prevY=ch*onlineY/100;
  if(!onlineGrounded){
-  onlineJumpVelocity+=1350*dt;let nextY=prevY+onlineJumpVelocity*dt,land=groundTop;
+  onlineJumpVelocity+=(onlineJumpHeld&&onlineJumpVelocity<0?1000:1450)*dt;let nextY=prevY+onlineJumpVelocity*dt,land=groundTop;
   let landingPlatform=null;
   if(onlineJumpVelocity>=0)for(const p of onlineCachedPlatforms){
    if(px+18>p.left&&px-18<p.right&&prevY<=p.top+7&&nextY>=p.top&&p.top<land){land=p.top;landingPlatform=p;}
@@ -652,17 +664,23 @@ function tickOnlineMovement(){
   }
   onlineY=Math.max(3,Math.min(98,nextY/ch*100));
  }else{
-  let support=groundTop;
-  for(const p of onlineCachedPlatforms)if(px+18>p.left&&px-18<p.right&&Math.abs(prevY-p.top)<Math.max(14,ch*.035)&&p.top<support)support=p.top;
-  onlineY=support/ch*100;
+  let support=null;
+  for(const p of onlineCachedPlatforms){
+   const overlaps=px+18>p.left&&px-18<p.right;
+   const nearTop=Math.abs(prevY-p.top)<Math.max(14,ch*.035);
+   if(overlaps&&nearTop&&(support===null||p.top<support))support=p.top;
+  }
+  if(support!==null){onlineY=support/ch*100;onlineJumpVelocity=0}
+  else if(prevY>=groundTop){onlineY=groundTop/ch*100;onlineJumpVelocity=0}
+  else{onlineGrounded=false;onlineJumpVelocity=Math.max(0,onlineJumpVelocity)}
  }
  const marker=markers.querySelector('.is-me');
  if(marker){marker.style.left=onlineX+'%';marker.style.top=onlineY+'%'}
  const playerPixel=cw*onlineX/100;viewport.scrollLeft=Math.max(0,Math.min(cw-viewport.clientWidth,playerPixel-viewport.clientWidth*.38));
  onlineMoveFrame=requestAnimationFrame(tickOnlineMovement);
 }
-document.addEventListener('keydown',function(e){if(!onlineMapId||!['ArrowLeft','ArrowRight','ArrowUp',' ','w','a','d','W','A','D'].includes(e.key))return;if(e.target&&['INPUT','TEXTAREA'].includes(e.target.tagName))return;e.preventDefault();const key=e.key.length===1?e.key.toLowerCase():e.key;onlineKeys.add(key);if(['ArrowUp',' ','w'].includes(key)&&onlineGrounded){onlineJumpVelocity=-210;onlineGrounded=false;playSound('jump')}});document.addEventListener('keyup',function(e){onlineKeys.delete(e.key.length===1?e.key.toLowerCase():e.key)});window.addEventListener('blur',function(){onlineKeys.clear();onlineMoveDirection='';onlineJumpHeld=false});
-function stopOnlineTimers(removePresence){onlineKeys.clear();onlineMoveDirection='';onlineJumpHeld=false;if(onlineMoveTimer)clearInterval(onlineMoveTimer);onlineMoveTimer=null;if(onlineMoveFrame)cancelAnimationFrame(onlineMoveFrame);onlineMoveFrame=0;onlineCachedCanvas=null;onlineCachedPlatforms=[];if(onlineRefreshTimer)clearInterval(onlineRefreshTimer);if(onlineHeartbeatTimer)clearInterval(onlineHeartbeatTimer);onlineRefreshTimer=onlineHeartbeatTimer=null;if(removePresence&&onlineMapId){const token=localStorage.getItem('dreamWorldSessionV1');if(token)fetch(DREAMWORLD_API+'/online/leave',{method:'POST',headers:{Authorization:'Bearer '+token}}).catch(()=>{})}}
+document.addEventListener('keydown',function(e){if(!onlineMapId||!['ArrowLeft','ArrowRight','ArrowUp',' ','w','a','d','W','A','D'].includes(e.key))return;if(e.target&&['INPUT','TEXTAREA'].includes(e.target.tagName))return;e.preventDefault();const key=e.key.length===1?e.key.toLowerCase():e.key;onlineKeys.add(key);if(['ArrowUp',' ','w'].includes(key)){onlineJumpHeld=true;if(onlineGrounded){onlineJumpVelocity=-300;onlineGrounded=false;playSound('jump')}}});document.addEventListener('keyup',function(e){const key=e.key.length===1?e.key.toLowerCase():e.key;onlineKeys.delete(key);if(['ArrowUp',' ','w'].includes(key))onlineJumpHeld=false});window.addEventListener('blur',function(){onlineKeys.clear();onlineMoveDirection='';onlineJumpHeld=false});
+function stopOnlineTimers(removePresence){onlinePlayersRequestSeq++;onlineKeys.clear();onlineMoveDirection='';onlineJumpHeld=false;if(onlineMoveTimer)clearInterval(onlineMoveTimer);onlineMoveTimer=null;if(onlineMoveFrame)cancelAnimationFrame(onlineMoveFrame);onlineMoveFrame=0;onlineCachedCanvas=null;onlineCachedPlatforms=[];if(onlineRefreshTimer)clearInterval(onlineRefreshTimer);if(onlineHeartbeatTimer)clearInterval(onlineHeartbeatTimer);onlineRefreshTimer=onlineHeartbeatTimer=null;if(removePresence&&onlineMapId){const token=localStorage.getItem('dreamWorldSessionV1');if(token)fetch(DREAMWORLD_API+'/online/leave',{method:'POST',headers:{Authorization:'Bearer '+token}}).catch(()=>{})}}
 function leaveOnlineWorld(){stopOnlineTimers(true);onlineMapId='';showScreen('home')}
 
 function showScreen(id){const target=$(id);if(id!=='game'&&!target){console.warn('Esther World: unknown screen',id);return}playSound('tap');$('modal').classList.remove('show');$('gameScreen').style.display='none';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));if(id==='game'){ $('gameScreen').style.display='block'; resizeCanvas();}else target.classList.add('active');syncCoins();if(id==='levels')renderLevels();if(id==='shop')renderShop();if(id==='backgrounds')renderBackgrounds();if(id==='custom')renderCustom();if(id==='home')renderPuppy('homeHero');if(id==='word')newWord()}
