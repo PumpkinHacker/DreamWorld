@@ -338,6 +338,17 @@ button:disabled{cursor:not-allowed}
 .mini-choices:has(.drawing-studio)>.drawing-studio{width:100%}
 @media(max-width:420px){.mini-games-grid{gap:11px}.mini-game-card{padding:8px;border-radius:21px}.mini-game-card .mini-thumb{height:105px;min-height:105px;font-size:3rem}.mini-game-card b{font-size:.94rem}.mini-game-card>small{font-size:.74rem}}
 
+
+/* Extra art tools and richer mini-game artwork */
+.sticker-tools{padding-top:2px}.sticker-label{font-size:.82rem;font-weight:900;color:#6480a1}.draw-sticker{width:39px;height:39px;border:2px solid white;border-radius:13px;background:linear-gradient(145deg,#fff,#eaf4ff);box-shadow:0 3px 0 #c7d9ef;font-size:1.25rem;cursor:pointer}.draw-sticker.active{outline:3px solid #7c8df5;outline-offset:1px;transform:translateY(-2px)}.draw-tool-btn{border:2px solid #fff;border-radius:14px;background:linear-gradient(145deg,#fff,#edf5ff);color:#365c84;font-weight:900;padding:10px 13px;box-shadow:0 3px 0 #c9dced}.draw-tool-btn.primary{background:linear-gradient(135deg,#ff91c9,#c1a7ff);color:#fff;box-shadow:0 3px 0 #b68cd9}
+.mini-game-card .mini-thumb{height:132px;min-height:132px;font-size:3.7rem;text-shadow:0 3px 8px #24446b20}
+.thumb-word{background:radial-gradient(circle at 50% 43%,#fff9 0 20%,transparent 21%),radial-gradient(circle at 20% 15%,#fff 0 4%,transparent 5%),linear-gradient(135deg,#ff78bd 0%,#f3a8ff 48%,#8eafff 100%)}
+.thumb-math{background:radial-gradient(circle at 50% 43%,#ffffffb8 0 20%,transparent 21%),radial-gradient(circle at 78% 18%,#fff 0 5%,transparent 6%),linear-gradient(135deg,#67dba7 0%,#aaf0c8 48%,#72c8ff 100%)}
+.thumb-memory{background:radial-gradient(circle at 38% 40%,#fff9 0 17%,transparent 18%),radial-gradient(circle at 65% 57%,#fff8 0 17%,transparent 18%),linear-gradient(135deg,#a88bff 0%,#e0baff 52%,#8ea6ff 100%)}
+.thumb-animal{background:radial-gradient(circle at 50% 43%,#fff9 0 21%,transparent 22%),radial-gradient(circle at 17% 18%,#fff 0 5%,transparent 6%),linear-gradient(135deg,#ffdb83 0%,#ffb46d 52%,#ff9eb8 100%)}
+.thumb-color{background:radial-gradient(circle at 50% 43%,#ffffffb8 0 22%,transparent 23%),radial-gradient(circle at 17% 18%,#fff 0 5%,transparent 6%),linear-gradient(135deg,#6ee7ff 0%,#9cb8ff 48%,#efa9ed 100%)}
+.thumb-odd{background:radial-gradient(circle at 50% 43%,#fff9 0 21%,transparent 22%),radial-gradient(circle at 78% 17%,#fff 0 5%,transparent 6%),linear-gradient(135deg,#8de3df 0%,#a9c0ff 52%,#d7a8ff 100%)}
+
 </style></head>
 <body><div id="app">
 <div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div><button id="logoutBtn" type="button" onclick="logoutDreamWorld()" aria-label="Log out of Dream World">↪ Log out</button>
@@ -1470,7 +1481,7 @@ function nextMiniRound(){
  const info=miniGameInfo[miniKind]||miniGameInfo.math;$('miniTitle').textContent=info.title;$('miniFeedback').textContent='Pick an answer to earn +5 tokens! ✨';
  let choices=[],prompt='';
  if(miniKind==='math'){
-  const a=1+Math.floor(Math.random()*12),b=1+Math.floor(Math.random()*12),op=Math.random()<.5?'+':'−';miniAnswer=op==='+'?a+b:a-b;prompt='🐶 '+a+' '+op+' '+b+' = ?';choices=[miniAnswer,miniAnswer+2,miniAnswer-1,miniAnswer+4].sort(()=>Math.random()-.5).map(v=>({label:String(v),value:v}));
+  let a,b,op;if(Math.random()<.5){a=1+Math.floor(Math.random()*8);b=1+Math.floor(Math.random()*(9-a));op='+';}else{a=1+Math.floor(Math.random()*9);b=1+Math.floor(Math.random()*a);op='−';}miniAnswer=op==='+'?a+b:a-b;prompt='🐶 '+a+' '+op+' '+b+' = ?';const opts=[miniAnswer];while(opts.length<4){const v=1+Math.floor(Math.random()*9);if(!opts.includes(v))opts.push(v)}choices=opts.sort(()=>Math.random()-.5).map(v=>({label:String(v),value:v}));
  }else if(miniKind==='animal'){
   const qs=[{q:'Who says “meow”?',a:'🐱 Cat',opts:['🐱 Cat','🐸 Frog','🐮 Cow','🦆 Duck']},{q:'Which animal has a long trunk?',a:'🐘 Elephant',opts:['🦊 Fox','🐘 Elephant','🐰 Bunny','🐼 Panda']},{q:'Which animal hops?',a:'🐰 Bunny',opts:['🐢 Turtle','🐰 Bunny','🐟 Fish','🐌 Snail']},{q:'Who is known as the king of the jungle?',a:'🦁 Lion',opts:['🐹 Hamster','🦁 Lion','🐸 Frog','🐧 Penguin']}];const q=qs[Math.floor(Math.random()*qs.length)];prompt=q.q;miniAnswer=q.a;choices=q.opts.sort(()=>Math.random()-.5).map(v=>({label:v,value:v}));
  }else if(miniKind==='color'){
@@ -1486,7 +1497,8 @@ function checkMiniAnswer(i,btn){
  if(btn.disabled)return;const val=btn.dataset.value;const good=miniKind==='math'?Number(val)===miniAnswer:val===miniAnswer;
  [...$('miniChoices').children].forEach(b=>b.disabled=true);
  if(good){btn.classList.add('correct');$('miniFeedback').textContent='Great job! +5 tokens! 🌟';coins+=5;syncCoins();playSound('success');saveProgress()}
- else{btn.classList.add('wrong');$('miniFeedback').textContent='Nice try! The answer is '+miniAnswer+'. Tap Play Again for another!';playSound('tap')}
+ else{btn.classList.add('wrong');$('miniFeedback').textContent='The answer is '+miniAnswer+'. Next question coming up!';playSound('tap')}
+ if(miniKind==='odd'||miniKind==='animal'){[...$('miniChoices').children].forEach(b=>b.disabled=true);setTimeout(()=>nextMiniRound(),1100)}
 }
 function pickMemory(i,btn){
  if(miniMemoryLock||btn.disabled)return;btn.textContent=btn.dataset.pair;
@@ -1496,24 +1508,25 @@ function pickMemory(i,btn){
  else{$('miniFeedback').textContent='Not a match — tap Play Again to shuffle!';playSound('tap')}
 }
 
-let drawColor='#ff5ca8',drawSize=7,drawIsDown=false,drawLast=null,drawRewarded=false,drawHistory=[];
+let drawColor='#ff5ca8',drawSize=7,drawIsDown=false,drawLast=null,drawRewarded=false,drawHistory=[],drawStamp='';
 function renderColorStudio(){
  $('miniTitle').textContent='🌈 Color Pop Studio';
  $('miniPrompt').innerHTML='<div class="drawing-studio"><div style="font-size:2.2rem;margin-bottom:6px">🎨 Make something magical!</div><div class="drawing-tip">Draw with your finger or mouse. Pick colors, doodle, and make your own masterpiece.</div></div>';
- const palette=[['#ff5ca8','Pink'],['#ff884d','Orange'],['#ffd447','Yellow'],['#53c985','Green'],['#39bff0','Blue'],['#9271f5','Purple'],['#4b5268','Ink'],['#ffffff','Eraser']];
- $('miniChoices').innerHTML='<div class="drawing-studio"><div class="drawing-tools" id="drawPalette">'+palette.map(([c,n])=>'<button class="draw-color '+(c===drawColor?'active':'')+'" style="background:'+c+'" aria-label="'+n+'" title="'+n+'" data-color="'+c+'"></button>').join('')+'</div><div class="drawing-canvas-wrap"><canvas id="colorDrawingCanvas" aria-label="Drawing canvas"></canvas></div><div class="drawing-size-row"><span>🖌️ Brush</span><input id="drawSizeInput" type="range" min="2" max="24" value="'+drawSize+'"><span id="drawSizeLabel">'+drawSize+' px</span></div><div class="drawing-tools"><button class="draw-tool-btn" id="drawUndo">↶ Undo</button><button class="draw-tool-btn" id="drawClear">🧽 Clear</button><button class="draw-tool-btn primary" id="drawDone">✨ Done!</button></div><div class="drawing-caption">Just for fun — keep drawing, undo a stroke, or clear the canvas to start fresh.</div></div>';
+ const palette=[['#ff5ca8','Pink'],['#ff884d','Orange'],['#ffd447','Yellow'],['#53c985','Green'],['#39bff0','Blue'],['#9271f5','Purple'],['#4b5268','Ink'],['eraser','🧽 Eraser']];
+ $('miniChoices').innerHTML='<div class="drawing-studio"><div class="drawing-tools" id="drawPalette">'+palette.map(([c,n])=>'<button class="draw-color '+((c===drawColor||(c==='eraser'&&drawColor==='eraser'))?'active':'')+'" style="background:'+(c==='eraser'?'linear-gradient(135deg,#fff 45%,#dcecff 46%,#dcecff 55%,#fff 56%)':c)+'" aria-label="'+n+'" title="'+n+'" data-color="'+c+'"></button>').join('')+'</div><div class="drawing-tools sticker-tools"><span class="sticker-label">Stickers:</span>'+['⭐','❤️','🌈','🐾','🌸','☁️'].map(v=>'<button class="draw-sticker" type="button" data-stamp="'+v+'" aria-label="Stamp '+v+'">'+v+'</button>').join('')+'</div><div class="drawing-canvas-wrap"><canvas id="colorDrawingCanvas" aria-label="Drawing canvas"></canvas></div><div class="drawing-size-row"><span>🖌️ Brush</span><input id="drawSizeInput" type="range" min="2" max="24" value="'+drawSize+'"><span id="drawSizeLabel">'+drawSize+' px</span></div><div class="drawing-tools"><button class="draw-tool-btn" id="drawUndo">↶ Undo</button><button class="draw-tool-btn" id="drawClear">🧽 Clear</button><button class="draw-tool-btn" id="drawSave">💾 Save Art</button><button class="draw-tool-btn primary" id="drawDone">✨ Done!</button></div><div class="drawing-caption">Just for fun — keep drawing, undo a stroke, or clear the canvas to start fresh.</div></div>';
  $('miniFeedback').textContent='Choose a color and start drawing! 🖍️';drawRewarded=false;drawHistory=[];setupDrawingCanvas();
- document.querySelectorAll('.draw-color').forEach(b=>b.onclick=()=>{drawColor=b.dataset.color;document.querySelectorAll('.draw-color').forEach(x=>x.classList.toggle('active',x===b))});
+ document.querySelectorAll('.draw-color').forEach(b=>b.onclick=()=>{drawColor=b.dataset.color;drawStamp='';document.querySelectorAll('.draw-color').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.draw-sticker').forEach(x=>x.classList.remove('active'));$('miniFeedback').textContent=drawColor==='eraser'?'Eraser selected — rub over marks to remove them. 🧽':'Color selected — let’s draw! 🎨'});document.querySelectorAll('.draw-sticker').forEach(b=>b.onclick=()=>{drawStamp=b.dataset.stamp;document.querySelectorAll('.draw-sticker').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.draw-color').forEach(x=>x.classList.remove('active'));$('miniFeedback').textContent='Sticker selected! Tap the canvas to place it. ✨'});
  $('drawSizeInput').oninput=e=>{drawSize=Number(e.target.value);$('drawSizeLabel').textContent=drawSize+' px'};
- $('drawClear').onclick=clearDrawing;$('drawUndo').onclick=undoDrawing;$('drawDone').onclick=finishDrawing;
+ $('drawClear').onclick=clearDrawing;$('drawUndo').onclick=undoDrawing;$('drawDone').onclick=finishDrawing;$('drawSave').onclick=saveDrawingImage;
 }
 function setupDrawingCanvas(){
  const c=$('colorDrawingCanvas');if(!c)return;const r=c.getBoundingClientRect(),dpr=Math.max(1,Math.min(2,window.devicePixelRatio||1));c.width=Math.round(r.width*dpr);c.height=Math.round(r.height*dpr);const x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.lineCap='round';x.lineJoin='round';x.fillStyle='#fff';x.fillRect(0,0,r.width,r.height);
- c.onpointerdown=e=>{e.preventDefault();c.setPointerCapture(e.pointerId);drawIsDown=true;const b=c.getBoundingClientRect();drawLast={x:e.clientX-b.left,y:e.clientY-b.top};drawHistory.push(x.getImageData(0,0,c.width,c.height));if(drawHistory.length>12)drawHistory.shift();x.beginPath();x.arc(drawLast.x,drawLast.y,drawSize/2,0,Math.PI*2);x.fillStyle=drawColor;x.fill()};
- c.onpointermove=e=>{if(!drawIsDown)return;e.preventDefault();const b=c.getBoundingClientRect(),p={x:e.clientX-b.left,y:e.clientY-b.top};x.beginPath();x.moveTo(drawLast.x,drawLast.y);x.lineTo(p.x,p.y);x.strokeStyle=drawColor;x.lineWidth=drawSize;x.stroke();drawLast=p};
+ c.onpointerdown=e=>{e.preventDefault();c.setPointerCapture(e.pointerId);drawIsDown=true;const b=c.getBoundingClientRect();drawLast={x:e.clientX-b.left,y:e.clientY-b.top};drawHistory.push(x.getImageData(0,0,c.width,c.height));if(drawHistory.length>12)drawHistory.shift();if(drawStamp){x.font=Math.max(24,drawSize*3)+'px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(drawStamp,drawLast.x,drawLast.y);return}x.beginPath();x.arc(drawLast.x,drawLast.y,drawSize/2,0,Math.PI*2);if(drawColor==='eraser'){x.globalCompositeOperation='destination-out';x.fillStyle='#000'}else{x.globalCompositeOperation='source-over';x.fillStyle=drawColor}x.fill();x.globalCompositeOperation='source-over'};
+ c.onpointermove=e=>{if(!drawIsDown)return;e.preventDefault();const b=c.getBoundingClientRect(),p={x:e.clientX-b.left,y:e.clientY-b.top};if(drawStamp){drawLast=p;return}x.beginPath();x.moveTo(drawLast.x,drawLast.y);x.lineTo(p.x,p.y);x.lineWidth=drawSize;if(drawColor==='eraser'){x.globalCompositeOperation='destination-out';x.strokeStyle='#000'}else{x.globalCompositeOperation='source-over';x.strokeStyle=drawColor}x.stroke();x.globalCompositeOperation='source-over';drawLast=p};
  const stop=()=>{drawIsDown=false;drawLast=null};c.onpointerup=stop;c.onpointercancel=stop;c.onlostpointercapture=stop;
 }
-function clearDrawing(){const c=$('colorDrawingCanvas');if(!c)return;const x=c.getContext('2d'),dpr=c.width/Math.max(1,c.getBoundingClientRect().width),r=c.getBoundingClientRect();x.clearRect(0,0,c.width,c.height);x.fillStyle='#fff';x.fillRect(0,0,r.width,r.height);drawHistory=[];$('miniFeedback').textContent='Fresh canvas! What will you draw? 🌈'}
+function clearDrawing(){const c=$('colorDrawingCanvas');if(!c)return;const x=c.getContext('2d'),r=c.getBoundingClientRect(),dpr=c.width/Math.max(1,r.width);x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,c.width,c.height);x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.setTransform(dpr,0,0,dpr,0,0);drawHistory=[];$('miniFeedback').textContent='Fresh canvas! What will you draw? 🌈'}
+function saveDrawingImage(){const c=$('colorDrawingCanvas');if(!c)return;const a=document.createElement('a');a.download='dream-world-art.png';a.href=c.toDataURL('image/png');a.click();$('miniFeedback').textContent='Your art image is ready to save! 💖'}
 function undoDrawing(){const c=$('colorDrawingCanvas');if(!c||!drawHistory.length)return;c.getContext('2d').putImageData(drawHistory.pop(),0,0);$('miniFeedback').textContent='Last stroke undone. ✨'}
 function finishDrawing(){if(!drawRewarded){coins+=5;syncCoins();saveProgress();drawRewarded=true;playSound('success');$('miniFeedback').textContent='Masterpiece made! +5 tokens! Keep creating! 🌟'}else $('miniFeedback').textContent='Your masterpiece is ready — keep drawing or clear it for a fresh page! 🎨'}
 </script></body></html>
