@@ -502,13 +502,16 @@ function boot(){
   safeInit('loading puppy',()=>renderPuppy('loadHero'));
   safeInit('tokens',syncCoins);
   // Build secondary screens after the first frame, not during the critical loading path.
+  // Keep the first screen responsive: heavy shop and wardrobe grids are built after the loading screen closes.
   setTimeout(()=>{
     safeInit('home puppy',()=>renderPuppy('homeHero'));
     safeInit('levels',renderLevels);
+    safeInit('word game',newWord);
+  },250);
+  setTimeout(()=>{
     safeInit('customization',renderCustom);
     safeInit('shop',renderShop);
-    safeInit('word game',newWord);
-  },50);
+  },900);
 }
 
 const DREAMWORLD_API='https://dreamworld-account-api.daviolvcass.workers.dev';
