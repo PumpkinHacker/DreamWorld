@@ -741,7 +741,7 @@ function boot(){
     if(p>=100)setTimeout(openHome,250);
   },100);
   // Watchdog guarantees a destination even if the loading animation stalls.
-  setTimeout(openHome,3000);
+  setTimeout(openHome,1800);
   const safeInit=(label,fn)=>{try{fn();}catch(err){console.error('Dream World setup issue ('+label+'):',err);}};
   safeInit('background',loadBackground);
   safeInit('music',startMusic);
@@ -843,7 +843,7 @@ async function resumeAuthSession(){
   const token=localStorage.getItem('dreamWorldSessionV1');
   if(!token){showAuth();return}
   try{
-    const res=await fetch(DREAMWORLD_API+'/auth/me',{headers:{Authorization:'Bearer '+token}});
+    const res=await fetch(DREAMWORLD_API+'/auth/me',{headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(5000),cache:'no-store'});
     let data={};try{data=await res.json()}catch(e){}
     if(!res.ok){if(res.status===401||res.status===403){localStorage.removeItem('dreamWorldSessionV1');localStorage.removeItem('dreamWorldPlayerIdV1');showAuth();$('authError').textContent='Your session expired. Please log in again.';return}throw new Error('Account server temporarily unavailable ('+res.status+').')}
     if(!data.player)throw new Error('The server response was incomplete.');
