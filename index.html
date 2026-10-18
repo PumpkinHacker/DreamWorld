@@ -1310,10 +1310,10 @@ function resetCustomLook(){col='#42a5ed';skinName='Classic Pup';accessory='🎀'
   family:'<circle cx="8" cy="7" r="3"/><circle cx="17" cy="8" r="2.5"/><path d="M2.5 20v-2a5.5 5.5 0 0 1 11 0v2M14 15a4.5 4.5 0 0 1 7.5 3.5V20"/>',
   gift:'<rect x="3" y="9" width="18" height="12" rx="2"/><path d="M2 6h20v4H2zM12 6v15M12 6H8a2 2 0 1 1 2-2zM12 6h4a2 2 0 1 0-2-2z"/>'
  };
- function iconFor(text){if(/play adventure/i.test(text))return'play';if(/online world/i.test(text))return'globe';if(/customize/i.test(text))return'palette';if(/star shop/i.test(text))return'shop';if(/space dimension/i.test(text))return'rocket';if(/background/i.test(text))return'landscape';if(/word drop/i.test(text))return'letters';if(/achievement/i.test(text))return'trophy';if(/admin panel/i.test(text))return'tools';if(/parent menu/i.test(text))return'family';if(/parent bonus/i.test(text))return'gift';if(/music/i.test(text))return'music';if(/buddy/i.test(text))return'paw';if(/tokens/i.test(text))return'star';if(/worlds/i.test(text))return'rainbow';return'paw'}
+ function iconFor(text){if(/play.*learn.*grow/i.test(text))return'rainbow';if(/soundtrack|music|sound/i.test(text))return'music';if(/footer|little steps/i.test(text))return'star';if(/play adventure/i.test(text))return'play';if(/online world/i.test(text))return'globe';if(/customize/i.test(text))return'palette';if(/star shop/i.test(text))return'shop';if(/space dimension/i.test(text))return'rocket';if(/background/i.test(text))return'landscape';if(/word drop/i.test(text))return'letters';if(/achievement/i.test(text))return'trophy';if(/admin panel/i.test(text))return'tools';if(/parent menu/i.test(text))return'family';if(/parent bonus/i.test(text))return'gift';if(/music/i.test(text))return'music';if(/buddy/i.test(text))return'paw';if(/tokens/i.test(text))return'star';if(/worlds/i.test(text))return'rainbow';return'paw'}
  function makeIcon(name){const shape=paths[name]||paths.paw;return '<span class="menu-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">'+(shape.includes('<')?shape:'<path d="'+shape+'"/>')+'</svg></span>'}
  const home=document.getElementById('home');if(!home)return;
- home.querySelectorAll('.btn-stack .bigbtn,#musicBtn,.menu-feature-strip span').forEach(el=>{
+ home.querySelectorAll('.btn-stack .bigbtn,#musicBtn,.menu-feature-strip span,.tagline,.footer-note').forEach(el=>{
   if(el.querySelector('.menu-icon'))return;
   const name=iconFor(el.textContent||'');
   el.innerHTML=el.innerHTML.replace(/^\s*[^\w<]*[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]+\s*/u,'');
