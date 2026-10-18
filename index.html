@@ -544,7 +544,7 @@ function boot(){
     if(p>=100)setTimeout(openHome,250);
   },100);
   // Watchdog: the home menu still opens even if a progress callback fails.
-  setTimeout(openHome,3000);
+  setTimeout(openHome,1800);
   const safeInit=(label,fn)=>{try{fn();}catch(err){console.error('Dream World setup issue ('+label+'):',err);}};
   // Keep startup lightweight so the loading screen cannot be held hostage by heavy shop/customization rendering.
   safeInit('background',loadBackground);
@@ -653,7 +653,7 @@ async function resumeAuthSession(){
   const token=localStorage.getItem('dreamWorldSessionV1');
   if(!token){showAuth();return}
   try{
-    const res=await fetch(DREAMWORLD_API+'/auth/me',{headers:{Authorization:'Bearer '+token}});
+    const res=await fetch(DREAMWORLD_API+'/auth/me',{headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(5000),cache:'no-store'});
     let data={};try{data=await res.json()}catch(e){}
     if(!res.ok){if(res.status===401||res.status===403){localStorage.removeItem('dreamWorldSessionV1');localStorage.removeItem('dreamWorldPlayerIdV1');showAuth();$('authError').textContent='Your session expired. Please log in again.';return}throw new Error('Account server temporarily unavailable ('+res.status+').')}
     if(!data.player)throw new Error('The server response was incomplete.');
