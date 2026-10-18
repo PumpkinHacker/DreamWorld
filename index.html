@@ -309,6 +309,35 @@ button:disabled{cursor:not-allowed}
 .drawing-size-row{display:flex;align-items:center;justify-content:center;gap:10px;color:#5c7899;font-size:.9rem;font-weight:900;margin-top:10px}.drawing-size-row input{width:130px;accent-color:#ec76b6}
 .drawing-caption{padding:10px 12px;border-radius:15px;background:#f2f8ff;color:#6480a1;font-size:.82rem;font-weight:800;text-align:center;margin:12px 0}
 @media(max-width:420px){.mini-thumb{height:100px}.mini-game-card{padding:8px}.drawing-tools{gap:8px}.draw-tool-btn{padding:9px 10px}}
+
+/* Dream World mini-game visual refresh v2 */
+.mini-games-grid{grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;gap:16px}
+.mini-game-card{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:9px;padding:12px;text-align:left;min-width:0;border:1px solid #d9eaff;border-radius:26px;background:linear-gradient(160deg,#ffffff 5%,#f3f8ff 100%);box-shadow:0 5px 0 #c3d9f0,0 12px 22px #517db01c}
+.mini-game-card:before{content:"";position:absolute;z-index:0;top:15px;right:17px;width:14px;height:14px;border-radius:50%;background:#ffffffb8;box-shadow:-25px 18px 0 -3px #ffffffa8,12px 35px 0 -5px #ffffffa8;pointer-events:none}
+.mini-game-card .mini-thumb{position:relative;display:flex;align-items:center;justify-content:center;height:126px;min-height:126px;border:0;border-radius:20px;font-size:3.5rem;overflow:hidden;box-shadow:inset 0 -12px 22px #243d5c12}
+.mini-thumb:before{content:"";position:absolute;width:95px;height:95px;border-radius:50%;background:#ffffff42;left:-24px;bottom:-43px}
+.mini-thumb:after{content:"";position:absolute;width:56px;height:56px;border-radius:18px;background:#ffffff2e;right:-12px;top:-12px;transform:rotate(25deg)}
+.mini-thumb{isolation:isolate}
+.mini-thumb:not(small){line-height:1}
+.mini-thumb small{position:absolute;z-index:2;left:9px;bottom:9px;padding:5px 9px;border:1px solid #ffffffd9;border-radius:999px;background:#ffffffd9;color:#365777;font-size:.62rem;font-weight:1000;letter-spacing:1.2px;box-shadow:0 2px 7px #31557712}
+.mini-game-card b{font-size:1.03rem;line-height:1.2;padding:0 3px;color:#254b78}
+.mini-game-card>small{display:block;min-height:2.5em;padding:0 3px 3px;color:#6b809a;font-size:.79rem;line-height:1.4}
+.mini-game-card:focus-visible{outline:4px solid #6aa8ff;outline-offset:3px}
+.thumb-word{background:radial-gradient(circle at 75% 18%,#fff8ff 0 8%,transparent 9%),linear-gradient(140deg,#ff8fc9,#f6b5ff 54%,#a9b8ff)}
+.thumb-math{background:radial-gradient(circle at 25% 25%,#fff9c8 0 9%,transparent 10%),linear-gradient(140deg,#80e8bd,#baf4d4 55%,#79c7ff)}
+.thumb-memory{background:radial-gradient(circle at 75% 25%,#fff 0 5%,transparent 6%),linear-gradient(140deg,#c5a9ff,#edc9ff 58%,#9aa8ff)}
+.thumb-animal{background:radial-gradient(circle at 22% 24%,#fff8d9 0 8%,transparent 9%),linear-gradient(140deg,#ffe49a,#ffc16d 55%,#ff9b9b)}
+.thumb-color{background:radial-gradient(circle at 20% 20%,#fff 0 6%,transparent 7%),linear-gradient(135deg,#8de9ff,#b3c4ff 48%,#f1b4f1)}
+.thumb-odd{background:radial-gradient(circle at 72% 22%,#fff 0 6%,transparent 7%),linear-gradient(140deg,#9be4ee,#b9c7ff 52%,#d8b7ff)}
+#miniPlay .panel.quiz{border:2px solid #ffffffd9;border-radius:30px;background:linear-gradient(155deg,#fff 0%,#f6faff 55%,#fff5fb 100%);box-shadow:0 16px 44px #315b8c1c}
+#miniPlay .mini-prompt{border-radius:23px;background:linear-gradient(135deg,#f0f8ff,#fff2fb);border:1px solid #e3efff;margin:12px 0;padding:22px 14px;color:#315f96}
+#miniPlay .mini-choice{border:2px solid #fff;border-radius:20px;box-shadow:0 4px 0 #a8cce9,0 7px 14px #426b9512;transition:transform .12s,filter .12s}
+#miniPlay .mini-choice:active{transform:translateY(2px);filter:saturate(1.1)}
+#miniPlay .bigbtn{border-radius:18px;box-shadow:0 4px 0 #00000012}
+.mini-choices:has(.drawing-studio){display:block}
+.mini-choices:has(.drawing-studio)>.drawing-studio{width:100%}
+@media(max-width:420px){.mini-games-grid{gap:11px}.mini-game-card{padding:8px;border-radius:21px}.mini-game-card .mini-thumb{height:105px;min-height:105px;font-size:3rem}.mini-game-card b{font-size:.94rem}.mini-game-card>small{font-size:.74rem}}
+
 </style></head>
 <body><div id="app">
 <div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div><button id="logoutBtn" type="button" onclick="logoutDreamWorld()" aria-label="Log out of Dream World">↪ Log out</button>
@@ -328,7 +357,7 @@ button:disabled{cursor:not-allowed}
 <button class="mini-game-card" onclick="startMiniGame('math')"><span class="mini-thumb thumb-math">➕<small>PAWS MATH</small></span><b>Math Paws</b><small>Solve a quick number puzzle</small></button>
 <button class="mini-game-card" onclick="startMiniGame('memory')"><span class="mini-thumb thumb-memory">🧠<small>MEMORY</small></span><b>Memory Match</b><small>Find the matching pairs</small></button>
 <button class="mini-game-card" onclick="startMiniGame('animal')"><span class="mini-thumb thumb-animal">🐾<small>ANIMAL QUIZ</small></span><b>Animal Quiz</b><small>Guess the animal clue</small></button>
-<button class="mini-game-card" onclick="startMiniGame('color')"><span class="mini-thumb thumb-color">🌈<small>COLOR POP</small></span><b>Color Pop</b><small>Tap the color named</small></button>
+<button class="mini-game-card" onclick="startMiniGame('color')"><span class="mini-thumb thumb-color">🎨<small>ART STUDIO</small></span><b>Color Pop</b><small>Draw, doodle, and make colorful art</small></button>
 <button class="mini-game-card" onclick="startMiniGame('odd')"><span class="mini-thumb thumb-odd">🕵️<small>ODD PAW</small></span><b>Odd One Out</b><small>Spot what doesn't belong</small></button>
 </div><button class="bigbtn pink" onclick="showScreen('home')">🏡 Back to Main Menu</button></div></section>
 <section id="miniPlay" class="screen"><div class="panel quiz"><div class="topbar"><button class="closebtn" onclick="showScreen('games')">‹</button><h2 id="miniTitle">🎮 Mini Game</h2><div class="coinpill">+5 ✨</div></div><div class="mini-prompt" id="miniPrompt"></div><div id="miniChoices" class="mini-choices"></div><div class="feedback" id="miniFeedback" aria-live="polite"></div><button class="bigbtn blue" onclick="nextMiniRound()">🔄 Play Again</button><button class="bigbtn pink" onclick="showScreen('games')">🎮 All Games</button></div></section>
