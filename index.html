@@ -1379,8 +1379,7 @@ function resetCustomLook(){col='#42a5ed';skinName='Classic Pup';accessory='🎀'
   const colors=$('colors');
   if(colors){
    colors.style.display=showSkins?'grid':'none';
-   const parent=colors.parentElement;
-   if(parent)parent.style.display=showSkins?'block':'none';
+   colors.style.visibility=showSkins?'visible':'hidden';
   }
   const heading=$('colorHeading');
   if(heading)heading.style.display=showSkins?'block':'none';
