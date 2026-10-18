@@ -811,7 +811,8 @@ function boot(){
         showAuth();
         $('authError').textContent='Log in from Dream World to enter the Online World.';
       }
-    }else if(!localStorage.getItem('dreamWorldSessionV1')){
+    }else{
+      // Always leave the loading screen for the regular game, including returning players.
       showScreen('home');
     }
   };
