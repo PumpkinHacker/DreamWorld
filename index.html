@@ -1035,6 +1035,61 @@ renderCustom=function(){
 const _syncCoins=syncCoins;
 syncCoins=function(){_syncCoins();saveProgress();scheduleServerTokenSync()};
 
+
+// Version 83: toddler-simple wardrobe, owned-item filtering, and extra animal silhouettes.
+(function(){
+ const isShoeEmoji=e=>['👟','🥾','🛼','💫','🩰','👢','🥿','👞'].includes(e);
+ const baseAnimals=[['🐶','Dream Pup',0],['🐱','Garden Kitty',0],['🐰','Meadow Bunny',45],['🦊','Little Fox',55],['🐼','Panda Pal',70],['🐸','Puddle Frog',65],['🐻','Honey Bear',75],['🦁','Sunny Lion',80],['🐨','Koala Cloud',75],['🦌','Woodland Fawn',90],['🐲','Tiny Dragon',130],['🐹','Berry Hamster',50],['🦔','Little Hedgehog',60]];
+ const oldSpaceRender=renderSpaceShop;
+ renderSpaceShop=function(){
+  oldSpaceRender();
+  const grid=$('animalGrid');if(!grid)return;
+  const animals=[...baseAnimals,['🦄','Rainbow Unicorn',120]];
+  grid.innerHTML=animals.map(([e,n,p])=>{
+   const id='animal:'+e,owned=p===0||itemsOwned.includes(id)||isDreamWorldAdmin,active=selectedAnimal===e;
+   if(!owned&&!isDreamWorldAdmin)return '';
+   return '<div class="item"><div class="emoji">'+e+'</div><b>'+n+'</b><br><small>'+(active?'✨ Playing!':'Your friend')+'</small><button onclick="chooseSpaceAnimal(\''+e+'\',\''+n+'\',0)">'+(active?'✓ Playing':'Choose me!')+'</button></div>';
+  }).join('')||'<p>Choose an animal in the main shop!</p>';
+ };
+ const oldCustom=renderCustom;
+ renderCustom=function(){
+  oldCustom();
+  const list=$('accessories');if(!list)return;
+  if(wardrobeCategory==='animals')return;
+  if(isDreamWorldAdmin)return;
+  const buttons=[...list.querySelectorAll('button[data-item]')];
+  const owned=e=>itemsOwned.includes(e)||itemsOwned.includes('spacegear:'+e);
+  const freeAccessories=['🎀','⭐','🌸'],freeShoes=['👟','🩰','🛼'];
+  let allowed=[];
+  if(wardrobeCategory==='shoes')allowed=freeShoes;
+  else if(wardrobeCategory==='accessories')allowed=freeAccessories;
+  else if(wardrobeCategory==='halloween'||wardrobeCategory==='items')allowed=[];
+  else if(wardrobeCategory==='all')allowed=[...freeAccessories,...freeShoes];
+  buttons.forEach(b=>{
+   const e=b.dataset.item;
+   if(!e)return;
+   const free=allowed.includes(e),has=owned(e);
+   if(!free&&!has)b.remove();
+  });
+  const hint=$('wardrobeHint');
+  if(hint)hint.textContent=wardrobeCategory==='shoes'?'👟 Pick 1 pair of shoes!':wardrobeCategory==='accessories'?'🎀 Pick up to 3 cute accessories!':'🌈 Pick your look! More goodies are in the Shop.';
+ };
+ const oldBuyItem=buyItem;
+ buyItem=function(e,c){
+  if(!itemsOwned.includes(e)&&coins<c){toast('You need more Tokens. Ask a grown-up to help!');return}
+  oldBuyItem(e,c);
+  renderShop();
+ };
+ const oldBuySkin=buySkin;
+ buySkin=function(n,c,p){
+  oldBuySkin(n,c,p);renderShop();
+ };
+ const oldChooseShopAnimal=chooseShopAnimal;
+ chooseShopAnimal=function(e,n,p){oldChooseShopAnimal(e,n,p);renderShop()};
+ const oldChooseSpaceAnimal=chooseSpaceAnimal;
+ chooseSpaceAnimal=function(e,n,p){oldChooseSpaceAnimal(e,n,p);renderSpaceShop()};
+})();
+
 // Version 31 polish: distinct animal silhouettes, synthesized animal voices, and a true Space hub.
 ;
 
