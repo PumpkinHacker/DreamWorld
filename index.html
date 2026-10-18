@@ -312,27 +312,29 @@ function puppySVG(){
   const blueBase=['#42a5ed','#26335e','#7565c9'].includes(col);
   const dark=blueBase?'#23518b':'#58405f';
   const animalEars = (selectedAnimal==='🦁')
-    ? `<path d="M130 43 L143 50 L160 43 L166 59 L184 64 L177 82 L189 99 L171 110 L173 129 L151 130 L139 147 L123 134 L103 143 L96 124 L77 115 L86 96 L75 79 L94 68 L99 49 L116 55Z" fill="#f4b34d" stroke="#8b563d" stroke-width="5" stroke-linejoin="round"/><circle cx="92" cy="82" r="9" fill="#ffd86b"/><circle cx="166" cy="82" r="9" fill="#ffd86b"/>`
+    ? `<circle cx="87" cy="73" r="25" fill="#d88a32" stroke="#78452e" stroke-width="5"/><circle cx="173" cy="73" r="25" fill="#d88a32" stroke="#78452e" stroke-width="5"/><circle cx="87" cy="73" r="13" fill="#f4b8a0"/><circle cx="173" cy="73" r="13" fill="#f4b8a0"/>`
     : selectedAnimal==='🐨'
-    ? `<circle cx="83" cy="76" r="28" fill="#c5cbd8" stroke="#423553" stroke-width="5"/><circle cx="177" cy="76" r="28" fill="#c5cbd8" stroke="#423553" stroke-width="5"/><circle cx="83" cy="76" r="15" fill="#f4c5d5"/><circle cx="177" cy="76" r="15" fill="#f4c5d5"/>`
+    ? `<circle cx="80" cy="75" r="29" fill="#aeb8c8" stroke="#51475c" stroke-width="5"/><circle cx="180" cy="75" r="29" fill="#aeb8c8" stroke="#51475c" stroke-width="5"/><circle cx="80" cy="75" r="17" fill="#f1b8c8"/><circle cx="180" cy="75" r="17" fill="#f1b8c8"/>`
     : selectedAnimal==='🦌'
-    ? `<path d="M99 77 Q80 45 71 35 M82 54 L62 49 M161 77 Q180 45 189 35 M178 54 L198 49" fill="none" stroke="#a8754d" stroke-width="8" stroke-linecap="round"/><path d="M83 87 Q57 52 35 58 Q32 99 79 137Z M177 87 Q203 52 225 58 Q228 99 181 137Z" fill="${fur}" stroke="#423553" stroke-width="5"/>`
+    ? `<path d="M100 79 Q82 49 73 27 M84 53 L62 48 M88 42 L75 37 M160 79 Q178 49 187 27 M176 53 L198 48 M172 42 L185 37" fill="none" stroke="#94603e" stroke-width="7" stroke-linecap="round"/><path d="M81 91 Q52 52 35 65 Q34 105 82 135Z M179 91 Q208 52 225 65 Q226 105 178 135Z" fill="#b87b4f" stroke="#70472f" stroke-width="5"/><path d="M59 87 L77 112 M201 87 L183 112" stroke="#f8dfbb" stroke-width="7" stroke-linecap="round"/>`
     : selectedAnimal==='🐲'
-    ? `<path d="M80 99 L70 60 L103 78 L121 49 L137 77 L166 51 L169 82 L190 69 L181 112Z" fill="#78d99a" stroke="#356b65" stroke-width="5" stroke-linejoin="round"/><path d="M93 73 L104 87 M151 72 L164 85" stroke="#eaffba" stroke-width="4"/>`
+    ? `<path d="M82 105 L66 58 L103 78 L121 43 L137 77 L166 48 L170 82 L194 64 L181 116Z" fill="#64c985" stroke="#28694f" stroke-width="5" stroke-linejoin="round"/><path d="M96 73 L107 88 M151 69 L164 85" stroke="#eaffbd" stroke-width="5"/><path d="M96 120 Q130 145 164 120" fill="none" stroke="#28694f" stroke-width="4"/>`
     : selectedAnimal==='🐹'
-    ? `<circle cx="84" cy="75" r="23" fill="#f2c3d0" stroke="#423553" stroke-width="4"/><circle cx="176" cy="75" r="23" fill="#f2c3d0" stroke="#423553" stroke-width="4"/>`
+    ? `<circle cx="84" cy="80" r="25" fill="#f3c4d2" stroke="#76505d" stroke-width="4"/><circle cx="176" cy="80" r="25" fill="#f3c4d2" stroke="#76505d" stroke-width="4"/><circle cx="84" cy="80" r="13" fill="#ff9dbb"/><circle cx="176" cy="80" r="13" fill="#ff9dbb"/>`
     : selectedAnimal==='🦔'
-    ? `<path d="M77 107 L70 84 L85 89 L87 67 L103 80 L113 58 L128 78 L144 58 L153 81 L174 69 L174 91 L190 86 L181 119Z" fill="#8d715e" stroke="#423553" stroke-width="4" stroke-linejoin="round"/>`
-    : (selectedAnimal==='🐱' || selectedAnimal==='🦊')
-    ? `<path d="M78 111 L82 54 L116 79 Q130 72 144 79 L178 54 L183 111 Q174 137 157 143 L103 143 Q83 136 78 111Z" fill="${fur}" stroke="#423553" stroke-width="5" stroke-linejoin="round"/><path d="M89 91 L92 67 L108 82Z M152 82 L169 67 L172 91Z" fill="${selectedAnimal==='🦊'?'#fff0df':'#ffb6d9'}" stroke="#423553" stroke-width="2"/>`
+    ? `<path d="M72 115 L65 88 L82 94 L85 67 L103 82 L114 57 L130 79 L145 57 L156 82 L175 68 L176 94 L194 88 L184 119Z" fill="#8c6b54" stroke="#59483e" stroke-width="4" stroke-linejoin="round"/><path d="M88 94 L97 108 M112 80 L119 98 M143 80 L139 98 M166 94 L157 108" stroke="#d8bd94" stroke-width="4" stroke-linecap="round"/>`
+    : selectedAnimal==='🐱'
+    ? `<path d="M78 111 L82 43 L115 72 Q130 66 145 72 L178 43 L183 111 Q174 137 157 143 L103 143 Q83 136 78 111Z" fill="${fur}" stroke="#423553" stroke-width="5" stroke-linejoin="round"/><path d="M89 85 L92 54 L109 76Z M151 76 L169 54 L172 85Z" fill="#ffb6d9" stroke="#423553" stroke-width="2"/><path d="M98 116 Q112 105 125 116 M135 116 Q148 105 161 116" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`
+    : selectedAnimal==='🦊'
+    ? `<path d="M78 111 L82 43 L115 72 Q130 66 145 72 L178 43 L183 111 Q174 137 157 143 L103 143 Q83 136 78 111Z" fill="#f28b43" stroke="#743f32" stroke-width="5" stroke-linejoin="round"/><path d="M89 85 L92 54 L109 76Z M151 76 L169 54 L172 85Z" fill="#fff0df" stroke="#743f32" stroke-width="2"/><path d="M94 118 Q130 145 166 118 L155 137 L105 137Z" fill="#fff0df"/>`
     : selectedAnimal==='🐰'
     ? `<path d="M94 104 Q74 51 92 20 Q109 10 119 69 L121 104Z M140 104 Q143 22 163 20 Q181 36 160 104Z" fill="${fur}" stroke="#423553" stroke-width="5"/><path d="M100 76 Q91 38 99 30 Q108 44 111 78 M149 78 Q155 39 162 32 Q166 53 156 80" fill="#ffb6d9"/>`
     : selectedAnimal==='🐼'
-    ? `<circle cx="84" cy="65" r="20" fill="#263650" stroke="#423553" stroke-width="4"/><circle cx="176" cy="65" r="20" fill="#263650" stroke="#423553" stroke-width="4"/>`
+    ? `<circle cx="84" cy="65" r="23" fill="#263650" stroke="#423553" stroke-width="4"/><circle cx="176" cy="65" r="23" fill="#263650" stroke="#423553" stroke-width="4"/>`
     : selectedAnimal==='🐸'
-    ? `<circle cx="100" cy="66" r="22" fill="${fur}" stroke="#423553" stroke-width="4"/><circle cx="158" cy="66" r="22" fill="${fur}" stroke="#423553" stroke-width="4"/>`
+    ? `<circle cx="100" cy="66" r="24" fill="#77d77e" stroke="#347c55" stroke-width="4"/><circle cx="158" cy="66" r="24" fill="#77d77e" stroke="#347c55" stroke-width="4"/><circle cx="100" cy="66" r="11" fill="#fff"/><circle cx="158" cy="66" r="11" fill="#fff"/><circle cx="103" cy="67" r="5" fill="#24334b"/><circle cx="155" cy="67" r="5" fill="#24334b"/>`
     : selectedAnimal==='🦄'
-    ? `<path d="M130 76 L116 23 Q130 31 144 59Z" fill="#ffe58a" stroke="#b986d9" stroke-width="4" stroke-linejoin="round"/><path d="M116 37 L139 48 M121 48 L141 57" stroke="#fff8c9" stroke-width="3" stroke-linecap="round"/><path d="M84 96 Q69 61 99 48 Q113 43 127 60 Q143 40 165 53 Q188 65 183 91 Q166 81 154 94 Q132 79 116 98 Q99 85 84 96Z" fill="url(#puppyRainbow)" stroke="#8b5bc7" stroke-width="4" stroke-linejoin="round"/><path d="M92 66 Q104 56 116 66 M139 59 Q151 49 163 60" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`
+    ? `<path d="M130 76 L116 23 Q130 31 144 59Z" fill="#ffe58a" stroke="#b986d9" stroke-width="4" stroke-linejoin="round"/><path d="M116 37 L139 48 M121 48 L141 57" stroke="#fff8c9" stroke-width="3" stroke-linecap="round"/><path d="M84 96 Q69 61 99 48 Q113 43 127 60 Q143 40 165 53 Q188 65 183 91 Q166 81 154 94 Q132 79 116 98 Q99 85 84 96Z" fill="url(#puppyRainbow)" stroke="#8b5bc7" stroke-width="4" stroke-linejoin="round"/>`
     : `<path d="M83 87 C57 52 32 58 35 91 C37 117 54 136 79 137 L99 112Z" fill="${fur}" stroke="#423553" stroke-width="5" stroke-linejoin="round"/><path d="M48 82 C54 82 66 100 77 120 Q58 115 49 96Z" fill="#f4a6b6"/><path d="M177 86 C200 51 228 54 228 84 C229 111 210 133 184 137 L164 110Z" fill="${fur}" stroke="#423553" stroke-width="5" stroke-linejoin="round"/><path d="M215 79 Q203 104 188 120 Q211 112 218 92Z" fill="#f4a6b6"/>`;
   const accessoryArt={
     '🧬':'<text x="130" y="55" text-anchor="middle" font-size="39" paint-order="stroke" stroke="#fff" stroke-width="2">🧬</text>',
