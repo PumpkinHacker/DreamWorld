@@ -1166,7 +1166,7 @@ renderCustom=function(){
   const colorTitle=$('colors')?.previousElementSibling;
   const accessoryTitle=$('accessories')?.previousElementSibling;
   const showSkins=wardrobeCategory==='all'||wardrobeCategory==='skins';
-  const showItems=wardrobeCategory!=='skins';
+  const showItems=true; // Keep the options list visible so the Skins category can show its skin buttons.
   if($('colors'))$('colors').parentElement.style.display=showSkins?'block':'none';
   if(colorTitle)colorTitle.style.display=showSkins?'block':'none';
   if($('colorHeading'))$('colorHeading').style.display=showSkins?'block':'none';
