@@ -544,6 +544,36 @@ html:has(#online.screen.active),body:has(#online.screen.active),#app:has(#online
 #online.screen .online-player-list{gap:10px}
 #online.screen .online-avatar{border:2px solid #fff!important;box-shadow:0 5px 0 #274a7820!important}
 @media(max-width:600px){#online.screen .online-panel{padding:12px!important}#online.screen .online-map-card{min-height:145px}#online.screen .online-world-viewport{min-height:260px}}
+</style><style id="online-v58-map-repair">
+/* Version 58: restore the actual side-scrolling world and its landmarks. */
+#online.screen.active #onlineWorldArea:not([hidden]) .online-world-viewport{
+  overflow-x:auto!important;overflow-y:hidden!important;
+  touch-action:pan-x pan-y!important;overscroll-behavior-x:contain!important;
+  -webkit-overflow-scrolling:touch!important;scrollbar-width:none!important;
+  position:relative!important;isolation:isolate!important;
+}
+#online.screen.active #onlineWorldArea:not([hidden]) .online-world-viewport::-webkit-scrollbar{display:none!important}
+#online.screen.active #onlineWorldArea:not([hidden]) .online-world-canvas{
+  width:2800px!important;min-width:2800px!important;max-width:none!important;
+  height:100%!important;min-height:390px!important;position:relative!important;
+  overflow:hidden!important;isolation:isolate!important;
+}
+#online.screen.active #onlineWorldArea:not([hidden]) .online-world-canvas .online-building,
+#online.screen.active #onlineWorldArea:not([hidden]) .online-world-canvas .online-platform-deco{
+  display:flex!important;visibility:visible!important;opacity:1!important;
+}
+#online.screen.active #onlineWorldArea:not([hidden]) .online-world-canvas .online-platform-deco{display:block!important}
+#online.screen.active #onlineWorldArea:not([hidden]) .online-world-canvas .desert-platform,
+#online.screen.active #onlineWorldArea:not([hidden]) .online-world-canvas .online-platform-deco,
+#online.screen.active #onlineWorldArea:not([hidden]) .online-world-canvas .online-building{pointer-events:none!important}
+#online.screen.active #onlineWorldArea:not([hidden]) #onlinePlayerMarkers{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;pointer-events:none!important;overflow:visible!important}
+#online.screen.active #onlineWorldArea:not([hidden]) .online-world-canvas .online-ground{z-index:2!important}
+#online.screen.active #onlineWorldArea:not([hidden]) .online-world-canvas .desert-platform{z-index:3!important}
+#online.screen.active #onlineWorldArea:not([hidden]) .online-world-canvas .online-avatar{z-index:8!important}
+@media(max-width:600px){
+ #online.screen.active #onlineWorldArea:not([hidden]) .online-world-viewport{height:clamp(330px,52dvh,520px)!important;min-height:330px!important}
+ #online.screen.active #onlineWorldArea:not([hidden]) .online-world-canvas{height:100%!important;min-height:330px!important}
+}
 </style></head>
 <body><div id="app">
 <div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div><button id="logoutBtn" type="button" onclick="logoutDreamWorld()" aria-label="Log out of Dream World">↪ Log out</button>
