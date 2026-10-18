@@ -574,7 +574,11 @@ html:has(#online.screen.active),body:has(#online.screen.active),#app:has(#online
  #online.screen.active #onlineWorldArea:not([hidden]) .online-world-viewport{height:clamp(330px,52dvh,520px)!important;min-height:330px!important}
  #online.screen.active #onlineWorldArea:not([hidden]) .online-world-canvas{height:100%!important;min-height:330px!important}
 }
-</style></head>
+</style><style id="online-v60-map-controls-layout">/* Version 60: keep map near the touch controls instead of covering the whole screen. */
+#online.screen.active #onlineWorldArea:not([hidden]){display:flex!important;flex-direction:column!important;gap:8px!important;padding-bottom:10px!important}
+#online.screen.active #onlineWorldArea:not([hidden]) .online-world-viewport{position:relative!important;inset:auto!important;width:100%!important;height:clamp(260px,42dvh,390px)!important;min-height:260px!important;max-height:390px!important;flex:0 0 auto!important;margin:0!important;border:3px solid #fff!important;border-radius:16px!important;overflow-x:auto!important;overflow-y:hidden!important}
+#online.screen.active #onlineWorldArea:not([hidden]) .online-controls{position:relative!important;inset:auto!important;margin:0 auto!important;width:100%!important;max-width:520px!important;flex-shrink:0!important}
+@media(max-height:740px){#online.screen.active #onlineWorldArea:not([hidden]) .online-world-viewport{height:34dvh!important;min-height:220px!important}}</style></head>
 <body><div id="app">
 <div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div><button id="logoutBtn" type="button" onclick="logoutDreamWorld()" aria-label="Log out of Dream World">↪ Log out</button>
 <div id="scenery"><div class="cloud" style="top:10%;left:10%"></div><div class="cloud" style="top:24%;left:60%;animation-delay:-14s;transform:scale(.7)"></div><div class="hill"></div><div class="hill h2"></div><div class="flowerfield"></div></div>
