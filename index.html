@@ -1285,6 +1285,13 @@ syncCoins=function(){_syncCoins();saveProgress();scheduleServerTokenSync()};
  const adminSymbols=new Set(adminExclusiveItems||[]);
  const oldRenderShop=renderShop;
  renderShop=function(){
+   if(typeof shopCategory!=='undefined'&&shopCategory==='animals'){
+     renderPuppy('homeHero');
+     const animalList=[['🐶','Dream Pup',0],['🐱','Garden Kitty',0],['🐰','Meadow Bunny',45],['🦊','Little Fox',55],['🐼','Panda Pal',70],['🐸','Puddle Frog',65],['🦄','Rainbow Unicorn',120],['🐻','Honey Bear',75],['🦁','Sunny Lion',80],['🐨','Koala Cloud',75],['🦌','Woodland Fawn',90],['🐲','Tiny Dragon',130],['🐹','Berry Hamster',50],['🦔','Little Hedgehog',60]];
+     const grid=document.getElementById('shopGrid');
+     grid.innerHTML='<h3 style="grid-column:1/-1;margin:8px 0;color:#4c4a98">🐾 Animal Friends</h3>'+animalList.map(([e,n,cost])=>{const id='animal:'+e,owned=cost===0||itemsOwned.includes(id),active=selectedAnimal===e;return `<div class="item" onclick="previewShopAnimal('${e}','${n}')"><div class="emoji">${e}</div><b>${n}</b><br><small>${active?'✨ Selected':owned?'Unlocked':cost+' Tokens'}</small><button onclick="event.stopPropagation();chooseShopAnimal('${e}','${n}',${cost})">${active?'✓ Selected':owned?'Choose':'Unlock · '+cost}</button></div>`}).join('');
+     return;
+   }
    if(typeof shopCategory!=='undefined'&&shopCategory==='admin')shopCategory='all';
    const tabs=document.getElementById('shopTabs');
    if(tabs)for(const b of [...tabs.querySelectorAll('button')])if(/admin|exclusive|🔐/i.test(b.textContent))b.remove();
