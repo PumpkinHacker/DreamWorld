@@ -1368,4 +1368,27 @@ function resetCustomLook(){col='#42a5ed';skinName='Classic Pup';accessory='🎀'
 
 // Category fix: animal choices stay inside the Animals category; no extra always-visible roster panel.
 
+ 
+// Final category guard: skins belong only in All and Skins, after every render wrapper.
+(function(){
+ const priorCategoryRender=renderCustom;
+ renderCustom=function(){
+  priorCategoryRender();
+  const category=wardrobeCategory;
+  const showSkins=category==='all'||category==='skins';
+  const colors=$('colors');
+  if(colors){
+   colors.style.display=showSkins?'grid':'none';
+   const parent=colors.parentElement;
+   if(parent)parent.style.display=showSkins?'block':'none';
+  }
+  const heading=$('colorHeading');
+  if(heading)heading.style.display=showSkins?'block':'none';
+  const list=$('accessories');
+  if(!list)return;
+  list.querySelectorAll('button').forEach(button=>{
+   if(button.textContent.trim().startsWith('🎨 ')&&!showSkins)button.remove();
+  });
+ };
+})();
 </script></body></html>
