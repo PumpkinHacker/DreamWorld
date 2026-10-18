@@ -564,12 +564,12 @@ function puppySVGLegacy(){
   <!-- soft music notes float behind the character, never covering the face -->
   <g fill="#8d7be8" opacity=".78" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"><path d="M37 111 V82 L55 77 V104 Q55 112 47 113 Q40 113 42 107 Q43 102 50 101 V88 L42 90 V110 Q40 116 34 115 Q29 114 31 110 Q32 107 37 107Z"/><path d="M207 147 V122 L223 117 V139 Q223 146 216 147 Q210 147 211 142 Q212 138 218 137 V127 L212 129 V145Z"/><circle cx="52" cy="143" r="3" fill="#ffb8d8" stroke="none"/><circle cx="214" cy="99" r="3" fill="#ffd86b" stroke="none"/></g>
   <!-- body and paws -->
-  <path d="M91 157 Q91 139 108 139 L152 139 Q169 139 169 158 L174 211 Q174 234 153 239 L107 239 Q86 234 86 211Z" fill="${fur}" stroke="#423553" stroke-width="5"/>
-  <path d="M105 166 Q130 153 155 166 Q161 185 155 211 Q130 225 105 211 Q99 185 105 166Z" fill="url(#puppyBelly)" stroke="#423553" stroke-width="3"/>
-  <path d="M94 190 Q78 198 79 220 Q80 239 96 241 Q110 241 116 225 L113 203Z" fill="${fur}" stroke="#423553" stroke-width="5"/>
-  <path d="M166 190 Q182 198 181 220 Q180 239 164 241 Q150 241 144 225 L147 203Z" fill="${fur}" stroke="#423553" stroke-width="5"/>
-  <path d="M91 240 Q83 253 99 259 L120 259 Q132 254 121 242Z" fill="${shoeColors[accessory]||'#fff0d8'}" stroke="#423553" stroke-width="4"/>
-  <path d="M147 242 Q138 254 151 259 L174 259 Q188 254 174 241Z" fill="${shoeColors[accessory]||'#fff0d8'}" stroke="#423553" stroke-width="4"/>
+  <path d="M91 157 Q91 139 108 139 L152 139 Q169 139 169 158 L169 207 Q169 224 153 226 L107 226 Q91 224 91 207Z" fill="${fur}" stroke="#423553" stroke-width="5"/>
+  <path d="M105 166 Q130 153 155 166 Q160 183 154 207 Q130 219 106 207 Q100 183 105 166Z" fill="url(#puppyBelly)" stroke="#423553" stroke-width="3"/>
+  <path d="M105 205 Q93 211 94 229 Q95 243 106 244 Q117 243 119 230 L117 207Z" fill="${fur}" stroke="#423553" stroke-width="5"/>
+  <path d="M155 205 Q167 211 166 229 Q165 243 154 244 Q143 243 141 230 L143 207Z" fill="${fur}" stroke="#423553" stroke-width="5"/>
+  <path d="M91 239 Q84 251 98 258 Q109 263 120 257 Q128 251 119 239 Q105 245 91 239Z" fill="${shoeColors[accessory]||'#fff0d8'}" stroke="#423553" stroke-width="4"/>
+  <path d="M143 239 Q135 251 148 257 Q159 263 171 258 Q182 251 173 239 Q158 245 143 239Z" fill="${shoeColors[accessory]||'#fff0d8'}" stroke="#423553" stroke-width="4"/>
   <!-- Tiny paw pads and toe beans -->
   ${shoeItems.includes(accessory)?'':'<g fill="#e99aab" stroke="#b96f86" stroke-width="1.2"><ellipse cx="101" cy="253" rx="4" ry="3"/><ellipse cx="111" cy="253" rx="4" ry="3"/><ellipse cx="105.5" cy="257" rx="5.5" ry="2.8"/><ellipse cx="157" cy="253" rx="4" ry="3"/><ellipse cx="167" cy="253" rx="4" ry="3"/><ellipse cx="162" cy="257" rx="5.5" ry="2.8"/></g>'}
   ${shoeItems.includes(accessory)?'<path d="M96 250 L117 250 M151 250 L171 250" stroke="#fff" stroke-width="3" stroke-linecap="round"/>':''}
