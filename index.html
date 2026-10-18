@@ -311,7 +311,19 @@ function puppySVG(){
   const fur=gradients[col]?`url(#${gradients[col]})`:(/^(#[0-9a-f]{3,8}|[a-z]+)$/i.test(String(col))?col:'#42a5ed');
   const blueBase=['#42a5ed','#26335e','#7565c9'].includes(col);
   const dark=blueBase?'#23518b':'#58405f';
-  const animalEars = (selectedAnimal==='🐱' || selectedAnimal==='🦊')
+  const animalEars = (selectedAnimal==='🦁')
+    ? `<path d="M130 43 L143 50 L160 43 L166 59 L184 64 L177 82 L189 99 L171 110 L173 129 L151 130 L139 147 L123 134 L103 143 L96 124 L77 115 L86 96 L75 79 L94 68 L99 49 L116 55Z" fill="#f4b34d" stroke="#8b563d" stroke-width="5" stroke-linejoin="round"/><circle cx="92" cy="82" r="9" fill="#ffd86b"/><circle cx="166" cy="82" r="9" fill="#ffd86b"/>`
+    : selectedAnimal==='🐨'
+    ? `<circle cx="83" cy="76" r="28" fill="#c5cbd8" stroke="#423553" stroke-width="5"/><circle cx="177" cy="76" r="28" fill="#c5cbd8" stroke="#423553" stroke-width="5"/><circle cx="83" cy="76" r="15" fill="#f4c5d5"/><circle cx="177" cy="76" r="15" fill="#f4c5d5"/>`
+    : selectedAnimal==='🦌'
+    ? `<path d="M99 77 Q80 45 71 35 M82 54 L62 49 M161 77 Q180 45 189 35 M178 54 L198 49" fill="none" stroke="#a8754d" stroke-width="8" stroke-linecap="round"/><path d="M83 87 Q57 52 35 58 Q32 99 79 137Z M177 87 Q203 52 225 58 Q228 99 181 137Z" fill="${fur}" stroke="#423553" stroke-width="5"/>`
+    : selectedAnimal==='🐲'
+    ? `<path d="M80 99 L70 60 L103 78 L121 49 L137 77 L166 51 L169 82 L190 69 L181 112Z" fill="#78d99a" stroke="#356b65" stroke-width="5" stroke-linejoin="round"/><path d="M93 73 L104 87 M151 72 L164 85" stroke="#eaffba" stroke-width="4"/>`
+    : selectedAnimal==='🐹'
+    ? `<circle cx="84" cy="75" r="23" fill="#f2c3d0" stroke="#423553" stroke-width="4"/><circle cx="176" cy="75" r="23" fill="#f2c3d0" stroke="#423553" stroke-width="4"/>`
+    : selectedAnimal==='🦔'
+    ? `<path d="M77 107 L70 84 L85 89 L87 67 L103 80 L113 58 L128 78 L144 58 L153 81 L174 69 L174 91 L190 86 L181 119Z" fill="#8d715e" stroke="#423553" stroke-width="4" stroke-linejoin="round"/>`
+    : (selectedAnimal==='🐱' || selectedAnimal==='🦊')
     ? `<path d="M78 111 L82 54 L116 79 Q130 72 144 79 L178 54 L183 111 Q174 137 157 143 L103 143 Q83 136 78 111Z" fill="${fur}" stroke="#423553" stroke-width="5" stroke-linejoin="round"/><path d="M89 91 L92 67 L108 82Z M152 82 L169 67 L172 91Z" fill="${selectedAnimal==='🦊'?'#fff0df':'#ffb6d9'}" stroke="#423553" stroke-width="2"/>`
     : selectedAnimal==='🐰'
     ? `<path d="M94 104 Q74 51 92 20 Q109 10 119 69 L121 104Z M140 104 Q143 22 163 20 Q181 36 160 104Z" fill="${fur}" stroke="#423553" stroke-width="5"/><path d="M100 76 Q91 38 99 30 Q108 44 111 78 M149 78 Q155 39 162 32 Q166 53 156 80" fill="#ffb6d9"/>`
@@ -1009,7 +1021,7 @@ renderCustom=function(){
   const halloweenOnly=new Set(['🎃','🦇','🧙','👻','🕸️','🧛','🧟','🍬','🕯️','🦉','🪦','🧪','🦴','🕷️','🧹','🩸','🧠','🍭']);
   const accessoryOnly=new Set(['🎀','⭐','🧢','🌸','👑','🦋','🪽','🧣','🎧','🕶️','🍓','🫧','🐉','🪄','🪐','🪁','🍄','🐝','🦕','🧚','🧿','🪺','🦜','🪶','🧥','🧤','🪖','🌈','✨','🎈','🪻','🍀','🫎','🧬','💠','🔰','🌠','🪩','⚡','🪙','🏵️','🧫','🛸']);
   const generalOnly=new Set(['🎒','🧸','💎','📚','🧺','🛟','🪆','🛡️','🎇']);
-  const animals=[['🐶','Dream Pup',0],['🐱','Garden Kitty',0],['🐰','Meadow Bunny',45],['🦊','Little Fox',55],['🐼','Panda Pal',70],['🐸','Puddle Frog',65],['🦄','Rainbow Unicorn',120],['🐻','Honey Bear',75],['🦁','Sunny Lion',80],['🐨','Koala Cloud',75],['🦌','Woodland Fawn',90],['🐲','Tiny Dragon',130],['🐹','Berry Hamster',50],['🦔','Little Hedgehog',60]];
+  const animals=[['🐶','Dream Pup',0],['🐱','Garden Kitty',0],['🐰','Meadow Bunny',45],['🦊','Little Fox',55],['🐼','Panda Pal',70],['🐸','Puddle Frog',65],['🐻','Honey Bear',75],['🦁','Sunny Lion',80],['🐨','Koala Cloud',75],['🦌','Woodland Fawn',90],['🐲','Tiny Dragon',130],['🐹','Berry Hamster',50],['🦔','Little Hedgehog',60]];
   const owned=[...new Set([...(itemsOwned||[]).filter(e=>typeof e==='string'&&e.length>0&&!e.startsWith('animal:')&&(isDreamWorldAdmin||!adminExclusiveItems.includes(e))),...(isDreamWorldAdmin?adminExclusiveItems:[])])];
   const itemNames={'🎀':'Bow','⭐':'Star','🧢':'Cool Cap','🌸':'Flower Clip','👑':'Royal Crown','🦋':'Butterfly','🪽':'Angel Wings','🧣':'Cozy Scarf','🎧':'Headphones','🕶️':'Sunglasses','🍓':'Berry Clip','🫧':'Bubble Wand','🐉':'Tiny Dragon','🪄':'Wish Wand','🪐':'Planet Pal','🪁':'Kite Buddy','🍄':'Mushroom Hat','🐝':'Bee Buddy','🦕':'Dino Pal','🧚':'Fairy Dust','🧿':'Lucky Charm','🪺':'Nest Hat','🦜':'Parrot Pal','🪶':'Feather','🧥':'Cozy Jacket','🧤':'Mittens','🪖':'Explorer Helmet','🌈':'Rainbow Trail','✨':'Sparkles','🎈':'Balloon','🪻':'Lavender Bloom','🍀':'Lucky Clover','🫎':'Moose Buddy','🎃':'Pumpkin Hat','🦇':'Bat Wings','🧙':'Witch Hat','👻':'Ghost Buddy','🕸️':'Spiderweb','🧛':'Vampire Cape','🧟':'Zombie Buddy','🍬':'Candy','🕯️':'Magic Candle','🦉':'Moon Owl','🪦':'Gravestone','🧪':'Potion','🦴':'Spooky Bone','🕷️':'Spider Pal','🧹':'Witch Broom','🩸':'Ruby Drop','🧠':'Brainy Buddy','🍭':'Candy Trail','🎒':'Adventure Pack','🧸':'Teddy Pack','💎':'Shiny Gem','📚':'Book Stack','🧺':'Picnic Basket','🛟':'Float Ring','🪆':'Doll Set','🛡️':'Guardian Shield','🎇':'Sparkler'};
   const itemButton=e=>'<button class="choice '+(accessory===e?'selected':'')+'" data-item="'+e+'" onclick="chooseWardrobeAccessory(this.dataset.item)">'+e+' '+(adminExclusiveItems.includes(e)?(adminExclusiveNames[e]||'Admin Item'):(itemNames[e]||(accessory===e?'✓ Selected':'Treasure')))+(accessory===e?' ✓':'')+'</button>';
