@@ -1613,4 +1613,44 @@ function clearDrawing(){const c=$('colorDrawingCanvas');if(!c)return;const x=c.g
 function saveDrawingImage(){const c=$('colorDrawingCanvas');if(!c)return;const a=document.createElement('a');a.download='dream-world-art.png';a.href=c.toDataURL('image/png');a.click();$('miniFeedback').textContent='Your art image is ready to save! 💖'}
 function undoDrawing(){const c=$('colorDrawingCanvas');if(!c||!drawHistory.length)return;c.getContext('2d').putImageData(drawHistory.pop(),0,0);$('miniFeedback').textContent='Last stroke undone. ✨'}
 function finishDrawing(){if(!drawRewarded){coins+=5;syncCoins();saveProgress();drawRewarded=true;playSound('success');$('miniFeedback').textContent='Masterpiece made! +5 tokens! Keep creating! 🌟'}else $('miniFeedback').textContent='Your masterpiece is ready — keep drawing or clear it for a fresh page! 🎨'}
-</script></body></html>
+</script>
+<!-- Wardrobe visibility hotfix: make hats/accessories visibly selectable without changing saved outfit data. -->
+<style id="wardrobe-accessory-visibility-hotfix">
+#custom #accessories{display:grid!important;visibility:visible!important;opacity:1!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;overflow:visible!important;max-height:none!important}
+#custom #accessories button[data-item]{display:flex!important;visibility:visible!important;opacity:1!important;min-height:58px!important;align-items:center!important;justify-content:center!important;gap:6px!important;white-space:normal!important;overflow-wrap:anywhere!important;position:relative!important}
+#custom #accessories #multiAccessoryHint{grid-column:1/-1}
+#custom #accessories button[data-item]::first-letter{font-size:1.35em}
+</style>
+<script id="wardrobe-accessory-visibility-hotfix-script">
+(function(){
+ const wardrobeWearables=[
+ ['🎀','Bow'],['⭐','Star'],['🧢','Cool Cap'],['🌸','Flower Clip'],['👑','Royal Crown'],['🦋','Butterfly'],['🪽','Angel Wings'],['🧣','Cozy Scarf'],['🎧','Headphones'],['🕶️','Sunglasses'],['🍓','Berry Clip'],['🫧','Bubble Wand'],['🐉','Tiny Dragon'],['🪄','Wish Wand'],['🪐','Planet Pal'],['🪁','Kite Buddy'],['🍄','Mushroom Hat'],['🐝','Bee Buddy'],['🦕','Dino Pal'],['🧚','Fairy Dust'],['🧿','Lucky Charm'],['🪺','Nest Hat'],['🦜','Parrot Pal'],['🪶','Feather'],['🧥','Cozy Jacket'],['🧤','Mittens'],['🪖','Explorer Helmet'],['🌈','Rainbow Trail'],['✨','Sparkles'],['🎈','Balloon'],['🪻','Lavender Bloom'],['🍀','Lucky Clover'],['🫎','Moose Buddy']
+ ];
+ const previousRender=window.renderCustom;
+ window.renderCustom=function(){
+   if(typeof previousRender==='function')previousRender();
+   const list=document.getElementById('accessories');
+   if(!list)return;
+   const category=window.wardrobeCategory;
+   if(category!=='accessories'&&category!=='all')return;
+   if(category==='accessories'){
+     const hint=document.createElement('div');
+     hint.id='multiAccessoryHint';
+     hint.textContent='🎩 Hats, bows, wings and accessories — tap one to wear it!';
+     const fragment=document.createDocumentFragment();
+     fragment.appendChild(hint);
+     wardrobeWearables.forEach(([emoji,name])=>{
+       const b=document.createElement('button');
+       b.type='button';b.className='choice'+(window.accessory===emoji?' selected':'');
+       b.dataset.item=emoji;b.textContent=emoji+' '+name+(window.accessory===emoji?' ✓':'');
+       b.addEventListener('click',()=>{if(typeof window.chooseWardrobeAccessory==='function')window.chooseWardrobeAccessory(emoji);});
+       fragment.appendChild(b);
+     });
+     list.replaceChildren(fragment);
+     list.style.display='grid';list.style.visibility='visible';list.style.opacity='1';
+     if(list.parentElement)list.parentElement.style.display='block';
+   }
+ };
+})();
+</script>
+</body></html>
