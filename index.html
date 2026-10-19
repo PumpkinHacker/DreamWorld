@@ -1589,14 +1589,16 @@ function checkMiniAnswer(i,btn){
  [...$('miniChoices').children].forEach(b=>b.disabled=true);
  if(good){btn.classList.add('correct');$('miniFeedback').textContent='Great job! +5 tokens! 🌟';coins+=5;syncCoins();playSound('success');saveProgress()}
  else{btn.classList.add('wrong');$('miniFeedback').textContent='The answer is '+miniAnswer+'. Next question coming up!';playSound('tap')}
- if(miniKind==='odd'||miniKind==='animal'){[...$('miniChoices').children].forEach(b=>b.disabled=true);setTimeout(()=>nextMiniRound(),1100)}
+ if(miniKind==='odd'||miniKind==='animal'||miniKind==='math'){[...$('miniChoices').children].forEach(b=>b.disabled=true);setTimeout(()=>nextMiniRound(),1100)}
 }
 function pickMemory(i,btn){
  if(miniMemoryLock||btn.disabled)return;btn.textContent=btn.dataset.pair;
  if(!miniMemoryFirst){miniMemoryFirst=btn;return}
  miniMemoryLock=true;
  if(miniMemoryFirst.dataset.pair===btn.dataset.pair){miniMemoryFirst.disabled=true;btn.disabled=true;miniMemoryFirst.classList.add('correct');btn.classList.add('correct');$('miniFeedback').textContent='A match! +5 tokens! ✨';coins+=5;syncCoins();saveProgress();playSound('success');}
- else{$('miniFeedback').textContent='Not a match — tap Play Again to shuffle!';playSound('tap')}
+ else{$('miniFeedback').textContent='Not a match — try again!';playSound('tap');const first=miniMemoryFirst;setTimeout(()=>{if(first&&first.isConnected&&!first.disabled)first.textContent='❔';if(btn.isConnected&&!btn.disabled)btn.textContent='❔';miniMemoryFirst=null;miniMemoryLock=false},850);return}
+ miniMemoryFirst=null;miniMemoryLock=false;
+ if([...$('miniChoices').children].every(card=>card.disabled)){$('miniFeedback').textContent='You matched them all! 🎉 Tap Play Again to play another round.';const again=document.createElement('button');again.className='mini-choice';again.textContent='Play Again 🔄';again.onclick=()=>nextMiniRound();$('miniChoices').appendChild(again)}
 }
 
 let drawColor='#ff5ca8',drawSize=7,drawIsDown=false,drawLast=null,drawRewarded=false,drawHistory=[],drawStamp='';
