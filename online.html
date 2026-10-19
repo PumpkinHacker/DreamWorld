@@ -616,7 +616,7 @@ html,body{height:100%;overflow:hidden!important}
  border-radius:14px!important;background:linear-gradient(#a994ff,#6f52df)!important;
  box-shadow:0 4px 0 #39228b55!important
 }
-</style></head>
+</style><style id="disable-online-world-animations">/* User preference: keep the Online World still; movement/game logic remains functional. */ #online.screen.active #onlineWorldArea *, #online.screen.active #onlineWorldArea *::before, #online.screen.active #onlineWorldArea *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } #online.screen.active #onlineWorldArea .online-avatar { will-change: auto !important; }</style></head>
 <body><div id="app">
 <div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div><button id="logoutBtn" type="button" onclick="logoutDreamWorld()" aria-label="Log out of Dream World">↪ Log out</button>
 <div id="scenery"><div class="cloud" style="top:10%;left:10%"></div><div class="cloud" style="top:24%;left:60%;animation-delay:-14s;transform:scale(.7)"></div><div class="hill"></div><div class="hill h2"></div><div class="flowerfield"></div></div>
