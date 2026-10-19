@@ -1399,20 +1399,10 @@ syncCoins=function(){_syncCoins();saveProgress();scheduleServerTokenSync()};
   const list=$('accessories');if(!list)return;
   if(wardrobeCategory==='animals')return;
   if(isDreamWorldAdmin)return;
+  // Keep all accessory and hat choices visible in the wardrobe. This only
+  // changes visibility; it does not alter the user's saved outfit or selection.
   const buttons=[...list.querySelectorAll('button[data-item]')];
-  const owned=e=>itemsOwned.includes(e)||itemsOwned.includes('spacegear:'+e);
-  const freeAccessories=['🎀','⭐','🌸'],freeShoes=['👟','🩰','🛼'];
-  let allowed=[];
-  if(wardrobeCategory==='shoes')allowed=freeShoes;
-  else if(wardrobeCategory==='accessories')allowed=freeAccessories;
-  else if(wardrobeCategory==='halloween'||wardrobeCategory==='items')allowed=[];
-  else if(wardrobeCategory==='all')allowed=[...freeAccessories,...freeShoes];
-  buttons.forEach(b=>{
-   const e=b.dataset.item;
-   if(!e)return;
-   const free=allowed.includes(e),has=owned(e);
-   if(!free&&!has)b.remove();
-  });
+  buttons.forEach(b=>{b.style.display='';b.style.visibility='visible';});
   const hint=$('wardrobeHint');
   if(hint)hint.textContent=wardrobeCategory==='shoes'?'👟 Pick 1 pair of shoes!':wardrobeCategory==='accessories'?'🎀 Pick up to 3 cute accessories!':'🌈 Pick your look! More goodies are in the Shop.';
  };
