@@ -1357,7 +1357,7 @@ renderCustom=function(){
   const halloweenItems=[...new Set([...halloweenOnly,...owned.filter(e=>halloweenOnly.has(e))])];
   const accessoryItems=[...new Set([...accessoryOnly,...owned.filter(e=>accessoryOnly.has(e))])];
   const generalItems=[...new Set([...generalOnly,...owned.filter(e=>generalOnly.has(e))])];
-  const outfitItems=[...new Set([...outfitOnly,...owned.filter(e=>outfitOnly.has(e))])];
+  const outfitItems=[...outfitOnly]; // Always show the complete outfit collection in Customization, even before purchase.
   const skins=[...new Set(['Classic Pup',...(ownedSkins||[])])];
   const skinButtons=skins.map(n=>'<button type="button" class="choice '+(skinName===n?'selected':'')+'" onclick="equipSkin(\''+n+'\')">🎨 '+n+'</button>');
   if(wardrobeCategory==='animals')opts=animalButtons;
