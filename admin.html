@@ -18,7 +18,7 @@
 <button id="connectBtn">Sign in</button><div id="loginStatus" class="status" role="status">Not signed in.</div></section>
 <section id="dashboard" class="hidden">
 <div class="card"><div class="row" style="align-items:center"><div><h2>Players</h2><p class="muted">Accounts and numeric player IDs from the same database used by sign-up and login.</p></div><div style="text-align:right"><button id="refreshBtn">Refresh players</button></div></div><div id="players"></div></div>
-<div class="card"><h2>🔐 Account Management</h2><p class="muted">View registered usernames and Player IDs. You cannot view anyone's existing password; set a new password here if an account owner needs a reset. Resetting a password signs that account out everywhere.</p><div id="accounts"></div><div id="accountsStatus" class="status" role="status">Account list will load after admin sign-in.</div></div>
+<div class="card"><h2>📈 Player Activity</h2><p class="muted">Online status and playtime appear when the game API reports activity data.</p><div id="activityStatus" class="status" role="status">Activity data loads after sign-in.</div></div><div class="card"><h2>🔐 Account Management</h2><p class="muted">View registered usernames and Player IDs. You cannot view anyone's existing password; set a new password here if an account owner needs a reset. Resetting a password signs that account out everywhere.</p><div id="accounts"></div><div id="accountsStatus" class="status" role="status">Account list will load after admin sign-in.</div></div>
 <div class="card"><h2>Manage player Tokens</h2><p class="muted">Select an ID above or type a player ID. Set replaces the balance; Add and Remove change it by the amount entered. Removing more than the balance leaves 0.</p>
 <label for="playerId">Player ID</label><input id="playerId" inputmode="numeric" autocomplete="off" placeholder="Numeric player ID">
 <div class="row"><div><label for="amount">Amount</label><input id="amount" type="number" min="0" max="999999999" step="1" placeholder="Enter a whole number"></div></div>
@@ -43,7 +43,16 @@
    const id=document.createElement('div');const code=document.createElement('code');code.textContent='Player ID: '+a.playerId;id.appendChild(code);
    const created=document.createElement('small');created.className='muted';created.style.display='block';created.textContent=a.createdAt?'Created '+new Date(a.createdAt*1000).toLocaleDateString():'';
    info.append(name,id,created);
+   const activity=document.createElement('small');activity.className='muted';activity.style.display='block';
+   const isOnline=a.online===true||a.isOnline===true||a.status==='online';
+   const mins=Number(a.playtimeMinutes??a.minutesPlayed??a.totalMinutes);
+   activity.textContent=(isOnline?'🟢 Online':'⚪ Offline')+(Number.isFinite(mins)&&mins>=0?' · Playtime: '+Math.floor(mins/60)+'h '+Math.floor(mins%60)+'m':' · Playtime unavailable');info.appendChild(activity);
    const controls=document.createElement('div');controls.style.flex='1 1 240px';controls.style.minWidth='0';
+   const rename=document.createElement('input');rename.type='text';rename.maxLength=20;rename.placeholder='New username';rename.value=a.username||'';rename.style.marginBottom='6px';
+   const renameBtn=document.createElement('button');renameBtn.textContent='Change Name';renameBtn.style.marginTop='0';renameBtn.style.width='100%';
+   renameBtn.addEventListener('click',async()=>{const username=rename.value.trim();if(!/^[A-Za-z0-9_]{3,20}$/.test(username)){status('accountsStatus','Username must be 3–20 letters, numbers, or underscores.','error');return}renameBtn.disabled=true;try{await api('/admin/accounts/rename','POST',{playerId:String(a.playerId),username});status('accountsStatus','Name changed for Player ID '+a.playerId+'.','ok');await refresh()}catch(e){status('accountsStatus','Could not change name: '+e.message,'error')}finally{renameBtn.disabled=false}});
+   const deleteBtn=document.createElement('button');deleteBtn.textContent=a.deleted?'Restore Account':'Delete Account';deleteBtn.className='secondary';deleteBtn.style.width='100%';
+   deleteBtn.addEventListener('click',async()=>{const restore=!!a.deleted;if(!confirm((restore?'Restore':'Delete')+' account '+(a.username||a.playerId)+'?'))return;deleteBtn.disabled=true;try{await api(restore?'/admin/accounts/restore':'/admin/accounts/delete','POST',{playerId:String(a.playerId)});status('accountsStatus',(restore?'Restored':'Deleted')+' account for Player ID '+a.playerId+'.','ok');await refresh()}catch(e){status('accountsStatus','Account action failed: '+e.message,'error')}finally{deleteBtn.disabled=false}});
    const pass=document.createElement('input');pass.type='password';pass.autocomplete='new-password';pass.minLength=8;pass.maxLength=128;pass.placeholder='New password (8–128 characters)';pass.setAttribute('aria-label','New password for '+(a.username||'player'));pass.style.marginBottom='6px';
    const btn=document.createElement('button');btn.textContent='Reset Password';btn.style.marginTop='0';btn.style.width='100%';
    if(String(a.playerId)===currentAdminId){btn.disabled=true;btn.title='Use a different admin account to reset your own password.'}
@@ -55,14 +64,14 @@
     catch(e){status('accountsStatus',e.message,'error')}
     finally{btn.disabled=false}
    });
-   controls.append(pass,btn);row.append(info,controls);root.appendChild(row);
+   controls.append(rename,renameBtn,deleteBtn,pass,btn);row.append(info,controls);root.appendChild(row);
   });
  }
  async function refresh(){ $('refreshBtn').disabled=true;try{const d=await api('/admin/players');const a=await api('/admin/accounts');renderPlayers(d.players||[]);renderAccounts(a.accounts||[]);$('announcement').value=d.announcement?.message||'';$('charCount').textContent=$('announcement').value.length;status('tokensStatus','Player list refreshed.','ok')}catch(e){status('tokensStatus',e.message,'error')}finally{$('refreshBtn').disabled=false}}
  async function saveTokens(action){const playerId=$('playerId').value.trim(),raw=$('amount').value,amount=Number(raw);if(!/^\d{1,12}$/.test(playerId)||raw===''||!Number.isSafeInteger(amount)||amount<0||amount>999999999){status('tokensStatus','Enter a numeric player ID and a whole-number amount from 0 to 999,999,999.','error');return}const buttonId=action==='set'?'setTokensBtn':action==='add'?'addTokensBtn':'removeTokensBtn';$(buttonId).disabled=true;try{const d=await api('/admin/tokens','POST',{playerId,action,amount});status('tokensStatus','Player '+playerId+': '+d.previous+' → '+d.coins+' Tokens.','ok');await refresh()}catch(e){status('tokensStatus',e.message,'error')}finally{$(buttonId).disabled=false}}
  async function saveAnnouncement(){const message=$('announcement').value.trim();if(message.length>300){status('announcementStatus','Announcement must be 300 characters or fewer.','error');return}$('saveAnnouncementBtn').disabled=true;try{await api('/admin/announcement','POST',{message});status('announcementStatus','Announcement saved.','ok')}catch(e){status('announcementStatus',e.message,'error')}finally{$('saveAnnouncementBtn').disabled=false}}
  async function refreshLiveData(){if(!token||$('dashboard').classList.contains('hidden'))return;try{const d=await api('/admin/players');renderPlayers(d.players||[]);if(document.activeElement!==$('announcement')){const serverMessage=d.announcement?.message||'';if($('announcement').value!==serverMessage){$('announcement').value=serverMessage;$('charCount').textContent=serverMessage.length}}}catch(e){console.warn('Live admin refresh failed:',e.message)}}
- setInterval(refreshLiveData,3000);
+ setInterval(refreshLiveData,1000);
  async function disconnect(){try{await api('/auth/logout','POST',{})}catch(e){}token='';localStorage.removeItem(savedTokenKey);$('dashboard').classList.add('hidden');$('loginCard').classList.remove('hidden');$('password').value='';status('loginStatus','Signed out.')}
  async function restoreLogin(){
   if(!token)return;
