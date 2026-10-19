@@ -1592,7 +1592,7 @@ function checkMiniAnswer(i,btn){
  if(miniKind==='odd'||miniKind==='animal'||miniKind==='math'){[...$('miniChoices').children].forEach(b=>b.disabled=true);setTimeout(()=>nextMiniRound(),1100)}
 }
 function pickMemory(i,btn){
- if(miniMemoryLock||btn.disabled)return;btn.textContent=btn.dataset.pair;
+ if(miniMemoryLock||btn.disabled||miniMemoryFirst===btn)return;btn.textContent=btn.dataset.pair;
  if(!miniMemoryFirst){miniMemoryFirst=btn;return}
  miniMemoryLock=true;
  if(miniMemoryFirst.dataset.pair===btn.dataset.pair){miniMemoryFirst.disabled=true;btn.disabled=true;miniMemoryFirst.classList.add('correct');btn.classList.add('correct');$('miniFeedback').textContent='A match! +5 tokens! ✨';coins+=5;syncCoins();saveProgress();playSound('success');}
