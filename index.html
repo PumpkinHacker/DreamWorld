@@ -962,14 +962,14 @@ async function apiAuth(path,body){
 }
 async function resumeAuthSession(){
   const token=localStorage.getItem('dreamWorldSessionV1');
-  if(!token){showAuth();return}
+  if(!token){if(!$('home')?.classList.contains('active')&&!$('custom')?.classList.contains('active')&&!$('shop')?.classList.contains('active')&&!$('levels')?.classList.contains('active'))showAuth();return}
   try{
     const res=await fetch(DREAMWORLD_API+'/auth/me',{headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(5000),cache:'no-store'});
     let data={};try{data=await res.json()}catch(e){}
-    if(!res.ok){if(res.status===401||res.status===403){localStorage.removeItem('dreamWorldSessionV1');localStorage.removeItem('dreamWorldPlayerIdV1');showAuth();$('authError').textContent='Your session expired. Please log in again.';return}throw new Error('Account server temporarily unavailable ('+res.status+').')}
+    if(!res.ok){if(res.status===401||res.status===403){localStorage.removeItem('dreamWorldSessionV1');localStorage.removeItem('dreamWorldPlayerIdV1');if(document.querySelector('.screen.active')?.id==='home'||document.querySelector('.screen.active')?.id==='authScreen'){showAuth();$('authError').textContent='Your session expired. Please log in again.'}return}throw new Error('Account server temporarily unavailable ('+res.status+').')}
     if(!data.player)throw new Error('The server response was incomplete.');
-    authSession=token;setPlayerHud(data.player.playerId);await loadServerTokenBalance();showScreen('home');refreshAdminAccess();
-  }catch(e){const cachedId=localStorage.getItem('dreamWorldPlayerIdV1');if(cachedId){authSession=token;setPlayerHud(cachedId);showScreen('home');console.warn('Session check unavailable; kept cached sign-in.')}else{$('authError').textContent='Can’t reach the account server. Your login has been kept—reload to retry.';showAuth()}}
+    authSession=token;setPlayerHud(data.player.playerId);await loadServerTokenBalance();refreshAdminAccess();
+  }catch(e){const cachedId=localStorage.getItem('dreamWorldPlayerIdV1');if(cachedId){authSession=token;setPlayerHud(cachedId);console.warn('Session check unavailable; kept cached sign-in.')}else{if(document.querySelector('.screen.active')?.id==='authScreen')$('authError').textContent='Can’t reach the account server. Your login has been kept—reload to retry.';console.warn('Session check unavailable; no cached player ID.')}} 
 }
 async function submitAuth(event){
   event.preventDefault();
