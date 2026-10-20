@@ -1280,7 +1280,7 @@ let puppyCanvasKey='',puppyCanvasImage=null,puppyCanvasFailed=false;
 function drawPuppy(x,y,tilt=0,squash=0){
   ctx.save();ctx.translate(x,y-42);ctx.rotate(tilt);ctx.scale(1+squash,1-squash);ctx.translate(-x,-(y-42));
   // One shared SVG source powers the menu, dress-up preview and in-game player.
-  const key=col+'|'+accessory;
+  const key=JSON.stringify([selectedAnimal,col,skinName,accessory,Array.isArray(wornAccessories)?wornAccessories:[]]);
   if(key!==puppyCanvasKey){
     puppyCanvasKey=key;puppyCanvasImage=null;puppyCanvasFailed=false;
     const img=new Image();
