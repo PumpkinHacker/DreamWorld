@@ -796,6 +796,11 @@ function boot(){
   },80);
   // Hard fallback: always leave the loading screen, even if initialization or auth fails.
   watchdog=setTimeout(openHome,1200);
+  // Independent recovery in case a delayed setup task or mobile browser stalls.
+  try{
+    window.addEventListener('error',()=>{try{openHome()}catch(_){const loading=document.getElementById('loading');if(loading)loading.classList.remove('active');const home=document.getElementById('home');if(home)home.classList.add('active')}},{once:true});
+    window.addEventListener('unhandledrejection',()=>{try{openHome()}catch(_){}},{once:true});
+  }catch(_){}
   const safeInit=(label,fn)=>{try{fn()}catch(err){console.error('Dream World setup issue ('+label+'):',err)}};
   safeInit('background',loadBackground);
   safeInit('music',startMusic);
