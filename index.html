@@ -763,37 +763,44 @@ function setBackground(id){if(!backgroundOptions.some(b=>b.id===id))return;activ
 function loadBackground(){try{const v=localStorage.getItem('estherDreamworldBackground');if(backgroundOptions.some(b=>b.id===v))activeBackground=v}catch(e){}applyBackground();renderBackgrounds()}
 
 function boot(){
-  // Keep the progress animation independent from game setup, and never leave the player stranded here.
-  let p=0,finished=false;
+  let p=0,finished=false,timer=null,watchdog=null;
   const progress=$('progress');
   const openHome=()=>{
     if(finished)return;
     finished=true;
-    clearInterval(timer);
-    // Leave the decorative loading screen even if account validation is slow.
+    if(timer)clearInterval(timer);
+    if(watchdog)clearTimeout(watchdog);
     try{
       const token=localStorage.getItem('dreamWorldSessionV1');
-      if(!token){showAuth();return;}
       const cachedId=localStorage.getItem('dreamWorldPlayerIdV1');
-      if(cachedId){authSession=token;setPlayerHud(cachedId);showScreen('home');}
-      resumeAuthSession();
-    }catch(err){console.error('Startup recovery:',err);showAuth();}
+      if(token&&cachedId){
+        authSession=token;
+        setPlayerHud(cachedId);
+        showScreen('home');
+        // Refresh the session after the menu is visible; never block startup on the network.
+        setTimeout(()=>{resumeAuthSession().catch(err=>console.warn('Session refresh:',err));},0);
+      }else{
+        showAuth();
+        // A saved token without a cached player ID can still be checked in the background.
+        if(token)setTimeout(()=>{resumeAuthSession().catch(err=>console.warn('Session restore:',err));},0);
+      }
+    }catch(err){
+      console.error('Startup recovery:',err);
+      try{showAuth()}catch(_){}
+    }
   };
-  const timer=setInterval(()=>{
-    p=Math.min(100,p+8);
+  timer=setInterval(()=>{
+    p=Math.min(100,p+10);
     if(progress)progress.style.width=p+'%';
-    if(p>=100)setTimeout(openHome,250);
-  },100);
-  // Watchdog: the home menu still opens even if a progress callback fails.
-  setTimeout(openHome,1800);
-  const safeInit=(label,fn)=>{try{fn();}catch(err){console.error('Dream World setup issue ('+label+'):',err);}};
-  // Keep startup lightweight so the loading screen cannot be held hostage by heavy shop/customization rendering.
+    if(p>=100)openHome();
+  },80);
+  // Hard fallback: always leave the loading screen, even if initialization or auth fails.
+  watchdog=setTimeout(openHome,1200);
+  const safeInit=(label,fn)=>{try{fn()}catch(err){console.error('Dream World setup issue ('+label+'):',err)}};
   safeInit('background',loadBackground);
   safeInit('music',startMusic);
   safeInit('loading puppy',()=>renderPuppy('loadHero'));
   safeInit('tokens',syncCoins);
-  // Build secondary screens after the first frame, not during the critical loading path.
-  // Keep the first screen responsive: heavy shop and wardrobe grids are built after the loading screen closes.
   setTimeout(()=>{
     safeInit('home puppy',()=>renderPuppy('homeHero'));
     safeInit('levels',renderLevels);
