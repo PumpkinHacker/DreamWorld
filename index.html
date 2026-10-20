@@ -362,7 +362,8 @@ button:disabled{cursor:not-allowed}
 .thumb-color{background:radial-gradient(circle at 50% 43%,#ffffffb8 0 22%,transparent 23%),radial-gradient(circle at 17% 18%,#fff 0 5%,transparent 6%),linear-gradient(135deg,#6ee7ff 0%,#9cb8ff 48%,#efa9ed 100%)}
 .thumb-odd{background:radial-gradient(circle at 50% 43%,#fff9 0 21%,transparent 22%),radial-gradient(circle at 78% 17%,#fff 0 5%,transparent 6%),linear-gradient(135deg,#8de3df 0%,#a9c0ff 52%,#d7a8ff 100%)}
 
-\n/* Fresh, lightweight startup splash */\n.new-splash{position:relative;overflow:hidden;min-height:58vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:radial-gradient(circle at 15% 10%,#ffe6f5 0,transparent 32%),radial-gradient(circle at 85% 90%,#d8f7ff 0,transparent 35%),linear-gradient(145deg,#fff,#f5f4ff)!important;border:3px solid #fff;box-shadow:0 8px 0 #8abbe455!important}\n.splash-sparkles{font-size:clamp(1.4rem,5vw,2.4rem);letter-spacing:.22em;animation:splashFloat 2s ease-in-out infinite}\n.new-splash .loading-title{font-size:clamp(2.8rem,10vw,5rem);margin:0;line-height:1.05}\n.new-splash .hero{min-height:145px;width:100%;max-width:300px}\n.splash-subtitle{color:#37639b;margin:0;font-size:clamp(1.1rem,4vw,1.55rem);text-align:center}\n.new-splash .progress{width:min(100%,360px);margin:8px auto}\n.new-splash .footer-note{margin:0}\n@keyframes splashFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}\n</style></head>
+
+/* Fresh, lightweight startup splash */\n.new-splash{position:relative;overflow:hidden;min-height:58vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:radial-gradient(circle at 15% 10%,#ffe6f5 0,transparent 32%),radial-gradient(circle at 85% 90%,#d8f7ff 0,transparent 35%),linear-gradient(145deg,#fff,#f5f4ff)!important;border:3px solid #fff;box-shadow:0 8px 0 #8abbe455!important}\n.splash-sparkles{font-size:clamp(1.4rem,5vw,2.4rem);letter-spacing:.22em;animation:splashFloat 2s ease-in-out infinite}\n.new-splash .loading-title{font-size:clamp(2.8rem,10vw,5rem);margin:0;line-height:1.05}\n.new-splash .hero{min-height:145px;width:100%;max-width:300px}\n.splash-subtitle{color:#37639b;margin:0;font-size:clamp(1.1rem,4vw,1.55rem);text-align:center}\n.new-splash .progress{width:min(100%,360px);margin:8px auto}\n.new-splash .footer-note{margin:0}\n@keyframes splashFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}\n</style></head>
 <body><div id="app">
 <div id="playerHud" aria-live="polite"><span id="playerIdLabel">Player ID: —</span><span id="fpsLabel">FPS: —</span></div><button id="logoutBtn" type="button" onclick="logoutDreamWorld()" aria-label="Log out of Dream World">↪ Log out</button>
 <div id="scenery"><div class="cloud" style="top:10%;left:10%"></div><div class="cloud" style="top:24%;left:60%;animation-delay:-14s;transform:scale(.7)"></div><div class="hill"></div><div class="hill h2"></div><div class="flowerfield"></div></div>
@@ -370,22 +371,28 @@ button:disabled{cursor:not-allowed}
 <!-- Independent startup failsafe: runs even if the main game script fails to parse. -->
 <script id="startup-independent-failsafe">
 (function(){
-  var started=Date.now();
+  var started=Date.now(),released=false;
   var bar=document.getElementById('progress');
+  function releaseStartup(){
+    if(released)return;
+    released=true;
+    clearInterval(timer);
+    var loading=document.getElementById('loading');
+    if(loading)loading.classList.remove('active');
+    document.querySelectorAll('.screen').forEach(function(el){el.classList.remove('active');});
+    var token=null,cachedId=null;
+    try{token=localStorage.getItem('dreamWorldSessionV1');cachedId=localStorage.getItem('dreamWorldPlayerIdV1');}catch(e){}
+    var target=document.getElementById(token&&cachedId?'home':'authScreen')||document.getElementById('authScreen');
+    if(target)target.classList.add('active');
+  }
   var timer=setInterval(function(){
     var loading=document.getElementById('loading');
     if(!loading || !loading.classList.contains('active')){clearInterval(timer);return;}
     if(bar)bar.style.width=Math.min(100,Math.round((Date.now()-started)/18))+'%';
-    if(Date.now()-started>=2400){
-      clearInterval(timer);
-      loading.classList.remove('active');
-      document.querySelectorAll('.screen').forEach(function(el){el.classList.remove('active');});
-      var token=null,cachedId=null;
-      try{token=localStorage.getItem('dreamWorldSessionV1');cachedId=localStorage.getItem('dreamWorldPlayerIdV1');}catch(e){}
-      var target=document.getElementById(token&&cachedId?'home':'authScreen')||document.getElementById('authScreen');
-      if(target)target.classList.add('active');
-    }
+    if(Date.now()-started>=1800)releaseStartup();
   },100);
+  // A second independent timeout covers timer/progress logic that fails to complete.
+  setTimeout(releaseStartup,3000);
 })();
 </script>
 <section id="authScreen" class="screen auth-screen"><div class="panel auth-card"><div style="font-size:3rem">🐾✨</div><h1>Welcome to Dream World!</h1><div class="tagline">Create an account or log in to start your adventure.</div><div class="auth-tabs"><button type="button" id="signupTab" class="active" onclick="setAuthMode('signup')">Create Account</button><button type="button" id="loginTab" onclick="setAuthMode('login')">Log In</button></div><form id="authForm" onsubmit="submitAuth(event)" autocomplete="on"><label for="authUsername">Username</label><input id="authUsername" name="username" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+" autocomplete="username" required placeholder="3–20 letters, numbers, or _"><label for="authPassword">Password</label><input id="authPassword" name="password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required placeholder="At least 8 characters"><p class="auth-note">No email needed. Keep your password private and ask a trusted adult for help if you need it. Your Player ID is assigned automatically.</p><div id="authError" class="auth-error" role="status" aria-live="polite"></div><button class="bigbtn blue" id="authSubmit" type="submit">Create Account &amp; Play 🐶</button></form></div></section>
