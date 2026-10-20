@@ -1799,9 +1799,12 @@ puppySVG = function(){
     }
     const overlays=items.map(item=>{
       const art=accessoryVectorArt(item);
-      return Array.isArray(art)?(art[1]||''):'';
+      return typeof art==='string'?art:(Array.isArray(art)?String(art[1]||''):'');
     }).join('');
-    return svg.replace('</svg>',overlays+'</svg>');
+    /* Costume pieces are separate from small accessories and must be drawn onto the body too. */
+    const costume=items.find(item=>['🦸','🧙‍♂️','🥷','🤠','👨‍🚀','🧑‍🍳','🧑‍🎤','🧚‍♂️','🧛‍♂️','🧜','👹'].includes(item));
+    const costumeArt=costume?dreamCostumeBody(costume):'';
+    return svg.replace('</svg>',costumeArt+overlays+'</svg>');
   } finally {accessory=oldAccessory;wornAccessories=oldWorn;}
 };
 /* Online presence now carries the full equipped set, not just the last tapped item. */
