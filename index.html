@@ -795,7 +795,7 @@ function boot(){
     if(p>=100)openHome();
   },80);
   // Hard fallback: always leave the loading screen, even if initialization or auth fails.
-  watchdog=setTimeout(openHome,1200);
+  watchdog=setTimeout(()=>{try{openHome()}catch(err){console.error('Startup watchdog:',err)}setTimeout(()=>{const loading=document.getElementById('loading');if(loading&&loading.classList.contains('active')){loading.classList.remove('active');const token=localStorage.getItem('dreamWorldSessionV1');const cachedId=localStorage.getItem('dreamWorldPlayerIdV1');const target=document.getElementById(token&&cachedId?'home':'authScreen');if(target)target.classList.add('active');if(token&&cachedId){try{authSession=token;setPlayerHud(cachedId)}catch(_){}}}},1500)},1200);
   // Independent recovery in case a delayed setup task or mobile browser stalls.
   try{
     window.addEventListener('error',()=>{try{openHome()}catch(_){const loading=document.getElementById('loading');if(loading)loading.classList.remove('active');const home=document.getElementById('home');if(home)home.classList.add('active')}},{once:true});
