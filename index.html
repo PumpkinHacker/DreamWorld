@@ -1528,9 +1528,14 @@ syncCoins=function(){_syncCoins();saveProgress();scheduleServerTokenSync()};
  };
 })();
 setInterval(()=>{if(playerId&&localStorage.getItem('dreamWorldSessionV1'))loadServerTokenBalance()},2000);
-loadProgress();
-// Start the loading progress and initialize the game screens.
-boot();
+try{loadProgress()}catch(err){console.error('Saved progress could not be loaded; starting with defaults:',err)}
+// Always start the boot sequence even if saved progress is corrupt or storage is unavailable.
+try{boot()}catch(err){
+ console.error('Dream World boot failed; showing a safe entry screen:',err);
+ const loading=document.getElementById('loading');if(loading)loading.classList.remove('active');
+ document.querySelectorAll('.screen').forEach(screen=>screen.classList.remove('active'));
+ const entry=document.getElementById('authScreen')||document.getElementById('home');if(entry)entry.classList.add('active');
+}
 
 function randomizeCustomLook(){
  const furChoices=[['Ocean Pop','#42a5ed'],['Berry Fizz','#f07bb6'],['Mint Dream','#56c9a1'],['Sunbeam','#f4bd49'],['Galaxy Grape','#8057df'],['Cotton Candy','#ffb7e3'],['Dragonfire','#ff654f'],['Lime Sprite','#a6e843'],['Moon Silver','#c7d4ef'],['Midnight','#26335e'],['Rainbow Magic','rainbow'],['Unicorn Aura','unicorn'],['Starlight','starlight'],['Crystal Ice','#a6f4ff'],['Peach Puff','#ffb58e'],['Mystic Lavender','#c7a2ff'],['Comet Tail','comet'],['Magic Opal','opal'],['Arctic Aurora','aurora']];
