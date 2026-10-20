@@ -1626,47 +1626,4 @@ function saveDrawingImage(){const c=$('colorDrawingCanvas');if(!c)return;const a
 function undoDrawing(){const c=$('colorDrawingCanvas');if(!c||!drawHistory.length)return;c.getContext('2d').putImageData(drawHistory.pop(),0,0);$('miniFeedback').textContent='Last stroke undone. ✨'}
 function finishDrawing(){if(!drawRewarded){coins+=5;syncCoins();saveProgress();drawRewarded=true;playSound('success');$('miniFeedback').textContent='Masterpiece made! +5 tokens! Keep creating! 🌟'}else $('miniFeedback').textContent='Your masterpiece is ready — keep drawing or clear it for a fresh page! 🎨'}
 </script>
-<!-- Wardrobe visibility hotfix: make hats/accessories visibly selectable without changing saved outfit data. -->
-<style id="wardrobe-accessory-visibility-hotfix">
-#custom #accessories{display:grid!important;visibility:visible!important;opacity:1!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;overflow:visible!important;max-height:none!important}
-#custom #accessories button[data-item]{display:flex!important;visibility:visible!important;opacity:1!important;min-height:58px!important;align-items:center!important;justify-content:center!important;gap:6px!important;white-space:normal!important;overflow-wrap:anywhere!important;position:relative!important}
-#custom #accessories #multiAccessoryHint{grid-column:1/-1}
-#custom #accessories button[data-item]::first-letter{font-size:1.35em}
-</style>
-<script id="wardrobe-accessory-visibility-hotfix-script">
-(function(){
- const wardrobeWearables=[
- ['🎀','Bow'],['⭐','Star'],['🧢','Cool Cap'],['🌸','Flower Clip'],['👑','Royal Crown'],['🦋','Butterfly'],['🪽','Angel Wings'],['🧣','Cozy Scarf'],['🎧','Headphones'],['🕶️','Sunglasses'],['🍓','Berry Clip'],['🫧','Bubble Wand'],['🐉','Tiny Dragon'],['🪄','Wish Wand'],['🪐','Planet Pal'],['🪁','Kite Buddy'],['🍄','Mushroom Hat'],['🐝','Bee Buddy'],['🦕','Dino Pal'],['🧚','Fairy Dust'],['🧿','Lucky Charm'],['🪺','Nest Hat'],['🦜','Parrot Pal'],['🪶','Feather'],['🧥','Cozy Jacket'],['🧤','Mittens'],['🪖','Explorer Helmet'],['🌈','Rainbow Trail'],['✨','Sparkles'],['🎈','Balloon'],['🪻','Lavender Bloom'],['🍀','Lucky Clover'],['🫎','Moose Buddy']
- ];
- const previousRender=window.renderCustom;
- window.renderCustom=function(){
-   if(typeof previousRender==='function')previousRender();
-   const list=document.getElementById('accessories');
-   if(!list)return;
-   const category=window.wardrobeCategory;
-   if(category!=='accessories'&&category!=='all')return;
-   if(category==='accessories'){
-     const hint=document.createElement('div');
-     hint.id='multiAccessoryHint';
-     hint.textContent='🎩 Hats, bows, wings and accessories — tap one to wear it!';
-     const fragment=document.createDocumentFragment();
-     fragment.appendChild(hint);
-     wardrobeWearables.forEach(([emoji,name])=>{
-       const b=document.createElement('button');
-       b.type='button';b.className='choice'+(window.accessory===emoji?' selected':'');
-       b.dataset.item=emoji;b.textContent=emoji+' '+name+(window.accessory===emoji?' ✓':'');
-       b.addEventListener('click',()=>{if(typeof window.chooseWardrobeAccessory==='function')window.chooseWardrobeAccessory(emoji);});
-       fragment.appendChild(b);
-     });
-     list.replaceChildren(fragment);
-     list.style.display='grid';list.style.visibility='visible';list.style.opacity='1';
-     if(list.parentElement)list.parentElement.style.display='block';
-   }
- };
-})();
-</script>
-
-<!-- Final wardrobe visibility fix: preserves existing outfit artwork and saved looks. -->
-<style id="wardrobe-final-visibility">#custom #accessories{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;max-height:none!important;overflow:visible!important}#custom #accessories button{display:flex!important;visibility:visible!important;opacity:1!important;min-height:58px!important;align-items:center!important;justify-content:center!important;white-space:normal!important}</style>
-<script id="wardrobe-final-wearables">(function(){const wearables=[['🎩','Top Hat'],['🎓','Graduation Cap'],['🤠','Cowboy Hat'],['🧙','Wizard Hat'],['🎃','Pumpkin Hat'],['🪖','Explorer Helmet'],['🎀','Bow'],['🌸','Flower Clip'],['🦋','Butterfly'],['🪽','Angel Wings'],['🎧','Headphones'],['🕶️','Sunglasses'],['🧣','Cozy Scarf'],['🧥','Cozy Jacket'],['🧤','Mittens'],['🌈','Rainbow Trail'],['✨','Sparkles']];const base=window.renderCustom;window.renderCustom=function(){if(typeof base==='function')base();const list=document.getElementById('accessories');if(!list)return;const category=(typeof wardrobeCategory!=='undefined'?wardrobeCategory:(window.wardrobeCategory||'all'));if(!['accessories','hats','all'].includes(category))return;if(category==='accessories'||category==='hats'){list.replaceChildren();const hint=document.createElement('div');hint.textContent=category==='hats'?'🎩 Hats — tap one to try it on!':'🎩 Hats and accessories — tap one to try it on!';hint.style.gridColumn='1/-1';list.appendChild(hint)}const existing=new Set([...list.querySelectorAll('button[data-item]')].map(b=>b.dataset.item));(category==='hats'?wearables.filter(x=>/Hat|Cap|Crown|Helmet/.test(x[1])):wearables).forEach(([emoji,name])=>{if(existing.has(emoji))return;const b=document.createElement('button');b.type='button';b.className='choice'+(window.accessory===emoji?' selected':'');b.dataset.item=emoji;b.textContent=emoji+' '+name;b.onclick=()=>{if(typeof window.chooseWardrobeAccessory==='function')window.chooseWardrobeAccessory(emoji)};list.appendChild(b)});list.style.display='grid';list.style.visibility='visible';list.style.opacity='1';if(list.parentElement)list.parentElement.style.display='block'}})();</script>
 </body></html>
