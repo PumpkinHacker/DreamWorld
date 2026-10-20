@@ -527,7 +527,7 @@ const ONLINE_MAPS={pawsville:{title:'🏘️ Pawsville',className:'pawsville'},'
 function openOnlineWorld(){if(!localStorage.getItem('dreamWorldSessionV1')){showAuth();$('authError').textContent='Create an account or log in to visit the Online World.';return}const target=new URL('online.html?world=1',location.href).href;const tab=window.open(target,'_blank');if(!tab)location.assign(target)}
 function showOnlineMaps(){stopOnlineTimers(true);$('onlineWorldArea').hidden=true;$('onlineMapPicker').hidden=false;onlineMapId=''}
 async function enterOnlineMap(mapId){if(!ONLINE_MAPS[mapId])return;const token=localStorage.getItem('dreamWorldSessionV1');if(!token){showAuth();return}stopOnlineTimers(true);onlineMapId=mapId;onlineX=8;onlineY=77;onlineJumpVelocity=0;onlineGrounded=true;renderOnlinePlatforms(mapId);updateOnlineMapScenery(mapId);$('onlineMapPicker').hidden=true;$('onlineWorldArea').hidden=false;$('onlineMapTitle').textContent=ONLINE_MAPS[mapId].title;$('onlineWorldCanvas').className='online-world-canvas '+ONLINE_MAPS[mapId].className;$('onlineStatus').textContent='Connecting…';$('onlinePlayerMarkers').innerHTML='';$('onlinePlayerList').textContent='Finding players…';$('onlineWorldViewport').scrollLeft=0;await syncOnlinePresence();onlineRefreshTimer=setInterval(loadOnlinePlayers,1200);onlineHeartbeatTimer=setInterval(syncOnlinePresence,900);onlineLastSentX=-999;onlineLastSentY=-999;onlineLastMoveAt=performance.now();if(onlineMoveTimer)clearInterval(onlineMoveTimer);onlineMoveTimer=setInterval(tickOnlineMovement,30);loadOnlinePlayers()}
-async function syncOnlinePresence(){const token=localStorage.getItem('dreamWorldSessionV1');if(!token||!onlineMapId||onlineRequestBusy)return;onlineRequestBusy=true;onlineLastSentX=onlineX;onlineLastSentY=onlineY;try{const res=await fetch(DREAMWORLD_API+'/online/presence',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({mapId:onlineMapId,x:onlineX,y:onlineY,dog:{animal:selectedAnimal,fur:col,skin:skinName,accessory}}),cache:'no-store'});if(res.status===401){stopOnlineTimers(false);$('onlineStatus').textContent='Please log in again';return}if(!res.ok)throw Error('Presence unavailable');$('onlineStatus').textContent='🟢 Online · live updates'}catch(e){$('onlineStatus').textContent='Reconnecting…'}finally{onlineRequestBusy=false}}
+async function syncOnlinePresence(){const token=localStorage.getItem('dreamWorldSessionV1');if(!token||!onlineMapId||onlineRequestBusy)return;onlineRequestBusy=true;onlineLastSentX=onlineX;onlineLastSentY=onlineY;try{const res=await fetch(DREAMWORLD_API+'/online/presence',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({mapId:onlineMapId,x:onlineX,y:onlineY,dog:{animal:selectedAnimal,fur:col,skin:skinName,accessory,accessories:(Array.isArray(wornAccessories)&&wornAccessories.length?wornAccessories.slice(0,3):(accessory?[accessory]:[]))}}),cache:'no-store'});if(res.status===401){stopOnlineTimers(false);$('onlineStatus').textContent='Please log in again';return}if(!res.ok)throw Error('Presence unavailable');$('onlineStatus').textContent='🟢 Online · live updates'}catch(e){$('onlineStatus').textContent='Reconnecting…'}finally{onlineRequestBusy=false}}
 async function loadOnlinePlayers(){const token=localStorage.getItem('dreamWorldSessionV1');if(!token||!onlineMapId)return;try{const res=await fetch(DREAMWORLD_API+'/online/players?map='+encodeURIComponent(onlineMapId),{headers:{Authorization:'Bearer '+token},cache:'no-store'});const data=await res.json();if(!res.ok)throw Error(data.error||'Could not load players');renderOnlinePlayers(data.players||[])}catch(e){$('onlineStatus').textContent='Connection interrupted — retrying…'}}
 function dogSvgForData(dog){const old={selectedAnimal,col,skinName,accessory,wornAccessories};try{const d=dog&&typeof dog==='object'?dog:{};selectedAnimal=['🐶','🐱','🐰','🦊','🐼','🐸','🦄','🐻'].includes(d.animal)?d.animal:'🐶';col=typeof d.fur==='string'&&(/^(#[0-9a-f]{3,8}|[a-z]+)$/i.test(d.fur)||['rainbow','unicorn','starlight','comet','opal','aurora'].includes(d.fur))?d.fur:'#42a5ed';skinName=typeof d.skin==='string'?d.skin.slice(0,40):'Classic Pup';accessory=typeof d.accessory==='string'?d.accessory.slice(0,8):'🎀';return puppySVG()}finally{selectedAnimal=old.selectedAnimal;col=old.col;skinName=old.skinName;accessory=old.accessory}}
 function openPlayerProfile(id,username,dog){const mine=String(id)===String(playerId||localStorage.getItem('dreamWorldPlayerIdV1')||'');window.onlineProfileDog=dog||null;$('profilePlayerName').textContent='🐾 '+username;$('profileDogCaption').textContent=mine?'Your custom Dream World dog ✨':username+'’s custom dog ✨';const stage=$('profileDogStage');stage.innerHTML=dogSvgForData(window.onlineProfileDog);const svg=stage.querySelector('svg');if(svg){svg.classList.add('puppy');svg.removeAttribute('width');svg.removeAttribute('height');svg.style.width='min(78%,360px)';svg.style.maxHeight='80%'}window.profileReturnScreen='online';showScreen('playerProfile')}
@@ -1764,5 +1764,92 @@ function toggleDreamPassword(){
   button.setAttribute('aria-pressed',String(reveal));
   input.focus();
 }
+</script>
+
+<script id="dreamworld-appearance-sync-v33">
+/* One shared appearance model for Dress-Up, Shop, game player, and Online World. */
+const _dwOriginalPuppySVG_v33 = puppySVG;
+puppySVG = function(){
+  const oldAccessory=accessory;
+  const oldWorn=Array.isArray(wornAccessories)?wornAccessories.slice():[];
+  const outfitSet=new Set(['🦸','🧙‍♂️','🥷','🤠','👨‍🚀','🧑‍🍳','🧑‍🎤','🧚‍♂️','🧛‍♂️','🧜','👹']);
+  let items=outfitSet.has(accessory)?[accessory]:(oldWorn.length?oldWorn:(accessory?[accessory]:[]));
+  items=[...new Set(items.filter(Boolean))].slice(0,3);
+  try{
+    accessory='';
+    let svg=_dwOriginalPuppySVG_v33();
+    const animal=selectedAnimal||'🐶';
+    const baseColors={'🐶':'#f5bd59','🐱':'#b9a4ef','🐰':'#fff0e4','🦊':'#f28b43','🐼':'#fffdf7','🐸':'#83d979','🦄':'#f5d7ff','🐻':'#c98d5d','🦁':'#f3b94e','🐨':'#b8c4d3','🦌':'#c58a59','🐲':'#62d8a1','🐹':'#f3c4d2','🦔':'#b98a67'};
+    const gradients={
+      rainbow:['#ff4d8d','#ffb347','#fff06a','#62e69a','#57cfff','#8a63ff'],
+      unicorn:['#ffc5ee','#d6b8ff','#9deaff','#fff2a6'],
+      starlight:['#17194f','#5145a5','#9b8cff','#f5caff'],
+      comet:['#ff705c','#ffb85c','#fff0a6','#79e8ff','#a58aff'],
+      opal:['#f7b8ff','#9ef6ff','#fff3a6','#b9a7ff'],
+      aurora:['#75fff0','#7aa8ff','#d69cff','#8dffd2']
+    };
+    const stops=gradients[col];
+    if(stops){
+      const base=baseColors[animal]||baseColors['🐶'];
+      svg=svg.replaceAll('fill="'+base+'"','fill="url(#dwFurGradient)"');
+      const step=100/(stops.length-1);
+      const stopMarkup=stops.map((c,i)=>'<stop offset="'+(i*step)+'%" stop-color="'+c+'"/>').join('');
+      const def='<defs><linearGradient id="dwFurGradient" x1="0" y1="0" x2="1" y2="1">'+stopMarkup+'</linearGradient></defs>';
+      svg=svg.replace(/(<svg\b[^>]*>)/, '$1'+def);
+    }
+    const overlays=items.map(item=>{
+      const art=accessoryVectorArt(item);
+      return Array.isArray(art)?(art[1]||''):'';
+    }).join('');
+    return svg.replace('</svg>',overlays+'</svg>');
+  } finally {accessory=oldAccessory;wornAccessories=oldWorn;}
+};
+/* Online presence now carries the full equipped set, not just the last tapped item. */
+const _dwOriginalDogSvgForData_v33 = dogSvgForData;
+dogSvgForData = function(dog){
+  const old={selectedAnimal,col,skinName,accessory,wornAccessories:Array.isArray(wornAccessories)?wornAccessories.slice():[]};
+  try{
+    const d=dog&&typeof dog==='object'?dog:{};
+    const validAnimals=['🐶','🐱','🐰','🦊','🐼','🐸','🦄','🐻','🦁','🐨','🦌','🐲','🐹','🦔'];
+    selectedAnimal=validAnimals.includes(d.animal)?d.animal:'🐶';
+    const validFurs=['rainbow','unicorn','starlight','comet','opal','aurora'];
+    col=typeof d.fur==='string'&&(/^(#[0-9a-f]{3,8}|[a-z]+)$/i.test(d.fur)||validFurs.includes(d.fur))?d.fur:'#42a5ed';
+    skinName=typeof d.skin==='string'?d.skin.slice(0,40):'Classic Pup';
+    accessory=typeof d.accessory==='string'?d.accessory.slice(0,16):'🎀';
+    wornAccessories=Array.isArray(d.accessories)?d.accessories.filter(x=>typeof x==='string').slice(0,3):(accessory?[accessory]:[]);
+    return puppySVG();
+  } finally {selectedAnimal=old.selectedAnimal;col=old.col;skinName=old.skinName;accessory=old.accessory;wornAccessories=old.wornAccessories;}
+};
+/* Fix preview helper state restoration and make every shop preview match the equipped character. */
+paintShopPreview = function({animal=selectedAnimal,fur=col,skin=skinName,item=accessory,accessories=wornAccessories}={}){
+  const old={selectedAnimal,col,skinName,accessory,wornAccessories:Array.isArray(wornAccessories)?wornAccessories.slice():[]};
+  try{
+    selectedAnimal=animal;col=fur;skinName=skin;
+    accessory=item;
+    wornAccessories=Array.isArray(accessories)?accessories.slice():[];
+    if(item&&(!wornAccessories.length)&&!['🦸','🧙‍♂️','🥷','🤠','👨‍🚀','🧑‍🍳','🧑‍🎤','🧚‍♂️','🧛‍♂️','🧜','👹'].includes(item))wornAccessories=[item];
+    return puppySVG();
+  } finally {selectedAnimal=old.selectedAnimal;col=old.col;skinName=old.skinName;accessory=old.accessory;wornAccessories=old.wornAccessories;}
+};
+const _dwRenderShopAppearance_v33=renderShop;
+renderShop=function(){
+  _dwRenderShopAppearance_v33();
+  const preview=$('shopPreviewPup');
+  if(preview&&!preview.innerHTML)preview.innerHTML=paintShopPreview();
+};
+/* Preserve worn accessories in progress storage; the earlier wrapper was overwritten by a later save. */
+const _dwSaveProgressAppearance_v33=saveProgress;
+saveProgress=function(){
+  _dwSaveProgressAppearance_v33();
+  try{
+    const key='estherDreamworldV5';
+    const data=JSON.parse(localStorage.getItem(key)||'{}');
+    data.selectedAnimal=selectedAnimal;data.col=col;data.accessory=accessory;
+    data.wornAccessories=Array.isArray(wornAccessories)?wornAccessories.slice():[];
+    data.skinName=skinName;data.ownedSkins=ownedSkins;data.itemsOwned=itemsOwned;
+    localStorage.setItem(key,JSON.stringify(data));
+  }catch(e){}
+};
+/* Include all currently worn items in the multiplayer profile sent to the server. */
 </script>
 </body></html>
