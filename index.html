@@ -1070,12 +1070,26 @@ function renderLevels(){$('levelGrid').innerHTML=levels.map((l,i)=>{const n=i+1,
 function renderCustom(){ $('customPreview').innerHTML=puppySVG();renderPuppy('homeHero');if($('characterDetails'))$('characterDetails').textContent=selectedAnimal+' '+skinName+' · '+({'🎀':'Bow','⭐':'Star','🧢':'Cool cap','💖':'Heart','🌸':'Flower','👑':'Royal crown','🦋':'Butterfly','🌈':'Rainbow','🪽':'Angel wings','✨':'Sparkles','🕶️':'Sunnies','🍓':'Berry clip'}[accessory]||accessory); const palette=[['Ocean Pop','#42a5ed'],['Berry Fizz','#f07bb6'],['Mint Dream','#56c9a1'],['Sunbeam','#f4bd49'],['Galaxy Grape','#8057df'],['Cotton Candy','#ffb7e3'],['Dragonfire','#ff654f'],['Lime Sprite','#a6e843'],['Moon Silver','#c7d4ef'],['Midnight','#26335e'],['Rainbow Magic','rainbow'],['Unicorn Aura','unicorn'],['Starlight','starlight'],['Crystal Ice','#a6f4ff'],['Peach Puff','#ffb58e'],['Mystic Lavender','#c7a2ff'],['Comet Tail','comet'],['Magic Opal','opal'],['Bubblegum','#ff79d1'],['Arctic Aurora','aurora']]; $('colors').innerHTML=palette.map(([n,c])=>{let v=c==='rainbow'?'linear-gradient(90deg,red,orange,yellow,lime,cyan,blue,violet)':c==='comet'?'linear-gradient(135deg,#ff7a59,#ffd166,#7ee8fa,#b388ff)':c==='opal'?'linear-gradient(135deg,#f7b8ff,#9ef6ff,#fff3a6,#b9a7ff)':c==='aurora'?'linear-gradient(135deg,#75fff0,#7aa8ff,#d69cff)':c==='unicorn'?'linear-gradient(135deg,#ffb5e8,#bca8ff,#a7f3ff)':c==='starlight'?'linear-gradient(135deg,#17244f,#9c8aff,#fff4a6)':c;return `<button type="button" class="choice ${col===c?'selected':''}" onclick="col='${c}';skinName='Custom: ${n}';playSound('tap');renderCustom();renderShop();saveProgress()"><span class="swatch" style="background:${v}"></span>${n}</button>`}).join(''); $('accessories').innerHTML=[['🎀','Fancy Bow'],['⭐','Super Star'],['🎭','Superhero Mask'],['🦸','Hero Cape'],['🧤','Hero Gloves'],['🛡️','Hero Star Emblem'],['🦺','Hero Utility Belt'],['🥾','Hero Boots'],['🧙','Star Wizard Hat'],['🪄','Wizard Magic Staff'],['🧥','Wizard Cape'],['🕶️','Wizard Moon Glasses'],['📚','Enchanted Spellbook'],['😇','Neon Halo'],['🎧','Star Headphones'],['💎','Glowing Star Necklace'],['✨','Star Aura'],['📿','Neon Star Bracelets'],['🧢','Shadow Bucket Hat'],['🔗','Street Chain'],['🎒','Street Crossbody Bag'],['🧊','Ice-Star Winter Hat'],['🧣','Frost Scarf'],['❄️','Snowflake Mask'],['🌊','Ocean Royal Crown'],['🐚','Ocean Shell Necklace'],['🪽','Fairy Wings'],['🌸','Fairy Flower Crown'],['🦇','Vampire Bat Wings'],['🥷','Ninja Mask'],['🤠','Cowboy Hat'],['🚀','Galaxy Jetpack'],['🎃','Pumpkin Hat'],['👻','Ghost Backpack'],['👟','Sparkle Shoes'],['🌈','Rainbow Aura'],['🦋','Butterfly'],['👑','Royal Crown']].map(([a,n])=>`<button type="button" class="choice accessory-animated ${wornAccessories.includes(a)||accessory===a?"selected":""}" aria-label="Wear ${n}" title="${n}" onclick="equipWardrobeItem('${a}')">${a} ${n}</button>`).join(''); }
 function equipWardrobeItem(item){
  const outfitItems=new Set(['🦸','🧙‍♂️','🥷','🤠','👨‍🚀','🧑‍🍳','🧑‍🎤','🧚‍♂️','🧛‍♂️','🧜','👹']);
+ const matchingAccessories={
+  '🦸':['🦸','🧤','🛡️','🦺','🥾','🎭'],
+  '🧙‍♂️':['🧙‍♂️','🪄','🧥','🕶️','📚','✨'],
+  '🥷':['🥷','🗡️','🧣','🧤','👟'],
+  '🤠':['🤠','🧣','🥾','⭐','🎒'],
+  '👨‍🚀':['👨‍🚀','🚀','🪐','✨','🛸','🥾'],
+  '🧑‍🍳':['🧑‍🍳','🧤','🧣','🍓'],
+  '🧑‍🎤':['🧑‍🎤','🎧','⭐','✨','🕶️'],
+  '🧚‍♂️':['🧚‍♂️','🪽','🌸','🦋','✨'],
+  '🧛‍♂️':['🧛‍♂️','🦇','🕸️','🧣','👑'],
+  '🧜':['🧜','🐚','🌊','🫧','🪽'],
+  '👹':['👹','😈','🪽','⚡','💠','✨']
+ };
  if(!Array.isArray(wornAccessories))wornAccessories=[];
  if(outfitItems.has(item)){
    accessory=item;
-   wornAccessories=[item,...wornAccessories.filter(x=>x!==item&&!outfitItems.has(x))].slice(0,6);
+   const themed=matchingAccessories[item]||[item];
+   wornAccessories=[...new Set([...themed,...wornAccessories.filter(x=>!outfitItems.has(x)&&!themed.includes(x))])].slice(0,7);
  }else{
-   wornAccessories=wornAccessories.includes(item)?wornAccessories.filter(x=>x!==item):[...wornAccessories.filter(x=>!outfitItems.has(x)),item].slice(-6);
+   wornAccessories=wornAccessories.includes(item)?wornAccessories.filter(x=>x!==item):[...wornAccessories.filter(x=>!outfitItems.has(x)),item].slice(-7);
    if(!outfitItems.has(accessory)&&!wornAccessories.includes(accessory))accessory=item;
  }
  playSound('tap');renderCustom();renderShop();saveProgress();
