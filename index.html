@@ -137,7 +137,7 @@ button:active{transform:translateY(3px) scale(.98);box-shadow:0 2px 0 #153f7440}
 .splash-sparkles{filter:drop-shadow(0 4px 7px #eaa4d955);animation:splashFloat 2.3s ease-in-out infinite}
 .new-splash .loading-title{letter-spacing:-.055em;text-shadow:0 3px #fff,0 7px #9fdcff,0 10px 22px #2776c333}
 .new-splash .progress{height:25px;border:3px solid #fff;background:#dceeff;box-shadow:inset 0 2px 5px #3277a51a,0 5px 0 #6da7d833}
-.new-splash .progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#39c7ff 0%,#7d8cff 28%,#bd83ff 52%,#ff8ac4 76%,#ffd66b 100%);background-size:100% 100%;background-position:left center;animation:none!important;transition:width .12s linear;will-change:width;border-radius:999px;box-shadow:inset 0 2px 0 #ffffff70,0 0 12px #78caff55}
+.new-splash .progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#39c7ff 0%,#7d8cff 28%,#bd83ff 52%,#ff8ac4 76%,#ffd66b 100%);background-size:100% 100%;background-position:left center;animation:none!important;transition:width .12s linear;will-change:width;border-radius:999px;box-shadow:inset 0 2px 0 #ffffff70,0 0 12px #78caff55}.new-splash .progress{position:relative;overflow:hidden;isolation:isolate}.new-splash .progress span{position:relative;min-width:0;transform:none!important;animation:none!important;flex:none}
 .new-splash .footer-note{padding:10px 17px;border-radius:999px;background:#ffffffb8;border:1px solid #fff;color:#57749d}
 @keyframes loadingRainbow{to{background-position:220% 0}}
 .auth-screen .auth-card{border:3px solid #fff;border-radius:32px;background:radial-gradient(ellipse at 100% 0,#ffe8f5 0,transparent 38%),linear-gradient(145deg,#fff,#f1f8ff);box-shadow:0 12px 0 #4b93c52b,0 24px 60px #1b5d8d26}
@@ -393,8 +393,9 @@ button:disabled{cursor:not-allowed}
 <!-- Independent startup failsafe: runs even if the main game script fails to parse. -->
 <script id="startup-independent-failsafe">
 (function(){
-  var started=Date.now(),released=false;
+  var started=Date.now(),released=false,lastWidth=0;
   var bar=document.getElementById('progress');
+  if(bar){bar.style.width="0%";bar.style.transition="width 0.12s linear";bar.style.backgroundPosition="left center";}
   function releaseStartup(){
     if(released)return;
     released=true;
@@ -410,7 +411,7 @@ button:disabled{cursor:not-allowed}
   var timer=setInterval(function(){
     var loading=document.getElementById('loading');
     if(!loading || !loading.classList.contains('active')){clearInterval(timer);return;}
-    if(bar)bar.style.width=Math.min(100,Math.round((Date.now()-started)/18))+'%';
+    if(bar){var nextWidth=Math.min(100,Math.round((Date.now()-started)/18));lastWidth=Math.max(lastWidth,nextWidth);bar.style.width=lastWidth+'%';}
     if(Date.now()-started>=1800)releaseStartup();
   },100);
   // A second independent timeout covers timer/progress logic that fails to complete.
