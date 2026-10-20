@@ -411,7 +411,7 @@ button:disabled{cursor:not-allowed}
   var timer=setInterval(function(){
     var loading=document.getElementById('loading');
     if(!loading || !loading.classList.contains('active')){clearInterval(timer);return;}
-    if(bar){var nextWidth=Math.min(100,Math.round((Date.now()-started)/18));lastWidth=Math.max(lastWidth,nextWidth);bar.style.width=lastWidth+'%';}
+    /* The main boot() function owns progress updates. This independent failsafe only releases a stuck splash, so two timers never fight over the bar width. */
     if(Date.now()-started>=1800)releaseStartup();
   },100);
   // A second independent timeout covers timer/progress logic that fails to complete.
