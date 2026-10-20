@@ -825,6 +825,16 @@ function boot(){
   const progress=$('progress');
   const openHome=()=>{
     if(finished)return;
+    // Do not let a delayed startup watchdog overwrite a screen the player has
+    // already opened. On slower phones the loading UI can finish late, while
+    // menu taps are already possible.
+    const activeScreen=document.querySelector('.screen.active');
+    if(activeScreen&&activeScreen.id!=='loading'){
+      finished=true;
+      if(timer)clearInterval(timer);
+      if(watchdog)clearTimeout(watchdog);
+      return;
+    }
     finished=true;
     if(timer)clearInterval(timer);
     if(watchdog)clearTimeout(watchdog);
