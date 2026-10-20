@@ -770,23 +770,31 @@ function boot(){
     finished=true;
     if(timer)clearInterval(timer);
     if(watchdog)clearTimeout(watchdog);
+    // First switch away from the splash using plain DOM operations. This must
+    // happen before optional auth, HUD, sound, or rendering code can throw.
+    const loading=document.getElementById('loading');
+    if(loading)loading.classList.remove('active');
+    const token=(()=>{try{return localStorage.getItem('dreamWorldSessionV1')}catch(_){return null}})();
+    const cachedId=(()=>{try{return localStorage.getItem('dreamWorldPlayerIdV1')}catch(_){return null}})();
+    const target=document.getElementById(token&&cachedId?'home':'authScreen');
+    document.querySelectorAll('.screen').forEach(screen=>screen.classList.remove('active'));
+    if(target)target.classList.add('active');
     try{
-      const token=localStorage.getItem('dreamWorldSessionV1');
-      const cachedId=localStorage.getItem('dreamWorldPlayerIdV1');
       if(token&&cachedId){
         authSession=token;
-        setPlayerHud(cachedId);
-        showScreen('home');
+        try{setPlayerHud(cachedId)}catch(err){console.warn('Player HUD setup:',err)}
+        try{showScreen('home')}catch(err){console.warn('Home screen setup:',err)}
         // Refresh the session after the menu is visible; never block startup on the network.
         setTimeout(()=>{resumeAuthSession().catch(err=>console.warn('Session refresh:',err));},0);
       }else{
-        showAuth();
+        try{showAuth()}catch(err){console.warn('Auth screen setup:',err)}
         // A saved token without a cached player ID can still be checked in the background.
         if(token)setTimeout(()=>{resumeAuthSession().catch(err=>console.warn('Session restore:',err));},0);
       }
     }catch(err){
       console.error('Startup recovery:',err);
-      try{showAuth()}catch(_){}
+      const fallback=document.getElementById('authScreen');
+      if(fallback){document.querySelectorAll('.screen').forEach(screen=>screen.classList.remove('active'));fallback.classList.add('active')}
     }
   };
   timer=setInterval(()=>{
