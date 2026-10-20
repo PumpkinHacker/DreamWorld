@@ -766,7 +766,43 @@ const art={
   // group shifted and enlarged the horns, torso, arms, and boots away from their anchors.
   if(outfitArt[item])return '<g class="fitted-outfit-overlay">'+outfitArt[item]+'</g>';
  if(!item||item==='🎀')return art[item]||'';
- return art[item]||'<g><circle cx="130" cy="53" r="13" fill="#fff0a6" stroke="#9a73d9" stroke-width="3"/><path d="M130 33 L134 46 L147 50 L134 54 L130 67 L126 54 L113 50 L126 46Z" fill="#fff" stroke="#9a73d9" stroke-width="2"/></g>';
+ if(art[item])return art[item];
+ // Distinct fallback vector for every remaining catalog accessory: shape, accent,
+ // outline and a small highlight are based on the item itself, not a shared star.
+ const vectorByItem={
+ '🧤':['#ff8fb8','#a84478','<path d="M111 74 L108 49 Q108 41 114 41 Q120 41 120 49 L120 57 L124 35 Q125 28 131 30 Q137 31 135 38 L132 55 L138 41 Q141 35 146 38 Q151 41 147 48 L143 61 L150 54 Q156 50 159 56 Q161 60 156 66 L146 79Z'],
+ '🛡️':['#62c9ff','#3157a8','<path d="M130 30 L162 43 L157 68 Q148 84 130 94 Q112 84 103 68 L98 43Z M115 58 L126 70 L147 49'],
+ '🦺':['#ffcf5c','#b66a2d','<path d="M111 33 L124 42 L136 42 L149 33 L164 72 L146 80 L139 60 L139 88 L121 88 L121 60 L114 80 L96 72Z M111 61 L149 61'],
+ '🧸':['#c98a65','#75452f','<circle cx="111" cy="43" r="12"/><circle cx="149" cy="43" r="12"/><circle cx="130" cy="59" r="25"/><ellipse cx="130" cy="67" rx="13" ry="10" fill="#f9d7a5"/><circle cx="122" cy="56" r="3" fill="#493653"/><circle cx="138" cy="56" r="3" fill="#493653"/>'],
+ '🎒':['#fa7e98','#98445f','<path d="M108 47 Q108 34 130 34 Q152 34 152 47 L160 78 Q130 91 100 78Z M116 53 L144 53 L144 70 L116 70Z'],
+ '🫧':['#a5f4ff','#5587e8','<circle cx="115" cy="54" r="17" fill="#a5f4ff" fill-opacity=".65"/><circle cx="145" cy="43" r="11" fill="#fff" fill-opacity=".8"/><circle cx="151" cy="72" r="8" fill="#d9b7ff" fill-opacity=".8"/><path d="M109 47 L115 43 M141 39 L145 36" stroke="#fff" stroke-width="3"/>'],
+ '🪁':['#ff8eaa','#7456d5','<path d="M130 29 L158 55 L130 82 L102 55Z M130 82 L139 94 L132 103 L144 112" fill="#ff8eaa"/><path d="M130 29 L130 82 M102 55 L158 55" stroke="#fff" stroke-width="3"/>'],
+ '🍄':['#ff6f87','#8a456b','<path d="M94 59 Q96 30 130 29 Q164 30 166 59Z"/><path d="M119 59 L141 59 L146 88 L114 88Z" fill="#fff0d8"/><circle cx="116" cy="47" r="5" fill="#fff"/><circle cx="143" cy="42" r="4" fill="#fff"/>'],
+ '🐝':['#ffd84d','#8a6232','<ellipse cx="130" cy="57" rx="22" ry="27"/><path d="M111 45 L149 45 M108 58 L152 58 M113 71 L147 71" stroke="#493653" stroke-width="7"/><ellipse cx="108" cy="39" rx="13" ry="9" fill="#dffaff"/><ellipse cx="151" cy="39" rx="13" ry="9" fill="#dffaff"/>'],
+ '🦕':['#7fe0a5','#388a68','<path d="M105 83 L105 60 L118 43 L141 43 L153 59 L153 83 L142 83 L142 70 L116 70 L116 83Z"/><circle cx="120" cy="51" r="3" fill="#fff"/><path d="M115 43 L109 33 L122 39 L130 29 L137 39 L149 34 L144 47" fill="#8af2b4"/>'],
+ '🧿':['#5ecfff','#3157b5','<ellipse cx="130" cy="57" rx="32" ry="22" fill="#fff"/><ellipse cx="130" cy="57" rx="22" ry="16" fill="#40a7f2"/><circle cx="130" cy="57" r="10" fill="#243b80"/><circle cx="134" cy="53" r="4" fill="#fff"/>'],
+ '🪺':['#c58c59','#805334','<path d="M96 59 Q130 42 164 59 L155 79 Q130 92 105 79Z"/><ellipse cx="118" cy="52" rx="9" ry="12" fill="#ffe6a2"/><ellipse cx="140" cy="51" rx="9" ry="12" fill="#a8e6ff"/><circle cx="130" cy="43" r="8" fill="#ff9bb8"/>'],
+ '🦜':['#64d8a3','#327d80','<path d="M106 37 Q132 24 151 45 L145 66 L129 80 L112 64Z"/><path d="M145 48 L164 55 L145 62Z" fill="#ffcf5c"/><circle cx="137" cy="44" r="4" fill="#fff"/><circle cx="138" cy="44" r="2" fill="#493653"/>'],
+ '🪶':['#9edfff','#597bc6','<path d="M102 83 Q96 36 151 29 Q160 67 111 83Z M109 80 L148 37 M122 69 L117 53 M135 57 L132 44" fill="#b9e8ff" stroke="#597bc6" stroke-width="2"/>'],
+ '🧥':['#7e9ff5','#4554a5','<path d="M112 33 L125 42 L135 42 L148 33 L164 75 L146 82 L139 61 L139 91 L121 91 L121 61 L114 82 L96 75Z M130 43 L130 88" />'],
+ '🧤':['#ff8fb8','#a84478','<path d="M111 74 L108 49 Q108 41 114 41 Q120 41 120 49 L120 57 L124 35 Q125 28 131 30 Q137 31 135 38 L132 55 L138 41 Q141 35 146 38 Q151 41 147 48 L143 61 L150 54 Q156 50 159 56 Q161 60 156 66 L146 79Z"/>'],
+ '🛟':['#ff9e83','#b64f69','<circle cx="130" cy="58" r="30" fill="#ff8b8b"/><circle cx="130" cy="58" r="15" fill="#d9f7ff"/><path d="M109 37 L119 48 M141 68 L152 79 M151 37 L141 48 M119 68 L108 79" stroke="#fff" stroke-width="8"/>'],
+ '🌻':['#ffd85c','#9a7a2b','<g fill="#ffd85c"><ellipse cx="130" cy="36" rx="8" ry="15"/><ellipse cx="130" cy="80" rx="8" ry="15"/><ellipse cx="108" cy="58" rx="15" ry="8"/><ellipse cx="152" cy="58" rx="15" ry="8"/></g><circle cx="130" cy="58" r="17" fill="#75452f"/><circle cx="124" cy="53" r="2" fill="#fff"/><circle cx="137" cy="62" r="2" fill="#fff"/>'],
+ '🐚':['#ffc4df','#a36da6','<path d="M101 80 Q88 54 107 38 Q130 22 151 38 Q171 57 158 80Z"/><path d="M130 80 L130 38 M111 77 L111 48 M149 77 L149 48" stroke="#fff0f8" stroke-width="3"/>'],
+ '📚':['#ff7b87','#9b405e','<path d="M96 39 L127 45 L127 82 L96 75Z M133 45 L164 39 L164 75 L133 82Z"/><path d="M101 48 L121 52 M138 52 L159 48" stroke="#ffe16b" stroke-width="3"/>'],
+ '🪻':['#c8a2ff','#7456b8','<path d="M130 83 L130 45 M130 57 Q108 57 113 43 Q128 39 130 57 M130 67 Q151 66 147 52 Q133 49 130 67 M130 47 Q117 42 125 30 Q139 31 130 47" fill="#c8a2ff"/>'],
+ '🍀':['#74dc8c','#33875c','<path d="M130 55 C101 29 92 52 116 63 C88 78 112 94 130 70 C148 94 172 78 144 63 C168 52 159 29 130 55Z M130 67 L130 91" fill="#74dc8c"/>'],
+ '🎈':['#ff85b9','#b84c8b','<ellipse cx="130" cy="52" rx="24" ry="30"/><path d="M124 81 L136 81 L130 89Z M130 89 Q145 99 130 108" fill="none" stroke="#b84c8b" stroke-width="3"/><ellipse cx="120" cy="43" rx="5" ry="10" fill="#fff" fill-opacity=".7"/>'],
+ '🪆':['#e9a4c8','#8a527b','<path d="M130 30 Q151 30 151 49 L158 78 Q130 91 102 78 L109 49 Q109 30 130 30Z"/><circle cx="130" cy="49" r="12" fill="#ffe0b3"/><path d="M117 67 Q130 76 143 67" fill="none" stroke="#fff" stroke-width="3"/>'],
+ '🍭':['#ff8bd1','#a44a9e','<path d="M130 61 L153 89" stroke="#fff" stroke-width="7" stroke-linecap="round"/><circle cx="121" cy="48" r="22" fill="#ff8bd1"/><path d="M107 36 Q121 24 135 37 M104 48 Q120 37 139 51" fill="none" stroke="#fff" stroke-width="5"/>'],
+ '🧺':['#dba46a','#8c5b37','<path d="M101 54 L159 54 L153 83 L107 83Z"/><path d="M112 54 Q112 28 130 28 Q148 28 148 54" fill="none" stroke="#8c5b37" stroke-width="5"/><path d="M108 64 L155 64 M110 73 L153 73" stroke="#ffe3a6" stroke-width="3"/>'],
+ '🪄':['#b99aff','#7651b4','<path d="M105 82 L153 34" stroke="#7651b4" stroke-width="8" stroke-linecap="round"/><path d="M153 26 L157 38 L169 42 L157 46 L153 58 L149 46 L137 42 L149 38Z" fill="#fff16b"/>']
+ };
+ const spec=vectorByItem[item];
+ if(spec){const [fill,edge,shape]=spec;return '<g class="accessory-vector" stroke="'+edge+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="'+fill+'">'+shape+'</g>';}
+ // For catalog entries without a dedicated drawing, generate a recognizable icon using
+ // their own emoji instead of reusing the same unrelated star graphic.
+ return '<g class="accessory-vector-fallback"><text x="130" y="72" text-anchor="middle" font-size="48">'+String(item||'✨')+'</text><path d="M94 91 Q130 103 166 91" fill="none" stroke="#fff" stroke-width="3" opacity=".8"/></g>';
 }
 function dreamCostumeBody(item){
  const designs={
