@@ -764,7 +764,7 @@ const art={
  // Version 54: keep costume pieces aligned to the puppy SVG's native body coordinates.
   // The outfit paths are authored for the 260x260 character canvas; scaling the whole
   // group shifted and enlarged the horns, torso, arms, and boots away from their anchors.
-  if(outfitArt[item])return '<g class="fitted-outfit-overlay">'+outfitArt[item]+'</g>';
+  if(outfitArt[item])return '<g class="fitted-outfit-overlay">'+(Array.isArray(outfitArt[item])?String(outfitArt[item][1]||''):String(outfitArt[item]))+'</g>';
  if(!item||item==='🎀')return art[item]||'';
  if(art[item])return art[item];
  // Distinct fallback vector for every remaining catalog accessory: shape, accent,
@@ -1408,7 +1408,7 @@ renderLevels=function(){
 openSpaceDimension=function(){if(!dimensionOneComplete()){showScreen('levels');toast('Complete all 9 Dimension 1 levels to unlock Space! 🌎');return}toast('Welcome to Space Dimension! 🚀');startLevel(10)};
 const _startLevelV30=startLevel;
 startLevel=function(n){n=Number(n)||1;if(n>=10&&!dimensionOneComplete()){toast('Finish all 9 Dimension 1 levels to unlock Space! 🌎');showScreen('levels');return}if(n>=11&&!levelDone[n-1]){toast('Complete the previous Space level first! 🚀');return}_startLevelV30(n)};
-function paintShopPreview({animal=selectedAnimal,fur=col,skin=skinName,item=accessory}={}){const old={selectedAnimal,col,skinName,accessory};selectedAnimal=animal;col=fur;skinName=skin;accessory=item;const svg=puppySVG();selectedAnimal=old.selectedAnimal;col=old.col;skinName=old.skinName;accessory=old.accessory;wornAccessories=old.wornAccessories;return svg}
+function paintShopPreview({animal=selectedAnimal,fur=col,skin=skinName,item=accessory}={}){const old={selectedAnimal,col,skinName,accessory,wornAccessories:Array.isArray(wornAccessories)?wornAccessories.slice():[]};selectedAnimal=animal;col=fur;skinName=skin;accessory=item;const svg=puppySVG();selectedAnimal=old.selectedAnimal;col=old.col;skinName=old.skinName;accessory=old.accessory;wornAccessories=old.wornAccessories;return svg}
 const _renderShopV30=renderShop;
 renderShop=function(){if(shopCategory==='animals'){renderPuppy('homeHero');const list=[['🐶','Dream Pup',0],['🐱','Garden Kitty',0],['🐰','Meadow Bunny',45],['🦊','Little Fox',55],['🐼','Panda Pal',70],['🐸','Puddle Frog',65],['🦄','Rainbow Unicorn',120],['🐻','Honey Bear',75],['🦁','Sunny Lion',80],['🐨','Koala Cloud',75],['🦌','Woodland Fawn',90],['🐲','Tiny Dragon',130],['🐹','Berry Hamster',50],['🦔','Little Hedgehog',60]];$('shopGrid').innerHTML='<h3 style="grid-column:1/-1;margin:8px 0;color:#4c4a98">🐾 Dimension 1 Animal Friends</h3>'+list.map(([e,n,cost])=>{const id='animal:'+e,owned=cost===0||itemsOwned.includes(id),active=selectedAnimal===e;return `<div class="item" onclick="previewShopAnimal('${e}','${n}')"><div class="emoji">${e}</div><b>${n}</b><br><small>${active?'✨ Selected':owned?'Unlocked':cost+' Tokens'}</small><button type="button" onclick="event.stopPropagation();chooseShopAnimal('${e}','${n}',${cost})">${active?'✓ Selected':owned?'Choose':'Unlock · '+cost}</button></div>`}).join('');if(!$('shopPreviewPup').innerHTML)$('shopPreviewPup').innerHTML=puppySVG();return}_renderShopV30()};
 function previewShopAnimal(e,n){$('shopPreviewPup').innerHTML=paintShopPreview({animal:e});$('shopPreviewName').textContent='Trying on: '+n;$('shopPreviewDesc').textContent='Animal preview ready. Choose it to make it your character.'}
@@ -1797,12 +1797,13 @@ puppySVG = function(){
       const def='<defs><linearGradient id="dwFurGradient" x1="0" y1="0" x2="1" y2="1">'+stopMarkup+'</linearGradient></defs>';
       svg=svg.replace(/(<svg\b[^>]*>)/, '$1'+def);
     }
-    const overlays=items.map(item=>{
+    const costumeItems=items.filter(item=>['🦸','🧙‍♂️','🥷','🤠','👨‍🚀','🧑‍🍳','🧑‍🎤','🧚‍♂️','🧛‍♂️','🧜','👹'].includes(item));
+    const overlays=items.filter(item=>!costumeItems.includes(item)).map(item=>{
       const art=accessoryVectorArt(item);
       return typeof art==='string'?art:(Array.isArray(art)?String(art[1]||''):'');
     }).join('');
     /* Costume pieces are separate from small accessories and must be drawn onto the body too. */
-    const costume=items.find(item=>['🦸','🧙‍♂️','🥷','🤠','👨‍🚀','🧑‍🍳','🧑‍🎤','🧚‍♂️','🧛‍♂️','🧜','👹'].includes(item));
+    const costume=costumeItems[0];
     const costumeArt=costume?dreamCostumeBody(costume):'';
     return svg.replace('</svg>',costumeArt+overlays+'</svg>');
   } finally {accessory=oldAccessory;wornAccessories=oldWorn;}
