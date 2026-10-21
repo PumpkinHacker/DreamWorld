@@ -192,6 +192,12 @@ button:active{transform:translateY(3px) scale(.98);box-shadow:0 2px 0 #153f7440}
 .puppy .outfit-accessory-layer path,.puppy .outfit-accessory-layer ellipse,.puppy .outfit-accessory-layer circle{vector-effect:non-scaling-stroke}
 @keyframes outfitAccessoryPulse{0%,100%{opacity:1;filter:drop-shadow(0 0 1px #9beaff)}50%{opacity:.94;filter:drop-shadow(0 0 4px #ff8fe0)}}
 @media(prefers-reduced-motion:reduce){.puppy .outfit-accessory-layer{animation:none!important}}
+
+/* Visible, animated matching outfit accessories — limited to the outfit preview art. */
+.outfit-detail,.accessory-art{pointer-events:none}
+.outfit-detail{transform-box:fill-box;transform-origin:center;animation:dwOutfitShimmer 2.4s ease-in-out infinite}
+@keyframes dwOutfitShimmer{0%,100%{filter:drop-shadow(0 0 0 rgba(120,220,255,0));opacity:1}50%{filter:drop-shadow(0 0 3px rgba(120,220,255,.9));opacity:.98}}
+@media(prefers-reduced-motion:reduce){.outfit-detail,.accessory-art{animation:none!important}}
 </style></style>
 <style id="esther-deluxe-design">
 :root{--navy:#14396f;--blue:#177be0;--pink:#f34f9e;--purple:#7951dc;--gold:#ffb929;--green:#27c86b}
