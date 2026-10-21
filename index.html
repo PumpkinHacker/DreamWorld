@@ -1869,11 +1869,17 @@ puppySVG = function(){
     '🧚‍♂️':new Set(['🧚','🧚‍♂️','🧚‍♀️','🪽']),
     '🧛‍♂️':new Set(['🧛','🧛‍♂️','🧛‍♀️']),
     '🧜':new Set(['🧜','🧜‍♀️','🧜‍♂️']),
-    '👹':new Set(['👹','😈','👿'])
+    '👹':new Set(['👹','😈','👿','🪖','⛑️','🎩','👑','👒','⛑','🧢','👓','🥽','🕶️','🪄','⚡'])
   };
   if(activeOutfit){
     const builtIns=outfitBuiltIns[activeOutfit]||new Set();
     items=items.filter(item=>item===activeOutfit||!builtIns.has(item));
+    /* Space Demon has its own animated halo and eye effects. Suppress standalone
+       head/face props for this outfit so they cannot stack over the halo or eyes. */
+    if(activeOutfit==='👹'){
+      const demonHeadProps=new Set(['🪖','⛑️','⛑','🎩','👑','👒','🧢','👓','🥽','🕶️','🤓','😎','🥸','🎭','⚡','🪽']);
+      items=items.filter(item=>item==='👹'||!demonHeadProps.has(item));
+    }
   }
   try{
     accessory='';
