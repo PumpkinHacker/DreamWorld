@@ -1851,8 +1851,30 @@ puppySVG = function(){
   const oldWorn=Array.isArray(wornAccessories)?wornAccessories.slice():[];
   const outfitSet=new Set(['🦸','🧙‍♂️','🥷','🤠','👨‍🚀','🧑‍🍳','🧑‍🎤','🧚‍♂️','🧛‍♂️','🧜','👹']);
   const equippedOutfit=outfitSet.has(accessory)?accessory:(oldWorn.find(item=>outfitSet.has(item))||'');
-  let items=[...(equippedOutfit?[equippedOutfit]:[]),...oldWorn.filter(item=>item!==equippedOutfit&&!outfitSet.has(item)),...(accessory&&!outfitSet.has(accessory)&&!oldWorn.includes(accessory)?[accessory]:[])];
-  items=[...new Set(items.filter(Boolean))].slice(0,4);
+  /* Normalize the equipped list before drawing: the selected accessory is often also
+     present in wornAccessories, and stale outfit emojis must never be drawn as loose props. */
+  const rawItems=[...(equippedOutfit?[equippedOutfit]:[]),...oldWorn.filter(item=>item!==equippedOutfit&&!outfitSet.has(item)),...(accessory&&!outfitSet.has(accessory)&&!oldWorn.includes(accessory)?[accessory]:[])];
+  let items=[...new Set(rawItems.filter(Boolean))].slice(0,4);
+  const activeOutfit=items.find(item=>outfitSet.has(item))||'';
+  /* Outfit-specific headwear is already included in the outfit art. Don't render it again
+     as a standalone accessory on top of the same hat/helmet. */
+  const outfitBuiltIns={
+    '🦸':new Set(['🦸','🦸‍♂️','🦸‍♀️','🦸🏻','🦸🏽','🦸🏿']),
+    '🧙‍♂️':new Set(['🧙','🧙‍♂️','🧙‍♀️','🪄']),
+    '🥷':new Set(['🥷','🎭']),
+    '🤠':new Set(['🤠','🤠']),
+    '👨‍🚀':new Set(['👨‍🚀','👩‍🚀','🧑‍🚀','🪖']),
+    '🧑‍🍳':new Set(['🧑‍🍳','👨‍🍳','👩‍🍳','🧑‍🍳']),
+    '🧑‍🎤':new Set(['🧑‍🎤','🎤']),
+    '🧚‍♂️':new Set(['🧚','🧚‍♂️','🧚‍♀️','🪽']),
+    '🧛‍♂️':new Set(['🧛','🧛‍♂️','🧛‍♀️']),
+    '🧜':new Set(['🧜','🧜‍♀️','🧜‍♂️']),
+    '👹':new Set(['👹','😈','👿'])
+  };
+  if(activeOutfit){
+    const builtIns=outfitBuiltIns[activeOutfit]||new Set();
+    items=items.filter(item=>item===activeOutfit||!builtIns.has(item));
+  }
   try{
     accessory='';
     let svg=_dwOriginalPuppySVG_v33();
