@@ -183,6 +183,15 @@ button:active{transform:translateY(3px) scale(.98);box-shadow:0 2px 0 #153f7440}
 @keyframes wardrobeTwinkle{0%,100%{opacity:0;transform:scale(.7) rotate(0)}50%{opacity:1;transform:scale(1.15) rotate(35deg)}}
 @keyframes wearableBob{0%,100%{translate:0 0}50%{translate:0 -3px}}
 @media(prefers-reduced-motion:reduce){#accessories .choice,.puppy .accessory-art,.puppy .extra-accessory-art{animation:none!important}}
+
+/* Outfit catalog polish: keep cards inside the mobile viewport and animate the wearable art itself. */
+#custom #accessories{overflow:visible!important;max-height:none!important;padding-bottom:18px!important}
+#custom #accessories .choice{min-height:190px;overflow:visible}
+#custom #accessories .choice:has(svg.puppy){min-height:190px!important}
+.puppy .outfit-accessory-layer{transform-box:fill-box;transform-origin:center;animation:outfitAccessoryPulse 2.8s ease-in-out infinite}
+.puppy .outfit-accessory-layer path,.puppy .outfit-accessory-layer ellipse,.puppy .outfit-accessory-layer circle{vector-effect:non-scaling-stroke}
+@keyframes outfitAccessoryPulse{0%,100%{opacity:1;filter:drop-shadow(0 0 1px #9beaff)}50%{opacity:.94;filter:drop-shadow(0 0 4px #ff8fe0)}}
+@media(prefers-reduced-motion:reduce){.puppy .outfit-accessory-layer{animation:none!important}}
 </style></style>
 <style id="esther-deluxe-design">
 :root{--navy:#14396f;--blue:#177be0;--pink:#f34f9e;--purple:#7951dc;--gold:#ffb929;--green:#27c86b}
@@ -1869,7 +1878,16 @@ puppySVG = function(){
       costumeArt='<g class="space-demon-body"><defs><linearGradient id="dwSpaceDemonArmor" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#16102f"/><stop offset="48%" stop-color="#47206f"/><stop offset="78%" stop-color="#102e65"/><stop offset="100%" stop-color="#080916"/></linearGradient><filter id="dwDemonGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="M103 169 Q130 180 157 169 L153 207 L130 218 L107 207Z" fill="url(#dwSpaceDemonArmor)" stroke="#ff365f" stroke-width="3"/><path d="M108 180 Q130 193 152 180 M110 198 Q130 210 150 198" fill="none" stroke="#8c67ff" stroke-width="3" filter="url(#dwDemonGlow)"><animate attributeName="opacity" values=".45;1;.45" dur="2.2s" repeatCount="indefinite"/></path><circle cx="116" cy="190" r="2.5" fill="#75f7ff"><animate attributeName="opacity" values=".3;1;.3" dur="1.4s" repeatCount="indefinite"/></circle><circle cx="145" cy="203" r="2.5" fill="#ff67dd"><animate attributeName="opacity" values="1;.25;1" dur="1.8s" repeatCount="indefinite"/></circle><path d="M130 181 L136 190 L148 192 L139 200 L141 211 L130 205 L119 211 L121 200 L112 192 L124 190Z" fill="#10142f" stroke="#ff5ac8" stroke-width="2" filter="url(#dwDemonGlow)"/></g>';
       specialHeadArt='<g class="space-demon-halo" filter="url(#dwDemonGlow)"><ellipse cx="130" cy="39" rx="29" ry="7" fill="none" stroke="#70f7ff" stroke-width="4"><animateTransform attributeName="transform" type="rotate" values="-8 130 39;8 130 39;-8 130 39" dur="3s" repeatCount="indefinite"/></ellipse><ellipse cx="130" cy="39" rx="35" ry="10" fill="none" stroke="#b85cff" stroke-width="2" opacity=".85"><animate attributeName="opacity" values=".35;1;.35" dur="2s" repeatCount="indefinite"/></ellipse></g><g class="space-demon-eyes" filter="url(#dwDemonGlow)"><path d="M94 108 Q106 99 119 108 L115 115 L99 115Z" fill="#fff46b" stroke="#ff315f" stroke-width="2"><animate attributeName="fill" values="#fff46b;#75f7ff;#fff46b" dur="1.7s" repeatCount="indefinite"/></path><path d="M141 108 Q154 99 166 108 L161 115 L145 115Z" fill="#fff46b" stroke="#ff315f" stroke-width="2"><animate attributeName="fill" values="#75f7ff;#fff46b;#75f7ff" dur="1.7s" repeatCount="indefinite"/></path></g>';
     }
-    return svg.replace('</svg>',costumeArt+overlays+specialHeadArt+'</svg>');
+    /* Layer costume body behind the head; keep wearable decorations in a separate animated front layer. */
+    const headStart=svg.indexOf('<path d="M77 104');
+    if(headStart>0){
+      svg=svg.slice(0,headStart)+costumeArt+svg.slice(headStart);
+      const headEnd=svg.lastIndexOf('</svg>');
+      svg=svg.slice(0,headEnd)+'<g class="outfit-accessory-layer accessory-art">'+overlays+specialHeadArt+'</g>'+svg.slice(headEnd);
+    }else{
+      svg=svg.replace('</svg>',costumeArt+'<g class="outfit-accessory-layer accessory-art">'+overlays+specialHeadArt+'</g></svg>');
+    }
+    return svg;
   } finally {accessory=oldAccessory;wornAccessories=oldWorn;}
 };
 /* Online presence now carries the full equipped set, not just the last tapped item. */
