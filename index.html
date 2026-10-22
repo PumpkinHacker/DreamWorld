@@ -218,6 +218,31 @@ body{background:radial-gradient(ellipse at 15% 5%,#e5f9ff 0%,transparent 38%),ra
 .character-card{background:linear-gradient(110deg,#fff0f8,#e8f8ff)!important}
 .footer-note,.wardrobe-hint,.autosave-note{border-radius:22px!important}
 @media(max-width:600px){.screen .panel{border-radius:25px!important;padding:12px!important}.shop-tabs,.wardrobe-tabs{gap:8px!important}.shop-tabs button,.wardrobe-tabs button{padding:10px 12px!important;font-size:.95rem!important}.custom-layout{gap:14px!important}}
+
+/* Reference-inspired main-menu redesign: make the home screen visibly different. */
+#home.screen{overflow-y:auto!important;background:radial-gradient(ellipse at 12% 10%,#fff8ff 0,transparent 28%),radial-gradient(ellipse at 90% 75%,#ffdff3 0,transparent 34%),linear-gradient(180deg,#9fe4ff 0%,#d7f5ff 42%,#f4e5ff 100%)!important}
+#home.screen>.panel{width:min(100% - 20px,1080px)!important;max-width:1080px!important;margin:12px auto 24px!important;padding:clamp(18px,4vw,42px)!important;position:relative!important;overflow:hidden!important;border-radius:34px!important;background:linear-gradient(145deg,#fffffffa 0%,#f5f5fffa 48%,#e5f9fffa 100%)!important;border:3px solid #fff!important;box-shadow:0 9px 0 #766ab32b,0 20px 55px #6378c52b!important}
+#home.screen>.panel:before{content:"☁️  ✨  🐾  🌈  ✨  ☁️";display:block;text-align:center;font-size:clamp(18px,3vw,28px);letter-spacing:clamp(3px,2vw,18px);opacity:.72;margin:-2px 0 8px;pointer-events:none}
+#home #dreamLogo.logo{font-size:clamp(2.8rem,8vw,6.4rem)!important;line-height:.92!important;letter-spacing:-.055em!important;color:#6551dc!important;text-shadow:0 3px #fff,0 7px #c5b9ff,0 11px 0 #8adfff!important;transform:none!important;margin:0 auto 12px!important;max-width:900px}
+#home #dreamLogo.logo span{font-size:.53em!important;color:#ff70b5!important;text-shadow:0 2px #fff,0 5px #ffd3e8!important;margin-top:8px!important}
+#home .tagline{color:#6c66bd!important;text-shadow:0 1px white}
+#home .menu-feature-strip{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:14px auto 18px}
+#home .menu-feature-strip span{background:linear-gradient(135deg,#fff,#edf8ff)!important;border:2px solid #d9d8ff;border-radius:999px;padding:9px 14px;color:#5e579d;font-weight:900;box-shadow:0 4px 0 #9186c51c}
+#home #musicBtn{max-width:260px!important;margin:0 auto 14px!important;background:linear-gradient(110deg,#8fcfff,#8e7cf7)!important;border-radius:999px!important}
+#home .menu-grid{grid-template-columns:minmax(0,1.05fr) minmax(230px,.95fr)!important;gap:clamp(16px,3vw,34px)!important;align-items:stretch!important;margin:20px 0!important}
+#home .hero{min-height:clamp(250px,36vw,440px)!important;border-radius:30px!important;border:3px solid #fff!important;background:radial-gradient(circle at 50% 35%,#fff 0%,#e4faff 28%,transparent 56%),linear-gradient(135deg,#b7f1ff,#e8e0ff 58%,#ffdef4)!important;box-shadow:inset 0 0 0 2px #c8dfff,0 8px 0 #7c74c51b!important;overflow:hidden}
+#home .hero:before{content:"✨       ✦       ✨";position:absolute;top:18px;left:0;right:0;text-align:center;color:#fff;font-size:clamp(22px,4vw,38px);text-shadow:0 2px 10px #b5a1ff;pointer-events:none}
+#home .hero .puppy{width:min(90%,350px)!important;max-height:390px!important;position:relative;z-index:1;filter:drop-shadow(0 12px 0 #6b65a52c) drop-shadow(0 0 16px #fff)!important}
+#home .btn-stack{display:grid!important;grid-template-columns:1fr!important;align-content:center!important;gap:12px!important}
+#home .btn-stack .bigbtn{min-height:clamp(52px,6vw,68px)!important;border-radius:22px!important;border:3px solid #fff!important;font-size:clamp(1rem,2.3vw,1.3rem)!important;box-shadow:0 6px 0 #7770b52a,inset 0 2px #ffffffaa!important}
+#home .btn-stack .bigbtn.green{background:linear-gradient(115deg,#79edb2,#26cda4)!important}
+#home .btn-stack .bigbtn.blue{background:linear-gradient(115deg,#63d9ff,#5775f5)!important}
+#home .btn-stack .bigbtn.pink{background:linear-gradient(115deg,#ff91d1,#f24fa9)!important}
+#home .btn-stack .bigbtn.gold{background:linear-gradient(115deg,#ffe58b,#ffb84b)!important;color:#795126!important}
+#home .btn-stack .bigbtn.purple{background:linear-gradient(115deg,#c3a2ff,#8756ef)!important}
+#home .btn-stack .bigbtn.orange{background:linear-gradient(115deg,#ffc18d,#ff846f)!important}
+#home .footer-note{margin-top:18px!important;padding:16px!important;border:2px solid white!important;border-radius:24px!important;background:linear-gradient(110deg,#f4e5ff,#e4faff)!important;color:#6d5fae!important}
+@media(max-width:650px){#home.screen>.panel{width:calc(100% - 16px)!important;margin:8px auto 18px!important;padding:16px 12px!important;border-radius:27px!important}#home .menu-grid{grid-template-columns:1fr!important;gap:12px!important}#home .hero{min-height:230px!important;max-height:300px!important}#home .hero .puppy{width:min(64%,250px)!important;max-height:260px!important}#home .btn-stack{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}#home .btn-stack .bigbtn{min-height:56px!important;padding:9px 7px!important;font-size:.92rem!important;border-radius:18px!important}#home .menu-feature-strip span{font-size:.78rem;padding:7px 10px}#home #musicBtn{min-height:44px!important}}
 </style></style>
 <style id="esther-deluxe-design">
 :root{--navy:#14396f;--blue:#177be0;--pink:#f34f9e;--purple:#7951dc;--gold:#ffb929;--green:#27c86b}
