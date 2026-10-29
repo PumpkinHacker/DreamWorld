@@ -107,6 +107,39 @@ body.playing-world #play> .glass>p{display:none!important}
 /* Footwear must sit visibly over the character's paws */
 #customPet .avatar-shoes,#heroPet .avatar-shoes{display:inline!important;opacity:1!important;visibility:visible!important;filter:drop-shadow(0 3px 2px #51417b66)!important}
 #customPet svg,#heroPet svg{overflow:visible!important}
+
+/* Home screen cleanup: keep the mascot, labels, and garden friends in separate rows. */
+#home .hero{min-height:0;padding:24px 18px 22px;overflow:hidden}
+#home .hero-content{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%}
+#home .hero-content>div:first-child{width:100%}
+#home .hero-content>div:nth-child(2){width:100%;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
+#home .hero #heroPet{order:1;display:block;width:min(64vw,245px);max-width:245px;margin:0 auto;flex:none}
+#home .hero #heroPet svg{width:100%;height:auto;display:block}
+#home .hero #heroPet+.chips{order:2;position:relative;z-index:3;width:100%;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 0 4px}
+#home .hero .garden-friends{order:3;position:relative;inset:auto;z-index:1;width:100%;height:64px;display:flex;align-items:flex-end;justify-content:space-around;margin:0;opacity:1}
+#home .hero .garden-friend{width:clamp(30px,8vw,52px);max-height:58px}
+#home .hero:before{background:
+radial-gradient(ellipse at 12% 94%,#8de4b7 0 10%,transparent 10.5%),
+radial-gradient(ellipse at 87% 94%,#91e8c3 0 13%,transparent 13.5%),
+radial-gradient(circle at 12% 19%,#fff9 0 7%,transparent 7.5%),
+radial-gradient(circle at 85% 25%,#fff7 0 8%,transparent 8.5%),
+linear-gradient(180deg,transparent 0 78%,#a7efce 78% 100%)}
+#home .hero:after{height:20%;opacity:.42}
+#home .main-grid{margin-top:14px}
+@media(min-width:800px){
+ #home .hero-content{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:24px}
+ #home .hero-content>div:nth-child(2){display:flex;flex-direction:column}
+ #home .hero #heroPet{width:min(100%,245px)}
+ #home .hero .garden-friends{height:58px}
+}
+@media(max-width:600px){
+ #home .hero{padding:20px 14px 14px}
+ #home .hero h1{font-size:clamp(2.8rem,13vw,4.4rem);line-height:.98}
+ #home .hero .subtitle{margin:8px 0 12px}
+ #home .hero #heroPet{width:min(58vw,220px)}
+ #home .hero .garden-friends{height:56px}
+ #home .hero .chip{font-size:.92rem;padding:8px 12px}
+}
 </style></head>
 <body>
 <div class="sky"><div class="cloud one"></div><div class="cloud two"></div><div class="orb"></div><div class="sparkles">✦ ✧ ✨</div></div>
