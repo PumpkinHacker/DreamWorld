@@ -53,14 +53,15 @@
    renameBtn.disabled=!!a.deleted;renameBtn.addEventListener('click',async()=>{const username=rename.value.trim();if(!/^[A-Za-z0-9_]{3,20}$/.test(username)){status('accountsStatus','Username must be 3–20 letters, numbers, or underscores.','error');return}renameBtn.disabled=true;try{await api('/admin/accounts/rename','POST',{playerId:String(a.playerId),username});status('accountsStatus','Name changed for Player ID '+a.playerId+'.','ok');await refresh()}catch(e){status('accountsStatus','Could not change name: '+e.message,'error')}finally{renameBtn.disabled=false}});
    const deleteBtn=document.createElement('button');deleteBtn.textContent=a.deleted?'Restore Account':'Delete Account';deleteBtn.className='secondary';deleteBtn.style.width='100%';if(String(a.playerId)===currentAdminId&&!a.deleted){deleteBtn.disabled=true;deleteBtn.title='The active admin account cannot delete itself.';}
    deleteBtn.addEventListener('click',async()=>{const restore=!!a.deleted;if(!confirm((restore?'Restore':'Delete')+' account '+(a.username||a.playerId)+'?'))return;deleteBtn.disabled=true;try{await api(restore?'/admin/accounts/restore':'/admin/accounts/delete','POST',{playerId:String(a.playerId)});status('accountsStatus',(restore?'Restored':'Deleted')+' account for Player ID '+a.playerId+'.','ok');await refresh()}catch(e){status('accountsStatus','Account action failed: '+e.message,'error')}finally{deleteBtn.disabled=false}});
-   const pass=document.createElement('input');pass.type='password';pass.autocomplete='new-password';pass.minLength=8;pass.maxLength=128;pass.placeholder='New password (8–128 characters)';pass.setAttribute('aria-label','New password for '+(a.username||'player'));pass.style.marginBottom='6px';
-   const btn=document.createElement('button');btn.textContent='Reset Password';btn.style.marginTop='0';btn.style.width='100%';
-   if(a.deleted||String(a.playerId)===currentAdminId){btn.disabled=true;btn.title='Use a different admin account to reset your own password.'}
+   const pass=document.createElement('input');pass.type='password';pass.autocomplete='new-password';pass.minLength=12;pass.maxLength=128;pass.placeholder='New password (12–128 characters)';pass.setAttribute('aria-label','New password for '+(a.username||'player'));pass.style.marginBottom='6px';
+   const btn=document.createElement('button');btn.textContent=String(a.playerId)===currentAdminId?'Change My Admin Password':'Reset Password';btn.style.marginTop='0';btn.style.width='100%';
+   if(a.deleted){btn.disabled=true;btn.title='Restore this account before changing its password.'}
    btn.addEventListener('click',async()=>{
     const password=pass.value;
-    if(password.length<8||password.length>128){status('accountsStatus','Enter a new password between 8 and 128 characters.','error');return}
-    btn.disabled=true;status('accountsStatus','Resetting password for '+a.username+'…');
-    try{await api('/admin/accounts/reset-password','POST',{playerId:String(a.playerId),password});pass.value='';status('accountsStatus','Password reset for '+a.username+'. Their old session has been signed out.','ok')}
+    if(password.length<12||password.length>128||!/[a-z]/.test(password)||!/[A-Z]/.test(password)||!/[0-9]/.test(password)||!/[^A-Za-z0-9]/.test(password)){status('accountsStatus','Use 12–128 characters with uppercase and lowercase letters, a number, and a symbol.','error');return}
+    if(!confirm('Change the password for '+(a.username||'Player ID '+a.playerId)+'? This will sign that account out everywhere.'))return;
+    btn.disabled=true;status('accountsStatus','Changing password for '+a.username+'…');
+    try{await api('/admin/accounts/reset-password','POST',{playerId:String(a.playerId),password});pass.value='';status('accountsStatus','Password changed for '+a.username+'. That account has been signed out everywhere. If this was your admin account, sign in again with the new password.','ok');if(String(a.playerId)===currentAdminId){token='';localStorage.removeItem(savedTokenKey);$('dashboard').classList.add('hidden');$('loginCard').classList.remove('hidden');currentAdminId='';status('loginStatus','Admin password changed. Sign in again using the new password.','ok')}}
     catch(e){status('accountsStatus',e.message,'error')}
     finally{btn.disabled=false}
    });
