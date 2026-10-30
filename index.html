@@ -332,4 +332,5 @@ document.getElementById("heroPet").innerHTML=vectorAvatarMarkup();document.getEl
 const requestedWorld=new URLSearchParams(window.location.search).get("world");if(requestedWorld&&["pawville","sky","space","forest","beach","candy"].includes(requestedWorld)){requestAnimationFrame(()=>launchWorldInPage(requestedWorld))}
 
 (function ensureHomePlayerCard(){function paint(){try{if(typeof updateHeader==='function')updateHeader();const home=document.getElementById('home');const card=home?.querySelector('.top-player-card');if(card){card.style.display='flex';card.style.visibility='visible';card.style.opacity='1';const av=card.querySelector('#homePlayerAvatar');if(av&&typeof vectorAvatarMarkup==='function'&&!av.querySelector('svg'))av.innerHTML=vectorAvatarMarkup();}}catch(e){}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',paint,{once:true});else paint();const home=document.getElementById('home');if(home)new MutationObserver(paint).observe(home,{attributes:true,attributeFilter:['class']});window.addEventListener('pageshow',paint);})();
-</script></body></html>
+</script><script src="./player-profile-sync.js"></script>
+</body></html>
