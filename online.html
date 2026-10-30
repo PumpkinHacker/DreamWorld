@@ -1188,7 +1188,7 @@ const achievementCatalog = [
  {id:'word5',title:'Letter Legend',desc:'Solve 5 Word Drop words',reward:25,unlocked:()=>wordsSolved>=5},
  {id:'word10',title:'Alphabet Ace',desc:'Solve 10 Word Drop words',reward:50,unlocked:()=>wordsSolved>=10},
  {id:'secretPaws',title:'Secret Paw Sparkle',desc:'Find the hidden title surprise',reward:20,unlocked:()=>{try{return !!localStorage.getItem('estherSecretPawsFound')}catch(e){return false}}},
- {id:'dressup',title:'Dress-Up Dreamer',desc:'Equip a shop treasure',reward:10,unlocked:()=>itemsOwned.length>1},
+ {id:'dressup',title:'Dress-Up Dreamer',desc:'Equip a shop treasure',reward:10,unlocked:()=>itemsOwned.length>=1},
  {id:'colorful',title:'Colorful Character',desc:'Choose a non-classic puppy skin',reward:10,unlocked:()=>skinName!=='Classic Pup'},
  {id:'skywalker',title:'Skywalker',desc:'Try the flying power in the Admin Panel',reward:10,unlocked:()=>!!achievementFlags.skywalker},
  {id:'jumper',title:'Super Bouncer',desc:'Try Super Jump in the Admin Panel',reward:10,unlocked:()=>!!achievementFlags.jumper},
@@ -1200,7 +1200,7 @@ const achievementCatalog = [
  {id:'dreamSkin',title:'Dreamy Unicorn',desc:'Unlock the Unicorn Dream skin',reward:25,unlocked:()=>ownedSkins.includes('Unicorn Dream')},
  {id:'manyLevels',title:'Three-Star Explorer',desc:'Complete 3 different levels',reward:30,unlocked:()=>Object.values(levelDone).filter(Boolean).length>=3},
  {id:'halfLevels',title:'Halfway Hero',desc:'Complete 4 different levels',reward:40,unlocked:()=>Object.values(levelDone).filter(Boolean).length>=4},
- {id:'shopVisit',title:'Window Shopper',desc:'Own at least one shop treasure',reward:10,unlocked:()=>itemsOwned.length>=2},
+ {id:'shopVisit',title:'Window Shopper',desc:'Own at least one shop treasure',reward:10,unlocked:()=>itemsOwned.length>=1},
  {id:'powerMix',title:'Power Pup',desc:'Try all three special powers',reward:35,unlocked:()=>!!(achievementFlags.skywalker&&achievementFlags.jumper&&achievementFlags.speedster)},
  {id:'levelExplorer',title:'Level Explorer',desc:'Complete 2 different levels',reward:25,unlocked:()=>Object.values(levelDone).filter(Boolean).length>=2},
  {id:'fullCloset',title:'Full Closet',desc:'Own 20 shop treasures',reward:75,unlocked:()=>itemsOwned.length>=20},
@@ -1232,7 +1232,7 @@ function grantModReward(){const reward=['🎒','🍄','🧢','🎧','🧣','🧥
 function closeModMenu(){$('modal').classList.remove('show');playSound('tap');if(modOrigin==='game'){paused=false;gameActive=true;lastTime=performance.now();requestAnimationFrame(loop)}else{paused=false;gameActive=false;showScreen('home')}}
 function openResetGame(){$('modalContent').innerHTML=`<div style="font-size:2.5rem">🔄🔐</div><h2>Reset the Whole Game?</h2><p>This resets Tokens, levels, accessories, achievements, and powers on this device. Enter the reset code to continue.</p><input class="field" id="resetCode" type="password" inputmode="numeric" maxlength="8" placeholder="8-digit reset code" aria-label="Reset code" style="letter-spacing:4px"><button type="button" class="bigbtn orange" style="margin-top:12px" onclick="confirmFullReset()">Reset Everything</button><button type="button" class="bigbtn blue" style="margin-top:8px" onclick="cancelReset()">Cancel</button>`;$('modal').classList.add('show');gameActive=false;paused=true}
 function cancelReset(){$('modal').classList.remove('show');paused=false;gameActive=true;lastTime=performance.now();requestAnimationFrame(loop)}
-function confirmFullReset(){if($('resetCode').value!=='REMOVED_PUBLIC_CODE'){playSound('wrong');toast('That reset code does not match. Nothing was changed.');return}try{['estherDreamworldV3','estherDreamworldV4','estherDreamworldV5','estherDreamworldCoinsResetV11','estherDreamworldTune','estherSecretPawsFound'].forEach(k=>localStorage.removeItem(k))}catch(e){}location.reload()}
+function confirmFullReset(){if(($('resetCode').value||'').trim().toUpperCase()!=='RESET MY LOCAL SAVE'){playSound('wrong');toast('Type RESET MY LOCAL SAVE to confirm. Nothing was changed.');return}try{['estherDreamworldV3','estherDreamworldV4','estherDreamworldV5','estherDreamworldCoinsResetV11','estherDreamworldTune','estherSecretPawsFound'].forEach(k=>localStorage.removeItem(k))}catch(e){}location.reload()}
 function closeModal(){$('modal').classList.remove('show');syncCoins();playSound('tap')}
 function toast(msg){$('modalContent').innerHTML=`<div style="font-size:2.4rem">💌</div><h2>${msg}</h2><button type="button" class="bigbtn pink" onclick="closeModal()">Okay! 💖</button>`;$('modal').classList.add('show')}
 function newWord(){achievementFlags.helper=true;saveProgress();wordProgress=0;let w=words[wordIndex%words.length];$('wordPrompt').textContent=w.hint+' Spell '+w.w+'!';$('wordSlots').innerHTML=Array.from(w.w).map(()=>'<div class="slot"></div>').join('');let chars=[...w.w];while(chars.length<5)chars.push('AEIOU'[Math.floor(Math.random()*5)]);chars.sort(()=>Math.random()-.5);$('wordLetters').innerHTML=chars.map((c,i)=>`<button type="button" class="letter" onclick="pickLetter('${c}',this)">${c}</button>`).join('');$('wordFeedback').textContent='Tap the letters in order.';wordIndex++}
