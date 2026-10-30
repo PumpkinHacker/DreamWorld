@@ -1014,14 +1014,8 @@ async function loadServerTokenBalance(){
   await serverStateRequest;
 }
 function scheduleServerTokenSync(){
-  if(!playerId)return;
-  const token=localStorage.getItem('dreamWorldSessionV1');
-  if(!token)return;
-  if(serverTokenSyncTimer)clearTimeout(serverTokenSyncTimer);
-  serverTokenSyncTimer=setTimeout(async()=>{
-    try{await fetch(DREAMWORLD_API+'/player/tokens',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({coins:Math.max(0,Math.min(999999999,Math.floor(Number(coins)||0)))})});}
-    catch(err){console.warn('Could not sync Tokens to account server.')}
-  },500);
+  // Disabled: never trust a coin balance supplied by the browser.
+  // The account API now rejects client-side balance writes.
 }
 
 async function logoutDreamWorld(){
