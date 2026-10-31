@@ -285,7 +285,7 @@ const shoes=[{id:"sneakers",name:"Cloud Sneakers",emoji:"👟",price:25},{id:"bo
 const shirts=[{"id":"tee-sky","name":"Sky Star Tee","hex":"#69c9ff","price":35},{"id":"tee-pink","name":"Bubblegum Tee","hex":"#ff83bd","price":35},{"id":"tee-mint","name":"Mint Cloud Tee","hex":"#64d7b5","price":35},{"id":"tee-galaxy","name":"Animated Galaxy Shirt","hex":"#7054bd","price":95},{"id":"tee-sunset","name":"Sunset Hoodie","hex":"#ff916e","price":55},{"id":"tee-lavender","name":"Lavender Knit","hex":"#aa91f0","price":45},{"id":"tee-lemon","name":"Lemon Pop Top","hex":"#f4d95c","price":40},{"id":"tee-rose","name":"Rose Hoodie","hex":"#d978a4","price":60},{"id":"tee-ocean","name":"Ocean Wave Shirt","hex":"#318dbd","price":45},{"id":"tee-star","name":"Starlight Jersey","hex":"#5265ad","price":75}];const pants=[{"id":"pants-denim","name":"Dream Denim","hex":"#537fc2","price":40},{"id":"pants-lilac","name":"Lilac Joggers","hex":"#aa8ce5","price":40},{"id":"pants-mint","name":"Mint Cargo Pants","hex":"#68c8a8","price":45},{"id":"pants-pink","name":"Bubblegum Pants","hex":"#ed8bb8","price":40},{"id":"pants-galaxy","name":"Animated Galaxy Pants","hex":"#51449b","price":100},{"id":"pants-night","name":"Midnight Jeans","hex":"#343957","price":55},{"id":"pants-sand","name":"Sandy Shorts","hex":"#d6aa75","price":35},{"id":"pants-sport","name":"Comet Track Pants","hex":"#4788b8","price":60},{"id":"pants-rose","name":"Rose Corduroys","hex":"#b96b86","price":55},{"id":"pants-snow","name":"Snow Day Pants","hex":"#e6eef9","price":50}];const pets=[{id:"starcat",name:"Star Kitty",emoji:"🐱",price:40},{id:"cloudbunny",name:"Cloud Bunny",emoji:"🐇",price:50},{id:"babyfox",name:"Baby Fox",emoji:"🦊",price:60},{id:"tinyunicorn",name:"Tiny Unicorn",emoji:"🦄",price:90},{id:"dragon",name:"Pocket Dragon",emoji:"🐉",price:120},{id:"penguin",name:"Snow Penguin",emoji:"🐧",price:35}];
 const quests=[{id:"portal",title:"Visit a Portal",desc:"Explore one world.",reward:20},{id:"star",title:"Star Collector",desc:"Collect 5 stars in an adventure.",reward:35},{id:"friend",title:"Say Hello",desc:"Send a friendly emote.",reward:15},{id:"style",title:"Find Your Style",desc:"Save a custom look.",reward:20}];
 const minigames=[{id:"math",title:"Tiny Math",emoji:"🔢",desc:"Solve a quick number puzzle."},{id:"memory",title:"Memory Match",emoji:"🧠",desc:"Remember the pattern."},{id:"color",title:"Color Pop",emoji:"🎨",desc:"Tap colors in order."},{id:"quiz",title:"Animal Quiz",emoji:"🐾",desc:"Guess the animal."},{id:"pumpkin",title:"Pumpkin Pick",emoji:"🎃",desc:"Find the hidden candy."},{id:"ghost",title:"Ghost Riddle",emoji:"👻",desc:"Solve a spooky riddle."}];
-const defaultSave={playerName:"Dreamer",playerId:1,accountCreated:false,loggedIn:false,coins:100,level:1,xp:0,animal:"dog",color:"Magic Opal",ownedAccessories:[],equippedAccessories:[],ownedShoes:[],equippedShoes:[],ownedShirts:[],equippedShirt:null,ownedPants:[],equippedPants:null,ownedPets:[],activePet:null,ownedItems:[],houseItems:[],questsDone:[],worldsVisited:[],stars:0,music:true,motion:true,emotes:[],lookSaved:false,activeOutfit:null};
+const defaultSave={playerName:"Dreamer",playerId:1,accountCreated:false,loggedIn:false,coins:100,level:1,xp:0,animal:"dog",color:"Magic Opal",ownedAccessories:[],equippedAccessories:[],ownedShoes:[],equippedShoes:[],ownedShirts:[],equippedShirt:null,ownedPants:[],equippedPants:null,ownedPets:[],activePet:null,ownedItems:[],houseItems:[],questsDone:[],worldsVisited:[],stars:0,music:true,motion:true,emotes:[],lookSaved:false,claimedAchievements:[],activeOutfit:null};
 let state=loadSave(),game=null,toastTimer=null;
 function accountSaveKey(playerId){return "dreamworld_player_"+String(playerId)+"_v1"}
 function cloneDefaultSave(){return JSON.parse(JSON.stringify(defaultSave))}
@@ -476,52 +476,61 @@ const emotes=[["👋","Hello!"],["💖","Great job!"],["🎉","Let's celebrate!"
 function renderSocial(){document.getElementById("emoteCards").innerHTML=emotes.map(e=>'<button class="card" onclick="sendEmote(\''+e[0]+'\',\''+e[1]+'\')"><div class="art">'+e[0]+'</div><h3>'+e[1]+'</h3></button>').join("")}
 function sendEmote(emoji,text){state.emotes.push(text);state.emotes=state.emotes.slice(-50);document.getElementById("emotePet").textContent=animalEmoji()+" "+emoji;document.getElementById("emoteText").textContent=text;save();notify(text);renderQuests()}
 const achievementList=[
- {id:"welcome",icon:"🌟",name:"Welcome to Dream World",desc:"Create or start your player adventure.",test:()=>!!(state.accountCreated||state.playerName&&state.playerName!=="Dreamer"),progress:()=>((state.accountCreated||state.playerName&&state.playerName!=="Dreamer")?1:0),goal:1},
- {id:"style",icon:"🎨",name:"Style Star",desc:"Save your own character look.",test:()=>!!state.lookSaved,progress:()=>state.lookSaved?1:0,goal:1},
- {id:"buddy",icon:"🐾",name:"A New Friend",desc:"Adopt your first pet buddy.",test:()=>(state.ownedPets||[]).length>=1,progress:()=>(state.ownedPets||[]).length,goal:1},
- {id:"collector",icon:"💎",name:"Little Collector",desc:"Collect 5 accessories or wearable items.",test:()=>(state.ownedAccessories||[]).length+(state.ownedShoes||[]).length+(state.ownedShirts||[]).length+(state.ownedPants||[]).length>=5,progress:()=>(state.ownedAccessories||[]).length+(state.ownedShoes||[]).length+(state.ownedShirts||[]).length+(state.ownedPants||[]).length,goal:5},
- {id:"quest",icon:"🗺️",name:"Quest Beginner",desc:"Complete your first quest.",test:()=>(state.questsDone||[]).length>=1,progress:()=>(state.questsDone||[]).length,goal:1},
- {id:"questmaster",icon:"🏅",name:"Quest Explorer",desc:"Complete all 4 starter quests.",test:()=>(state.questsDone||[]).length>=4,progress:()=>(state.questsDone||[]).length,goal:4},
- {id:"star",icon:"⭐",name:"Star Collector",desc:"Collect 5 adventure stars.",test:()=>Number(state.stars||0)>=5,progress:()=>Number(state.stars||0),goal:5},
- {id:"level",icon:"🚀",name:"Rising Dreamer",desc:"Reach player level 5.",test:()=>Number(state.level||1)>=5,progress:()=>Number(state.level||1),goal:5},
- {id:"coins",icon:"🪙",name:"Coin Saver",desc:"Have 500 coins in your wallet.",test:()=>Number(state.coins||0)>=500,progress:()=>Number(state.coins||0),goal:500},
- {id:"worlds",icon:"🌈",name:"World Wanderer",desc:"Visit 3 different worlds.",test:()=>(state.worldsVisited||[]).length>=3,progress:()=>(state.worldsVisited||[]).length,goal:3},
- {id:"coin1000",icon:"💰",name:"Coin Collector",desc:"Save up 1,000 Dream Coins.",test:()=>Number(state.coins||0)>=1000,progress:()=>Number(state.coins||0),goal:1000},
- {id:"coin2500",icon:"🏦",name:"Treasure Keeper",desc:"Save up 2,500 Dream Coins.",test:()=>Number(state.coins||0)>=2500,progress:()=>Number(state.coins||0),goal:2500},
- {id:"level2",icon:"📈",name:"Getting Stronger",desc:"Reach level 2.",test:()=>Number(state.level||1)>=2,progress:()=>Number(state.level||1),goal:2},
- {id:"level10",icon:"🌠",name:"Dream Champion",desc:"Reach level 10.",test:()=>Number(state.level||1)>=10,progress:()=>Number(state.level||1),goal:10},
- {id:"level20",icon:"👑",name:"Legendary Dreamer",desc:"Reach level 20.",test:()=>Number(state.level||1)>=20,progress:()=>Number(state.level||1),goal:20},
- {id:"star10",icon:"✨",name:"Shiny Seeker",desc:"Collect 10 adventure stars.",test:()=>Number(state.stars||0)>=10,progress:()=>Number(state.stars||0),goal:10},
- {id:"star25",icon:"🌟",name:"Star Expert",desc:"Collect 25 adventure stars.",test:()=>Number(state.stars||0)>=25,progress:()=>Number(state.stars||0),goal:25},
- {id:"star50",icon:"💫",name:"Galaxy of Stars",desc:"Collect 50 adventure stars.",test:()=>Number(state.stars||0)>=50,progress:()=>Number(state.stars||0),goal:50},
- {id:"world4",icon:"🧭",name:"Curious Traveler",desc:"Visit 4 different worlds.",test:()=>(state.worldsVisited||[]).length>=4,progress:()=>(state.worldsVisited||[]).length,goal:4},
- {id:"world6",icon:"🚩",name:"World Explorer",desc:"Visit every main world.",test:()=>(state.worldsVisited||[]).length>=6,progress:()=>(state.worldsVisited||[]).length,goal:6},
- {id:"pets3",icon:"🐶",name:"Pet Pals",desc:"Adopt 3 pets.",test:()=>(state.ownedPets||[]).length>=3,progress:()=>(state.ownedPets||[]).length,goal:3},
- {id:"pets5",icon:"🐾",name:"Pet Party",desc:"Adopt 5 pets.",test:()=>(state.ownedPets||[]).length>=5,progress:()=>(state.ownedPets||[]).length,goal:5},
- {id:"accessory3",icon:"🎀",name:"Accessory Fan",desc:"Collect 3 accessories.",test:()=>(state.ownedAccessories||[]).length>=3,progress:()=>(state.ownedAccessories||[]).length,goal:3},
- {id:"accessory10",icon:"💍",name:"Accessory Expert",desc:"Collect 10 accessories.",test:()=>(state.ownedAccessories||[]).length>=10,progress:()=>(state.ownedAccessories||[]).length,goal:10},
- {id:"clothes3",icon:"👕",name:"Wardrobe Starter",desc:"Collect 3 shirts.",test:()=>(state.ownedShirts||[]).length>=3,progress:()=>(state.ownedShirts||[]).length,goal:3},
- {id:"clothes8",icon:"🧥",name:"Fashion Collector",desc:"Collect 8 shirts.",test:()=>(state.ownedShirts||[]).length>=8,progress:()=>(state.ownedShirts||[]).length,goal:8},
- {id:"shoes3",icon:"👟",name:"Shoe Shelf",desc:"Collect 3 pairs of shoes.",test:()=>(state.ownedShoes||[]).length>=3,progress:()=>(state.ownedShoes||[]).length,goal:3},
- {id:"pants3",icon:"👖",name:"Bottoms Up",desc:"Collect 3 pairs of pants.",test:()=>(state.ownedPants||[]).length>=3,progress:()=>(state.ownedPants||[]).length,goal:3},
- {id:"quest2",icon:"📜",name:"Quest Regular",desc:"Complete 2 quests.",test:()=>(state.questsDone||[]).length>=2,progress:()=>(state.questsDone||[]).length,goal:2},
- {id:"quest3",icon:"🏆",name:"Quest Pro",desc:"Complete 3 quests.",test:()=>(state.questsDone||[]).length>=3,progress:()=>(state.questsDone||[]).length,goal:3},
- {id:"xp50",icon:"🔹",name:"XP Starter",desc:"Earn 50 experience points.",test:()=>Number(state.xp||0)>=50,progress:()=>Number(state.xp||0),goal:50},
- {id:"xp100",icon:"🔷",name:"XP Hunter",desc:"Earn 100 experience points.",test:()=>Number(state.xp||0)>=100,progress:()=>Number(state.xp||0),goal:100},
- {id:"xp250",icon:"💠",name:"XP Master",desc:"Earn 250 experience points.",test:()=>Number(state.xp||0)>=250,progress:()=>Number(state.xp||0),goal:250},
- {id:"emote1",icon:"😎",name:"Express Yourself",desc:"Unlock your first emote.",test:()=>(state.emotes||[]).length>=1,progress:()=>(state.emotes||[]).length,goal:1},
- {id:"emote5",icon:"🎭",name:"Emote Collector",desc:"Unlock 5 emotes.",test:()=>(state.emotes||[]).length>=5,progress:()=>(state.emotes||[]).length,goal:5},
- {id:"house1",icon:"🏡",name:"Home Sweet Home",desc:"Add your first item to your house.",test:()=>(state.houseItems||[]).length>=1,progress:()=>(state.houseItems||[]).length,goal:1},
- {id:"house5",icon:"🛋️",name:"Home Decorator",desc:"Add 5 items to your house.",test:()=>(state.houseItems||[]).length>=5,progress:()=>(state.houseItems||[]).length,goal:5},
- {id:"house10",icon:"🏠",name:"Dream Designer",desc:"Add 10 items to your house.",test:()=>(state.houseItems||[]).length>=10,progress:()=>(state.houseItems||[]).length,goal:10},
- {id:"items1",icon:"🎁",name:"First Treasure",desc:"Collect your first special item.",test:()=>(state.ownedItems||[]).length>=1,progress:()=>(state.ownedItems||[]).length,goal:1},
- {id:"items5",icon:"🧰",name:"Treasure Hunter",desc:"Collect 5 special items.",test:()=>(state.ownedItems||[]).length>=5,progress:()=>(state.ownedItems||[]).length,goal:5}
+ {id:"welcome",icon:"🌟",name:"Welcome to Dream World",desc:"Create or start your player adventure.",test:()=>!!(state.accountCreated||state.playerName&&state.playerName!=="Dreamer"),progress:()=>((state.accountCreated||state.playerName&&state.playerName!=="Dreamer")?1:0),goal:1,reward:50},
+ {id:"style",icon:"🎨",name:"Style Star",desc:"Save your own character look.",test:()=>!!state.lookSaved,progress:()=>state.lookSaved?1:0,goal:1,reward:75},
+ {id:"buddy",icon:"🐾",name:"A New Friend",desc:"Adopt your first pet buddy.",test:()=>(state.ownedPets||[]).length>=1,progress:()=>(state.ownedPets||[]).length,goal:1,reward:100},
+ {id:"collector",icon:"💎",name:"Little Collector",desc:"Collect 5 accessories or wearable items.",test:()=>(state.ownedAccessories||[]).length+(state.ownedShoes||[]).length+(state.ownedShirts||[]).length+(state.ownedPants||[]).length>=5,progress:()=>(state.ownedAccessories||[]).length+(state.ownedShoes||[]).length+(state.ownedShirts||[]).length+(state.ownedPants||[]).length,goal:5,reward:125},
+ {id:"quest",icon:"🗺️",name:"Quest Beginner",desc:"Complete your first quest.",test:()=>(state.questsDone||[]).length>=1,progress:()=>(state.questsDone||[]).length,goal:1,reward:150},
+ {id:"questmaster",icon:"🏅",name:"Quest Explorer",desc:"Complete all 4 starter quests.",test:()=>(state.questsDone||[]).length>=4,progress:()=>(state.questsDone||[]).length,goal:4,reward:175},
+ {id:"star",icon:"⭐",name:"Star Collector",desc:"Collect 5 adventure stars.",test:()=>Number(state.stars||0)>=5,progress:()=>Number(state.stars||0),goal:5,reward:200},
+ {id:"level",icon:"🚀",name:"Rising Dreamer",desc:"Reach player level 5.",test:()=>Number(state.level||1)>=5,progress:()=>Number(state.level||1),goal:5,reward:225},
+ {id:"coins",icon:"🪙",name:"Coin Saver",desc:"Have 500 coins in your wallet.",test:()=>Number(state.coins||0)>=500,progress:()=>Number(state.coins||0),goal:500,reward:250},
+ {id:"worlds",icon:"🌈",name:"World Wanderer",desc:"Visit 3 different worlds.",test:()=>(state.worldsVisited||[]).length>=3,progress:()=>(state.worldsVisited||[]).length,goal:3,reward:275},
+ {id:"coin1000",icon:"💰",name:"Coin Collector",desc:"Save up 1,000 Dream Coins.",test:()=>Number(state.coins||0)>=1000,progress:()=>Number(state.coins||0),goal:1000,reward:300},
+ {id:"coin2500",icon:"🏦",name:"Treasure Keeper",desc:"Save up 2,500 Dream Coins.",test:()=>Number(state.coins||0)>=2500,progress:()=>Number(state.coins||0),goal:2500,reward:325},
+ {id:"level2",icon:"📈",name:"Getting Stronger",desc:"Reach level 2.",test:()=>Number(state.level||1)>=2,progress:()=>Number(state.level||1),goal:2,reward:350},
+ {id:"level10",icon:"🌠",name:"Dream Champion",desc:"Reach level 10.",test:()=>Number(state.level||1)>=10,progress:()=>Number(state.level||1),goal:10,reward:375},
+ {id:"level20",icon:"👑",name:"Legendary Dreamer",desc:"Reach level 20.",test:()=>Number(state.level||1)>=20,progress:()=>Number(state.level||1),goal:20,reward:400},
+ {id:"star10",icon:"✨",name:"Shiny Seeker",desc:"Collect 10 adventure stars.",test:()=>Number(state.stars||0)>=10,progress:()=>Number(state.stars||0),goal:10,reward:425},
+ {id:"star25",icon:"🌟",name:"Star Expert",desc:"Collect 25 adventure stars.",test:()=>Number(state.stars||0)>=25,progress:()=>Number(state.stars||0),goal:25,reward:450},
+ {id:"star50",icon:"💫",name:"Galaxy of Stars",desc:"Collect 50 adventure stars.",test:()=>Number(state.stars||0)>=50,progress:()=>Number(state.stars||0),goal:50,reward:475},
+ {id:"world4",icon:"🧭",name:"Curious Traveler",desc:"Visit 4 different worlds.",test:()=>(state.worldsVisited||[]).length>=4,progress:()=>(state.worldsVisited||[]).length,goal:4,reward:500},
+ {id:"world6",icon:"🚩",name:"World Explorer",desc:"Visit every main world.",test:()=>(state.worldsVisited||[]).length>=6,progress:()=>(state.worldsVisited||[]).length,goal:6,reward:550},
+ {id:"pets3",icon:"🐶",name:"Pet Pals",desc:"Adopt 3 pets.",test:()=>(state.ownedPets||[]).length>=3,progress:()=>(state.ownedPets||[]).length,goal:3,reward:600},
+ {id:"pets5",icon:"🐾",name:"Pet Party",desc:"Adopt 5 pets.",test:()=>(state.ownedPets||[]).length>=5,progress:()=>(state.ownedPets||[]).length,goal:5,reward:650},
+ {id:"accessory3",icon:"🎀",name:"Accessory Fan",desc:"Collect 3 accessories.",test:()=>(state.ownedAccessories||[]).length>=3,progress:()=>(state.ownedAccessories||[]).length,goal:3,reward:700},
+ {id:"accessory10",icon:"💍",name:"Accessory Expert",desc:"Collect 10 accessories.",test:()=>(state.ownedAccessories||[]).length>=10,progress:()=>(state.ownedAccessories||[]).length,goal:10,reward:750},
+ {id:"clothes3",icon:"👕",name:"Wardrobe Starter",desc:"Collect 3 shirts.",test:()=>(state.ownedShirts||[]).length>=3,progress:()=>(state.ownedShirts||[]).length,goal:3,reward:800},
+ {id:"clothes8",icon:"🧥",name:"Fashion Collector",desc:"Collect 8 shirts.",test:()=>(state.ownedShirts||[]).length>=8,progress:()=>(state.ownedShirts||[]).length,goal:8,reward:850},
+ {id:"shoes3",icon:"👟",name:"Shoe Shelf",desc:"Collect 3 pairs of shoes.",test:()=>(state.ownedShoes||[]).length>=3,progress:()=>(state.ownedShoes||[]).length,goal:3,reward:900},
+ {id:"pants3",icon:"👖",name:"Bottoms Up",desc:"Collect 3 pairs of pants.",test:()=>(state.ownedPants||[]).length>=3,progress:()=>(state.ownedPants||[]).length,goal:3,reward:950},
+ {id:"quest2",icon:"📜",name:"Quest Regular",desc:"Complete 2 quests.",test:()=>(state.questsDone||[]).length>=2,progress:()=>(state.questsDone||[]).length,goal:2,reward:1000},
+ {id:"quest3",icon:"🏆",name:"Quest Pro",desc:"Complete 3 quests.",test:()=>(state.questsDone||[]).length>=3,progress:()=>(state.questsDone||[]).length,goal:3,reward:1200},
+ {id:"xp50",icon:"🔹",name:"XP Starter",desc:"Earn 50 experience points.",test:()=>Number(state.xp||0)>=50,progress:()=>Number(state.xp||0),goal:50,reward:1400},
+ {id:"xp100",icon:"🔷",name:"XP Hunter",desc:"Earn 100 experience points.",test:()=>Number(state.xp||0)>=100,progress:()=>Number(state.xp||0),goal:100,reward:1600},
+ {id:"xp250",icon:"💠",name:"XP Master",desc:"Earn 250 experience points.",test:()=>Number(state.xp||0)>=250,progress:()=>Number(state.xp||0),goal:250,reward:1800},
+ {id:"emote1",icon:"😎",name:"Express Yourself",desc:"Unlock your first emote.",test:()=>(state.emotes||[]).length>=1,progress:()=>(state.emotes||[]).length,goal:1,reward:2000},
+ {id:"emote5",icon:"🎭",name:"Emote Collector",desc:"Unlock 5 emotes.",test:()=>(state.emotes||[]).length>=5,progress:()=>(state.emotes||[]).length,goal:5,reward:2250},
+ {id:"house1",icon:"🏡",name:"Home Sweet Home",desc:"Add your first item to your house.",test:()=>(state.houseItems||[]).length>=1,progress:()=>(state.houseItems||[]).length,goal:1,reward:2500},
+ {id:"house5",icon:"🛋️",name:"Home Decorator",desc:"Add 5 items to your house.",test:()=>(state.houseItems||[]).length>=5,progress:()=>(state.houseItems||[]).length,goal:5,reward:2750},
+ {id:"house10",icon:"🏠",name:"Dream Designer",desc:"Add 10 items to your house.",test:()=>(state.houseItems||[]).length>=10,progress:()=>(state.houseItems||[]).length,goal:10,reward:3000},
+ {id:"items1",icon:"🎁",name:"First Treasure",desc:"Collect your first special item.",test:()=>(state.ownedItems||[]).length>=1,progress:()=>(state.ownedItems||[]).length,goal:1,reward:3500},
+ {id:"items5",icon:"🧰",name:"Treasure Hunter",desc:"Collect 5 special items.",test:()=>(state.ownedItems||[]).length>=5,progress:()=>(state.ownedItems||[]).length,goal:5,reward:4000}
 ];
+function claimAchievement(id){
+ const a=achievementList.find(x=>x.id===id);if(!a)return;
+ state.claimedAchievements=Array.isArray(state.claimedAchievements)?state.claimedAchievements:[];
+ if(!a.test())return notify("Complete this achievement first!");
+ if(state.claimedAchievements.includes(id))return notify("You already claimed this reward.");
+ state.claimedAchievements.push(id);state.coins=Math.max(0,Number(state.coins)||0)+Number(a.reward||0);
+ save();updateHeader();renderAchievements();notify("Reward claimed! +"+a.reward+" Dream Coins");
+}
 function renderAchievements(){
  const host=document.getElementById("achievementCards"),summary=document.getElementById("achievementSummary");if(!host)return;
- const unlocked=achievementList.filter(a=>a.test()).length;
- if(summary)summary.textContent=unlocked+" of "+achievementList.length+" achievements unlocked — keep exploring!";
- host.innerHTML=achievementList.map(a=>{const done=a.test(),value=Math.min(a.goal,Math.max(0,Number(a.progress())||0)),pct=Math.round(value/a.goal*100);return '<div class="card"><div class="art">'+(done?"🏆":a.icon)+'</div><h3>'+a.name+'</h3><p>'+a.desc+'</p><p><strong>'+(done?"Unlocked!":value+" / "+a.goal)+'</strong></p><div style="height:10px;border-radius:99px;background:#e8e4f5;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#8d7af0,#ff91c7);border-radius:99px"></div></div></div>'}).join("");
+ state.claimedAchievements=Array.isArray(state.claimedAchievements)?state.claimedAchievements:[];
+ const unlocked=achievementList.filter(a=>a.test()).length,claimed=state.claimedAchievements.length;
+ if(summary)summary.textContent=unlocked+" of "+achievementList.length+" unlocked · "+claimed+" rewards claimed · "+Number(state.coins||0)+" Dream Coins";
+ host.innerHTML=achievementList.map(a=>{const done=a.test(),claimed=state.claimedAchievements.includes(a.id),value=Math.min(a.goal,Math.max(0,Number(a.progress())||0)),pct=Math.round(value/a.goal*100),button=claimed?'<button class="btn neutral" disabled>✓ Reward claimed</button>':done?'<button class="btn gold" onclick="claimAchievement(\''+a.id+'\')">Claim +'+a.reward+' 🪙</button>':'<button class="btn neutral" disabled>🔒 Locked</button>';return '<div class="card"><div class="art">'+(claimed?"🎁":done?"🏆":a.icon)+'</div><h3>'+a.name+'</h3><p>'+a.desc+'</p><p><strong>'+(done?(claimed?"Reward collected!":"Unlocked!"):value+" / "+a.goal)+'</strong></p><p>Reward: <strong>🪙 '+a.reward+' Dream Coins</strong></p><div style="height:10px;border-radius:99px;background:#e8e4f5;overflow:hidden;margin-bottom:10px"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#8d7af0,#ff91c7);border-radius:99px"></div></div>'+button+'</div>'}).join("");
 }
 function renderCollection(){const list=[...state.ownedAccessories.map(id=>accessories.find(x=>x.id===id)).filter(Boolean),...state.ownedShoes.map(id=>shoes.find(x=>x.id===id)).filter(Boolean),...state.ownedPets.map(id=>pets.find(x=>x.id===id)).filter(Boolean)];document.getElementById("collectionCards").innerHTML=list.length?list.map(x=>'<div class="card"><div class="art">'+x.emoji+'</div><h3>'+x.name+'</h3><p>Collected ✨</p></div>').join(""):'<div class="notice wide">Your collection is waiting for its first treasure. Visit the Star Shop!</div>'}
 function renderSettings(){const info=document.getElementById("accountInfo");if(info)info.textContent="Player: "+state.playerName+" · Player ID: "+state.playerId+" · Local profile";document.getElementById("musicToggle").textContent="🎵 Music: "+(state.music?"On":"Off");document.getElementById("motionToggle").textContent="✨ Animations: "+(state.motion?"On":"Off")}
