@@ -371,7 +371,7 @@ function petShopArt(id){
 function renderShop(){
  ensureGalaxyCollection();
  const halloweenIds=["pumpkinCrown","witchHat","batWings","ghostBackpack","spiderCape","candyBucket"];
- const groups=[["All","All"],["Accessories","Accessory"],["Shoes","Shoes"],["Pets","Pet"],["Home","Home"],["Halloween","Halloween"]];
+ const groups=[["All","All"],["Accessories","Accessory"],["Shoes","Shoes"],["Pets","Pet"],["Home","Home"],["Halloween","Halloween"],["Halloween Creator","Halloween Creator"]];
  const cat=document.getElementById("shopCategories");
  if(cat)cat.innerHTML=groups.map(g=>'<button class="shop-category '+(shopCategory===g[0]?"active":"")+'" onclick="setShopCategory(\''+g[0]+'\')">'+g[0]+'</button>').join("");
  const list=[...accessories.filter(x=>!x.limited||Number(state.playerId)===1).map(x=>({...x,type:"Accessory",shopCategory:halloweenIds.includes(x.id)?"Halloween":"Accessory"})),...shoes.filter(x=>!x.limited||Number(state.playerId)===1).map(x=>({...x,type:"Shoes",shopCategory:"Shoes"})),...pets.map(x=>({...x,type:"Pet",shopCategory:"Pet"})),...houseDecorItems.map(x=>({...x,type:"Home",shopCategory:"Home"}))].filter(x=>shopCategory==="All"||x.shopCategory===shopCategory);
