@@ -410,7 +410,7 @@ function showMiniGame(id){
 function answerMiniGame(choice){
  if(!miniRound)return;const correct=String(choice)===String(miniRound.answer);
  const feedback=document.getElementById("miniGameFeedback");
- if(correct){const reward=miniRound.id==="memory"?15:10;state.coins+=reward;state.xp+=5;if(state.xp>=100){state.level++;state.xp-=100}save();feedback.textContent="That's right! ✨ +"+reward+" coins";document.getElementById("miniGameChoices").innerHTML='<button class="mini-choice mini-next" onclick="showMiniGame('+JSON.stringify(miniRound.id)+')">Play another round ↻</button><button class="mini-choice" onclick="closeMiniGame()">Done</button>'}
+ if(correct){const reward=miniRound.id==="memory"?15:10;state.coins+=reward;state.xp+=5;if(state.xp>=100){state.level++;state.xp-=100}save();feedback.textContent="That's right! ✨ +"+reward+" coins";document.getElementById("miniGameChoices").innerHTML='<button class="mini-choice mini-next" onclick="showMiniGame(&quot;'+miniRound.id+'&quot;)">Play another round ↻</button><button class="mini-choice" onclick="closeMiniGame()">Done</button>'}
  else{feedback.textContent="Good try! Choose another answer.";const buttons=document.querySelectorAll("#miniGameChoices .mini-choice");buttons.forEach(b=>{if(b.textContent===String(choice))b.disabled=true})}
 }
 function playMini(id){showMiniGame(id)}
