@@ -377,7 +377,7 @@ function renderShop(){
  const list=[...accessories.filter(x=>!x.limited||Number(state.playerId)===1).map(x=>({...x,type:"Accessory",shopCategory:halloweenIds.includes(x.id)?"Halloween":"Accessory"})),...shoes.filter(x=>!x.limited||Number(state.playerId)===1).map(x=>({...x,type:"Shoes",shopCategory:"Shoes"})),...pets.map(x=>({...x,type:"Pet",shopCategory:"Pet"})),...houseDecorItems.map(x=>({...x,type:"Home",shopCategory:"Home"})),...halloweenCreatorKits.map(x=>({...x,type:"CreatorKit",shopCategory:"Halloween Creator"}))].filter(x=>shopCategory==="All"||x.shopCategory===shopCategory);
  document.getElementById("shopCards").innerHTML=list.map(a=>{
  const owned=state.ownedAccessories.includes(a.id)||state.ownedShoes.includes(a.id)||state.ownedPets.includes(a.id)||state.ownedItems.includes(a.id)||state.houseItems.includes(a.id);
- const art=a.type==="Accessory"?accessoryShopArt(a.id):a.type==="Shoes"?vectorShoeArt(a.id):a.type==="Pet"?petShopArt(a.id):houseDecorArt(a.id);
+ const art=a.type==="Accessory"?accessoryShopArt(a.id):a.type==="Shoes"?vectorShoeArt(a.id):a.type==="Pet"?petShopArt(a.id):a.type==="CreatorKit"?halloweenCreatorKitArt(a.id):houseDecorArt(a.id);
  return '<div class="card"><div class="art item-art">'+art+'</div><h3>'+a.name+'</h3><p>'+a.type+' · '+(a.price||"Special")+(a.price?" coins":"")+'</p><button class="btn '+(owned?"purple":"gold")+'" '+(owned?"disabled":"")+' onclick="buyShopItem(\''+a.id+'\',\''+a.type+'\','+a.price+')">'+(owned?"Owned":a.limited?"Admin exclusive":"Buy")+'</button></div>';
  }).join("");
 }
