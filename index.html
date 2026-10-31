@@ -156,7 +156,8 @@ linear-gradient(180deg,transparent 0 78%,#a7efce 78% 100%)}
 #home.screen.active>.glass{display:block!important;visibility:visible!important;opacity:1!important}#home .top-player-card{display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;order:-1!important;width:100%!important;min-height:116px!important;margin:0 0 18px!important;box-sizing:border-box!important}#home .top-player-avatar{display:grid!important;visibility:visible!important;opacity:1!important;width:92px!important;height:104px!important;min-width:92px!important;flex:0 0 92px!important;place-items:center!important;overflow:visible!important}#home .top-player-avatar svg{display:block!important;visibility:visible!important;opacity:1!important;width:92px!important;height:104px!important;max-height:104px!important}#home .top-player-info{display:block!important;visibility:visible!important;opacity:1!important}
 
 #home .top-player-card{display:flex!important;visibility:visible!important;opacity:1!important;height:auto!important;min-height:120px!important}#home #homePlayerAvatar{display:grid!important;visibility:visible!important;opacity:1!important;width:96px!important;height:112px!important;min-width:96px!important;flex:0 0 96px!important}#home #homePlayerAvatar svg{display:block!important;visibility:visible!important;width:96px!important;height:112px!important;max-height:112px!important}
-body.account-gate header>.row{display:none!important}\n/* SPOOKY SEASON */
+body.account-gate header>.row{display:none!important}
+/* SPOOKY SEASON */
 
 @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Nunito:wght@500;700;800;900&display=swap');
 :root{--ink:#f9e9d0;--blue:#7654bd;--indigo:#7140a8;--pink:#c34d83;--mint:#579b79;--gold:#f5a83e;--lilac:#9d77c7;--glass:rgba(35,24,49,.9);--line:#f6d6a8;--shadow:0 8px 0 rgba(18,9,27,.3)}
@@ -365,7 +366,8 @@ function petShopArt(id){
 }
 function renderShop(){
  ensureGalaxyCollection();
- const halloweenIds=["pumpkinCrown","witchHat","batWings","ghostBackpack","spiderCape","candyBucket"];\n const groups=[["All","All"],["Accessories","Accessory"],["Shoes","Shoes"],["Pets","Pet"],["Home","Home"],["Halloween","Halloween"]];
+ const halloweenIds=["pumpkinCrown","witchHat","batWings","ghostBackpack","spiderCape","candyBucket"];
+ const groups=[["All","All"],["Accessories","Accessory"],["Shoes","Shoes"],["Pets","Pet"],["Home","Home"],["Halloween","Halloween"]];
  const cat=document.getElementById("shopCategories");
  if(cat)cat.innerHTML=groups.map(g=>'<button class="shop-category '+(shopCategory===g[0]?"active":"")+'" onclick="setShopCategory(\''+g[0]+'\')">'+g[0]+'</button>').join("");
  const list=[...accessories.filter(x=>!x.limited||Number(state.playerId)===1).map(x=>({...x,type:"Accessory",shopCategory:halloweenIds.includes(x.id)?"Halloween":"Accessory"})),...shoes.filter(x=>!x.limited||Number(state.playerId)===1).map(x=>({...x,type:"Shoes",shopCategory:"Shoes"})),...pets.map(x=>({...x,type:"Pet",shopCategory:"Pet"})),...houseDecorItems.map(x=>({...x,type:"Home",shopCategory:"Home"}))].filter(x=>shopCategory==="All"||x.shopCategory===shopCategory);
