@@ -381,7 +381,34 @@ function renderShop(){
  return '<div class="card"><div class="art item-art">'+art+'</div><h3>'+a.name+'</h3><p>'+a.type+' · '+(a.price||"Special")+(a.price?" coins":"")+'</p><button class="btn '+(owned?"purple":"gold")+'" '+(owned?"disabled":"")+' onclick="buyShopItem(\''+a.id+'\',\''+a.type+'\','+a.price+')">'+(owned?"Owned":a.limited?"Admin exclusive":"Buy")+'</button></div>';
  }).join("");
 }
-function buyShopItem(id,type,price){if(state.ownedAccessories.includes(id)||state.ownedShoes.includes(id)||state.ownedPets.includes(id)||state.ownedItems.includes(id)||state.houseItems.includes(id))return notify("Already in your collection!");if(state.coins<price)return notify("Not enough coins!");state.coins-=price;if(type==="Accessory")state.ownedAccessories.push(id);else if(type==="Shoes")state.ownedShoes.push(id);else if(type==="Pet")state.ownedPets.push(id);else if(type==="Home")state.houseItems.push(id);else state.ownedItems.push(id);save();renderShop();if(type==="Home"&&typeof renderHouse==="function")renderHouse();notify("Added to your collection!")}
+
+/* Halloween Creator: themed kits are shared by Customization and Shop. */
+const halloweenCreatorKits=[
+ {id:"hc_pumpkin",name:"Pumpkin Royalty Kit",price:240,desc:"A glowing pumpkin crown with a candy bucket.",items:["pumpkinCrown","candyBucket"],style:"pumpkin"},
+ {id:"hc_ghost",name:"Ghostlight Kit",price:260,desc:"A ghostly backpack and moonlit cape.",items:["ghostBackpack","spiderCape"],style:"ghost"},
+ {id:"hc_witch",name:"Moon Witch Kit",price:280,desc:"A witch hat and magical bat-wing cape.",items:["witchHat","batWings"],style:"witch"},
+ {id:"hc_bat",name:"Midnight Bat Kit",price:300,desc:"Bat wings with a dark spiderweb cape.",items:["batWings","spiderCape"],style:"bat"},
+ {id:"hc_candy",name:"Candy Monster Kit",price:220,desc:"A sweet candy bucket and pumpkin crown.",items:["candyBucket","pumpkinCrown"],style:"candy"}
+];
+function halloweenCreatorKitArt(id){
+ const colors={hc_pumpkin:["#ff9b35","#6c347e"],hc_ghost:["#f8fbff","#9d8ce8"],hc_witch:["#a77be8","#39264f"],hc_bat:["#3c3158","#9c78e8"],hc_candy:["#ff78b5","#ffc85c"]};
+ const c=colors[id]||colors.hc_pumpkin;
+ return '<svg viewBox="0 0 180 140" role="img" aria-label="Halloween creator kit artwork"><defs><linearGradient id="hcgrad" x1="0" x2="1" y1="0" y2="1"><stop stop-color="'+c[0]+'"/><stop offset="1" stop-color="'+c[1]+'"/></linearGradient></defs><path d="M90 12C48 12 22 43 25 83c3 31 28 47 65 47s62-16 65-47C158 43 132 12 90 12Z" fill="url(#hcgrad)" stroke="#fff" stroke-width="6"/><path d="M58 65q12-15 24 0M98 65q12-15 24 0" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><path d="M70 94q20 15 40 0" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/><path d="M90 3v18M81 11h18" stroke="#ffe18a" stroke-width="5" stroke-linecap="round"/></svg>';
+}
+function renderHalloweenCreator(host){
+ const owned=new Set(state.ownedItems||[]);
+ host.innerHTML='<div class="notice">Unlock a creator kit in the Shop to get its matching Halloween pieces. Then equip a complete themed look here. Your kit and equipped pieces save to your player.</div><div class="cards custom-item-grid">'+halloweenCreatorKits.map(k=>{const has=owned.has(k.id),wearing=state.halloweenCreatorStyle===k.style;return '<div class="card"><div class="art item-art">'+halloweenCreatorKitArt(k.id)+'</div><h3>'+k.name+'</h3><p>'+k.desc+'</p><button class="btn '+(wearing?'pink':has?'purple':'neutral')+'" '+(!has?'disabled':'')+' onclick="equipHalloweenCreatorKit(\''+k.id+'\')">'+(wearing?'✓ Wearing':has?'Create this look':'Get it in the Shop')+'</button></div>'}).join('')+'</div><button class="btn gold wide" style="margin-top:14px" onclick="setShopCategory(\'Halloween Creator\');openScreen(\'shop\')">🎃 Visit Halloween Creator Shop</button>';
+}
+function equipHalloweenCreatorKit(id){
+ const kit=halloweenCreatorKits.find(x=>x.id===id);if(!kit)return;
+ if(!(state.ownedItems||[]).includes(id))return notify("Unlock this creator kit in the Halloween Creator Shop first.");
+ state.ownedAccessories=Array.from(new Set([...(state.ownedAccessories||[]),...kit.items]));
+ state.equippedAccessories=kit.items.slice(0,2);
+ state.halloweenCreatorStyle=kit.style;state.activeOutfit=null;
+ enforceEquipLimits();save();renderCustom();notify(kit.name+" equipped!");
+}
+
+function buyShopItem(id,type,price){if(state.ownedAccessories.includes(id)||state.ownedShoes.includes(id)||state.ownedPets.includes(id)||state.ownedItems.includes(id)||state.houseItems.includes(id))return notify("Already in your collection!");if(state.coins<price)return notify("Not enough coins!");state.coins-=price;if(type==="Accessory")state.ownedAccessories.push(id);else if(type==="Shoes")state.ownedShoes.push(id);else if(type==="Pet")state.ownedPets.push(id);else if(type==="Home")state.houseItems.push(id);else state.ownedItems.push(id);if(type==="CreatorKit"){const kit=halloweenCreatorKits.find(x=>x.id===id);if(kit)kit.items.forEach(item=>{if(!state.ownedAccessories.includes(item))state.ownedAccessories.push(item)})}save();renderShop();if(type==="Home"&&typeof renderHouse==="function")renderHouse();notify("Added to your collection!")}
 function renderPets(){document.getElementById("petCards").innerHTML=pets.map(p=>{const owned=state.ownedPets.includes(p.id),active=state.activePet===p.id;return '<div class="card"><div class="art">'+p.emoji+'</div><h3>'+p.name+'</h3><p>'+p.price+' coins</p><button class="btn '+(active?"pink":owned?"purple":"gold")+'" onclick="petAction(\''+p.id+'\')">'+(active?"Following":owned?"Choose Buddy":"Adopt")+'</button></div>'}).join("")}
 function petAction(id){const p=pets.find(x=>x.id===id);if(!state.ownedPets.includes(id)){if(state.coins<p.price)return notify("Not enough coins!");state.coins-=p.price;state.ownedPets.push(id)}state.activePet=state.activePet===id?null:id;save();renderPets();notify(state.activePet?"Your buddy is following!":"Buddy resting at home.")}
 function renderQuests(){document.getElementById("questCards").innerHTML=quests.map(q=>{const done=state.questsDone.includes(q.id);let progress=q.id==="portal"?state.worldsVisited.length>0:q.id==="star"?state.stars>=5:q.id==="friend"?state.emotes.length>0:state.lookSaved;return '<div class="card"><div class="art">'+(done?"🏆":"🗺️")+'</div><h3>'+q.title+'</h3><p>'+q.desc+'</p><p>Reward: '+q.reward+' coins</p><button class="btn '+(done?"neutral":progress?"mint":"purple")+'" onclick="claimQuest(\''+q.id+'\')">'+(done?"Completed":progress?"Claim Reward":"Try Quest")+'</button></div>'}).join("")}
