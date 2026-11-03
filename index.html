@@ -621,9 +621,10 @@ const requestedWorld=new URLSearchParams(window.location.search).get("world");if
  const messageEl=document.getElementById("dwAnnouncementMessage");
  const closeBtn=document.getElementById("dwAnnouncementClose");
  if(!popup||!messageEl||!closeBtn)return;
+ const dismissedKey="dreamworld_dismissed_announcement_v1";
  let lastSignature="",pollBusy=false,dismissedSignature="";
+ try{dismissedSignature=localStorage.getItem(dismissedKey)||"";}catch(_){}
  function closePopup(){popup.classList.remove("show");}
- closeBtn.addEventListener("click",closePopup);
  async function checkAnnouncement(){
   const token=localStorage.getItem("dreamworld_account_token");
   if(!token||pollBusy||document.visibilityState==="hidden")return;
@@ -636,20 +637,24 @@ const requestedWorld=new URLSearchParams(window.location.search).get("world");if
    const data=await response.json();
    const announcement=data&&data.announcement;
    const message=announcement&&typeof announcement.message==="string"?announcement.message.trim():"";
-   if(!message){lastSignature="";dismissedSignature="";closePopup();return;}
+   if(!message){lastSignature="";closePopup();return;}
    const signature=String(announcement.id||announcement.updatedAt||announcement.updated_at||"")+"|"+message;
    if(signature===lastSignature||signature===dismissedSignature)return;
    lastSignature=signature;
    messageEl.textContent=message;
    popup.classList.add("show");
-   closeBtn.onclick=()=>{dismissedSignature=signature;closePopup();};
+   closeBtn.onclick=()=>{
+    dismissedSignature=signature;
+    try{localStorage.setItem(dismissedKey,signature);}catch(_){}
+    closePopup();
+   };
   }catch(error){console.warn("Announcement check failed:",error);}
   finally{pollBusy=false;}
  }
  checkAnnouncement();
- const timer=setInterval(checkAnnouncement,2000);
+ setInterval(checkAnnouncement,2000);
  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")checkAnnouncement();});
  window.addEventListener("pageshow",checkAnnouncement);
-})();
+})();;
 </script><script src="./player-profile-sync.js"></script>
 </body></html>
