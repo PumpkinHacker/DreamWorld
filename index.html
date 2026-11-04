@@ -651,6 +651,7 @@ const requestedWorld=new URLSearchParams(window.location.search).get("world");if
    lastSignature=signature;
    messageEl.textContent=message;
    popup.classList.add("show");
+   closeBtn.focus({preventScroll:true});
    closeBtn.onclick=()=>{
     dismissedSignature=signature;
     try{localStorage.setItem(dismissedKey,signature);}catch(_){}
@@ -663,6 +664,7 @@ const requestedWorld=new URLSearchParams(window.location.search).get("world");if
  setInterval(checkAnnouncement,2000);
  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")checkAnnouncement();});
  window.addEventListener("pageshow",checkAnnouncement);
+ document.addEventListener("keydown",event=>{if(event.key==="Escape"&&popup.classList.contains("show"))closeBtn.click();});
 })();;
 </script><script src="./player-profile-sync.js"></script>
 
