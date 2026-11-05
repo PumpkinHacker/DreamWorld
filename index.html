@@ -334,6 +334,13 @@ body:before{content:"";background:radial-gradient(ellipse at 12% 14%,#d58a43 0 5
 .home-menu-panel{background:linear-gradient(145deg,#fffaf0,#f1dfc5)!important;border-color:#e2c39a!important}
 @media(prefers-reduced-motion:no-preference){.brand:after{content:"  🍂";font-size:.7em;vertical-align:middle}}
 </style>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="./dreamworld-icon.svg">
+<link rel="apple-touch-icon" href="./dreamworld-icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Dream World">
+<meta name="mobile-web-app-capable" content="yes">
 </head>
 <body>
 <div class="sky"><div class="cloud one"></div><div class="cloud two"></div><div class="orb"></div><div class="sparkles">✦ ✧ ✨</div></div>
@@ -841,5 +848,10 @@ const requestedWorld=new URLSearchParams(window.location.search).get("world");if
  document.addEventListener("gestureend",stopZoom,{passive:false});
  document.addEventListener("touchmove",function(e){if(e.touches&&e.touches.length>1)stopZoom(e);},{passive:false});
 })();
+</script>
+<script>
+if("serviceWorker" in navigator && location.protocol==="https:"){
+ window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js",{scope:"./"}).catch(error=>console.warn("Dream World offline install support:",error)));
+}
 </script>
 </body></html>
