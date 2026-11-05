@@ -575,7 +575,7 @@ function renderShop(){
  const categoryHost=document.getElementById("shopCategories"),cards=document.getElementById("shopCards");if(!categoryHost||!cards)return;
  categoryHost.innerHTML=cats.map(([label])=>'<button type="button" class="shop-category '+(activeShopCategory===label?"active":"")+'" aria-pressed="'+(activeShopCategory===label)+'" onclick="setShopCategory(\''+label+'\')">'+label+'</button>').join("");
  const items=[];
- if(activeShopCategory==="All"||activeShopCategory==="Accessories")accessories.filter(x=>!x.limited||[1,6].includes(Number(state.playerId))).forEach(x=>items.push({...x,type:"Accessory",art:vectorIconArt("accessory",x.id)}));
+ if(activeShopCategory==="All"||activeShopCategory==="Accessories")accessories.filter(x=>!legacyHalloweenIds.includes(x.id)&&(!x.limited||[1,6].includes(Number(state.playerId)))).forEach(x=>items.push({...x,type:"Accessory",art:vectorIconArt("accessory",x.id)}));
  if(activeShopCategory==="All"||activeShopCategory==="Shoes")shoes.filter(x=>!x.limited||[1,6].includes(Number(state.playerId))).forEach(x=>items.push({...x,type:"Shoes",art:vectorShoeArt(x.id)}));
  if(activeShopCategory==="All"||activeShopCategory==="Pets")pets.forEach(x=>items.push({...x,type:"Pet",art:petShopArt(x.id)}));
  if(activeShopCategory==="All"||activeShopCategory==="Dream House")houseDecorItems.forEach(x=>items.push({...x,type:"Home",art:houseDecorArt(x.id)}));
