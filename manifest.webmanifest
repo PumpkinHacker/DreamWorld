@@ -1,19 +1,3 @@
 {
-  "name": "Dream World",
-  "short_name": "Dream World",
-  "description": "An autumn world to explore, customize your character, and play.",
-  "start_url": "./?source=homescreen",
-  "scope": "./",
-  "display": "standalone",
-  "orientation": "any",
-  "background_color": "#f4dfc0",
-  "theme_color": "#a95f37",
-  "icons": [
-    {
-      "src": "./dreamworld-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
-  ]
+  "name":"Dream World","short_name":"Dream World","description":"Explore, customize your character, and play in Dream World.","start_url":"./?source=homescreen","scope":"./","display":"standalone","orientation":"any","background_color":"#f4dfc0","theme_color":"#a95f37","icons":[{"src":"./dreamworld-icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
 }
